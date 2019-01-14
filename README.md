@@ -1,5 +1,7 @@
 # hic-straw
 
+[![Build Status](https://travis-ci.org/igvteam/hic-straw.svg?branch=master)](https://travis-ci.org/igvteam/hic-straw)
+
 Command line and web utilities for reading .hic contact matrix files
 
 ## Installation
