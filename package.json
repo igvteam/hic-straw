@@ -1,0 +1,49 @@
+{
+  "name": "hic-straw",
+  "version": "0.1.0",
+  "description": "Utilities for reading .files (contact matrix files)",
+  "main": "src/index.js",
+  "directories": {
+    "example": "examples",
+    "src": "src",
+    "test": "test"
+  },
+  "dependencies": {
+    "babel-runtime": "^6.26.0",
+    "cross-fetch": "^3.0.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "6",
+    "babel-eslint": "^8.0.0",
+    "babel-loader": "^7.1.4",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.1.8",
+    "babel-preset-stage-2": "^6.18.0",
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",
+    "webpack": "^4.28.4"
+  },
+  "scripts": {
+    "build": "webpack",
+    "test": "mocha -u tdd"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/igvteam/hic-straw.git"
+  },
+  "keywords": [
+    "hic",
+    "contact-matrix",
+    "juicebox"
+  ],
+  "author": "Jim Robinson <igv-team@broadinstitute.org> (https://igv.org)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/igvteam/hic-straw/issues"
+  },
+  "bin": {
+    "straw": "src/cli.js"
+  },
+  "homepage": "https://github.com/igvteam/hic-straw#readme"
+}
