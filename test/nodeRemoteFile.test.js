@@ -24,7 +24,7 @@ suite('NodeRemoteFile', function () {
 
     test('test load', (done) => {
 
-        const path = "http://localhost/igv-web/test/data/misc/BufferedReaderTest.bin"
+        const path = "https://s3.amazonaws.com/igv.org.test/data/BufferedReaderTest.bin"
         const file = new NodeRemoteFile(path)
         file.read(range.start, range.size)
             .then(function (arrayBuffer) {

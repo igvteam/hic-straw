@@ -4,7 +4,12 @@ Command line and web utilities for reading .hic contact matrix files
 
 ## Installation
 
+Requires Node (https://nodejs.org)
+
+```
 npm install hic-straw
+```
+
 
 ## Examples
 
