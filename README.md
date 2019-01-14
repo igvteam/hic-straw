@@ -45,7 +45,7 @@ straw.getContactRecords(
 
 ```
 
-# In a web page
+### In a web page
 
 See examples/straw.html
 
