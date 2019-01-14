@@ -24,7 +24,7 @@ suite('NodeLocalFile', function () {
 
     test('test load', (done) => {
 
-        const path = "/Users/jrobinso/igv-team Dropbox/James Robinson/projects/hic-straw/test/data/BufferedReaderTest.bin"
+        const path = require.resolve("./data/BufferedReaderTest.bin")
         const file = new NodeLocalFile(path)
         file.read(range.start, range.size)
             .then(function (arrayBuffer) {
