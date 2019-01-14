@@ -3,14 +3,14 @@
 const Straw = require("../src/straw")
 
 
-const straw = new Straw({path: "../test/data/hic/HCT-116_Cohesin_Loss.hic"})
+const straw = new Straw({path: "../test/data/test_chr22.hic"})
 
 straw.getContactRecords(
     "KR",
-    {chr: "8", start: 50000000, end: 60000000},
-    {chr: "8", start: 50000000, end: 60000000},
+    {chr: "22", start: 50000000, end: 100000000},
+    {chr: "22", start: 50000000, end: 100000000},
     "BP",
-    1000000
+    100000
 )
     .then(function (contactRecords) {
         for (let record of contactRecords) {

@@ -27,14 +27,14 @@ suite('Straw', function () {
     test('local file meta data', async function () {
 
         const straw = new Straw({
-            "path": require.resolve("./data/HCT-116_Cohesin_Loss.hic")
+            "path": require.resolve("./data/test_chr22.hic")
         })
 
         const meta = await straw.getMetaData()
         assert.ok(meta)
         assert.equal(meta.version, 8)
         assert.equal(meta.genome, "hg19")
-        assert.equal(meta.chromosomes.length, 2)
+        assert.equal(meta.chromosomes.length, 26)
         assert.equal(meta.resolutions.length, 9)
 
     })
@@ -42,7 +42,7 @@ suite('Straw', function () {
     test('local file norm vector options', async function () {
 
         const straw = new Straw({
-            "path": require.resolve("./data/HCT-116_Cohesin_Loss.hic")
+            "path": require.resolve("./data/test_chr22.hic")
         })
 
         const normalizationOptions = await straw.getNormalizationOptions()
@@ -53,48 +53,47 @@ suite('Straw', function () {
     test('local file nvi', async function () {
 
         const straw = new Straw({
-            "path": require.resolve("./data/HCT-116_Cohesin_Loss.hic")
+            "path": require.resolve("./data/test_chr22.hic")
         })
 
         const nvi = await straw.getNVI()
-        assert.equal(nvi, "149107485,1463")
+        assert.equal(nvi, "1720269,751")
     })
 
     test('local file contact records', async function () {
 
         const straw = new Straw({
-            "path": require.resolve("./data/HCT-116_Cohesin_Loss.hic")
+            "path": require.resolve("./data/test_chr22.hic")
         })
 
         const contactRecords = await straw.getContactRecords(
             "KR",
-            {chr: "8", start: 50000000, end: 100000000},
-            {chr: "8", start: 50000000, end: 100000000},
+            {chr: "22", start: 50000000, end: 100000000},
+            {chr: "22", start: 50000000, end: 100000000},
             "BP",
             100000
         )
 
         assert.ok(contactRecords)
-        assert.equal(contactRecords.length, 187459)
+        assert.equal(contactRecords.length, 70)
     })
 
     test('local file contact records - with NVI', async function () {
 
         const straw = new Straw({
-            "path": require.resolve("./data/HCT-116_Cohesin_Loss.hic"),
-            "nvi": "149107485,1463"
+            "path": require.resolve("./data/test_chr22.hic"),
         })
 
         const contactRecords = await straw.getContactRecords(
             "KR",
-            {chr: "8", start: 50000000, end: 100000000},
-            {chr: "8", start: 50000000, end: 100000000},
+            {chr: "22", start: 50000000, end: 100000000},
+            {chr: "22", start: 50000000, end: 100000000},
             "BP",
             100000
         )
 
         assert.ok(contactRecords)
-        assert.equal(contactRecords.length, 187459)
+        assert.equal(contactRecords.length, 70)
     })
 })
 

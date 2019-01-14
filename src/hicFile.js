@@ -565,7 +565,6 @@ class HicFile {
                 return Promise.resolve(p0 + chunkSize);
             }
             else {
-                console.log(nEntries + "  " + chunkSize)
                 return parseNext(p0 + chunkSize, nEntries);
             }
         }

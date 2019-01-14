@@ -7,8 +7,7 @@ suite('HicFile', function () {
     test('local file read header', async function () {
 
         const hicFile = new HicFile({
-            "path": require.resolve("./data/HCT-116_Cohesin_Loss.hic"),
-            "loadFragData": false
+            "path": require.resolve("./data/test_chr22.hic"),
         })
 
         await hicFile.readHeader()
@@ -18,17 +17,17 @@ suite('HicFile', function () {
     test('local file read matrix', async function () {
 
         const hicFile = new HicFile({
-            "path": require.resolve("./data/HCT-116_Cohesin_Loss.hic"),
+            "path": require.resolve("./data/test_chr22.hic"),
         })
 
-        const matrix = await hicFile.readMatrix("8", "8")
+        const matrix = await hicFile.readMatrix("22", "22")
         assert.equal(hicFile.magic, "HIC")
     })
 
     test('local file read norm vector index', async function () {
 
         const hicFile = new HicFile({
-            "path": require.resolve("./data/HCT-116_Cohesin_Loss.hic"),
+            "path": require.resolve("./data/test_chr22.hic"),
         })
 
         const normVectorIndex = await hicFile.getNormVectorIndex()
@@ -41,15 +40,15 @@ suite('HicFile', function () {
     test('local file read norm vector', async function () {
 
         const hicFile = new HicFile({
-            "path": require.resolve("./data/HCT-116_Cohesin_Loss.hic"),
+            "path": require.resolve("./data/test_chr22.hic"),
         })
 
         const type = "KR"
-        const chr = "8"
+        const chr = "22"
         const unit = "BP"
-        const binSize = 250000
+        const binSize = 100000
         const normVector = await hicFile.getNormalizationVector(type, chr, unit, binSize)
-        assert.equal(normVector.data.length, 587)
+        assert.equal(normVector.data.length, 515)
         assert.ok(normVector)
 
     })

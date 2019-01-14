@@ -49,7 +49,7 @@ async function printContacts(args) {
     const region1 = args[2]
     const region2 = args[3]
     const units = args[4]
-    const resolution = parseInt(args[5])
+    const resolution = parseInt(args[5].replace(/(,)/g, ""))
     const contactRecords = await fetchContacts(normalization, filepath, region1, region2, units, resolution)
 
     for (record of contactRecords) {
@@ -79,16 +79,16 @@ function parseRegion(region) {
     } else if(t1.length === 2) {
         const t2 = t1[1].split("-")
         if(t2.length == 2) {
-            start = parseInt(t2[0])
-            end = parseInt(t2[1])
+            start = parseInt(t2[0].replace(/(,)/g, ""))
+            end = parseInt(t2[1].replace(/(,)/g, ""))
         } else {
             console.error("Unrecognized region: " + region)
             process.exit(1)
         }
     } else if (t1.length === 3) {
         // todo validate
-        start = parseInt(t1[1])
-        end = parseInt(t1[2])
+        start = parseInt(t1[1].replace(/(,)/g, ""))
+        end = parseInt(t1[2].replace(/(,)/g, ""))
     } else {
         console.error("Unrecognized region: " + region)
         process.exit(1)

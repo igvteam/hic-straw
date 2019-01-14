@@ -10,11 +10,11 @@ npm install hic-straw
 
 ### Command line
 
-* Extract cells between 50MB and 60MB on chromosome 8 at 1MB resolution with KR (balanced) normalization and print to stdout
+* Extract cells between 40MB and 50MB on chromosome 22 at 100KB resolution with KR (balanced) normalization and print to stdout
 
 ```bash
 
-straw KR test/data/hic/HCT-116_Cohesin_Loss.hic 8:50000000-60000000 8:50000000-60000000 BP 1000000
+straw KR test/data/test_chr22.hic 22:40,000,000-50,000,000 22:40,000,000-50,000,000 BP 100,000
 
 ```
 
@@ -25,15 +25,15 @@ See examples/script.js
 ```js
 const Straw = require("../src/straw")
 
-const straw = new Straw({path: "../test/data/hic/HCT-116_Cohesin_Loss.hic"})
+const straw = new Straw({path: "../test/data/test_chr22.hic"})
 
 straw.getContactRecords(
     "KR",
-    {chr: "8", start: 50000000, end: 60000000},
-    {chr: "8", start: 50000000, end: 60000000},
+    {chr: "22", start: 40000000, end: 50000000},
+    {chr: "22", start: 40000000, end: 50000000},
     "BP",
-    1000000
-)
+    100000
+    )
     .then(function (contactRecords) {
         for (let record of contactRecords) {
             console.log(record)
