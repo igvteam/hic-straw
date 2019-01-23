@@ -7,6 +7,7 @@ const MatrixZoomData = require("./matrixZoomData")
 const NormalizationVector = require("./normalizationVector")
 const ContactRecord = require("./contactRecord")
 
+
 class Block {
     constructor(blockNumber, zoomData, records) {
         this.blockNumber = blockNumber;
@@ -113,13 +114,19 @@ class HicFile {
             }
         }
 
-        // // Attempt to determine genomeId if not recognized
-        // if (!Object.keys(knownGenomes).includes(dataset.genomeId)) {
-        //     tmp = matchGenome(dataset.chromosomes);
-        //     if (tmp) dataset.genomeId = tmp;
-        // }
-        //
-        // return this;
+        // Build lookup table for well-known chr aliases
+        this.chrAliasTable = {}
+        for(let chrName of Object.keys(this.chromosomeIndexMap)) {
+
+            if(chrName.startsWith("chr")) {
+                this.chrAliasTable[chrName.substr(3)] = chrName
+            } else if(chrName === "MT") {
+                this.chrAliasTable["chrM"] = chrName
+            } else {
+                this.chrAliasTable["chr" + chrName] = chrName
+            }
+        }
+
 
         // Meta data for the API
         this.meta = {
@@ -193,8 +200,6 @@ class HicFile {
         this.normExpectedValueVectorsPosition = this.masterIndexPos + 4 + nBytes;
 
         return this;
-
-
     };
 
     async readMatrix(chr1, chr2) {
@@ -660,5 +665,6 @@ function parseMatixZoomData(chr1, chr2, chr1Sites, chr2Sites, dis) {
 function getNormalizationVectorKey(type, chrIdx, unit, resolution) {
     return type + "_" + chrIdx + "_" + unit + "_" + resolution;
 }
+
 
 module.exports = HicFile

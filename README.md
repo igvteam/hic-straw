@@ -17,12 +17,25 @@ npm install hic-straw
 
 ### Command line
 
-* Extract cells between 40MB and 50MB on chromosome 22 at 100KB resolution with KR (balanced) normalization and print to stdout
+* Get file metadata
+
+```bash
+straw --meta https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic
+```
+
+* Extract values from a local hic file between 40MB and 50MB on chromosome 22 at 100KB resolution with KR (balanced) normalization and 
+print to stdout
+
 
 ```bash
 
 straw KR test/data/test_chr22.hic 22:40,000,000-50,000,000 22:40,000,000-50,000,000 BP 100,000
 
+```
+* Extract values from a remote hic file by URL
+
+```bash
+straw KR https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic 8:48,700,000-48,900,000 8:48700000-48900000 BP 10,000
 ```
 
 ### In a script 
