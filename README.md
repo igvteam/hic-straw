@@ -47,7 +47,14 @@ const Straw = require("../src/straw")
 
 const straw = new Straw({path: "../test/data/test_chr22.hic"})
 
-straw.getContactRecords(
+// Get the normalization options as an array 
+straw.getNormalizationOptions()
+    .then(function (normOptions) {
+        
+    })
+
+// Get the contact records over a region
+const contacts = straw.getContactRecords(
     "KR",
     {chr: "22", start: 40000000, end: 50000000},
     {chr: "22", start: 40000000, end: 50000000},
@@ -62,6 +69,7 @@ straw.getContactRecords(
     .catch(function (error) {
         console.log(error)
     })
+    
 
 ```
 

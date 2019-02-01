@@ -8,11 +8,14 @@ const usageString = "Usage: $straw normalization hicfile region1 region2 units r
 
 const a = prepArgs(args)
 
-if (a.options.has("--meta") && a.options.size == 1 && a.positional.length === 1) {
+if (a.options.has("--meta") && a.positional.length === 1) {
 
     printMetaData(a.positional[0])
 
-} else if (a.positional.length >= 6 && !a.options.has("--meta")) {
+} else if (a.options.has("--nvi") && a.positional.length === 1) {
+    printNVI(a.positional[0])
+}
+else if (a.positional.length >= 6) {
 
     printContacts(a.positional)
 
@@ -34,6 +37,12 @@ function prepArgs(args) {
         }
     }
     return a
+}
+
+async function printNVI(filepath) {
+    const straw = new Straw({path: filepath})
+    const nvi = await straw.getNVI()
+    console.log('nvi=' + nvi)
 }
 
 async function printMetaData(filepath) {
@@ -76,9 +85,9 @@ function parseRegion(region) {
     if (t1.length === 0) {
         start = 0
         end = Number.MAX_VALUE
-    } else if(t1.length === 2) {
+    } else if (t1.length === 2) {
         const t2 = t1[1].split("-")
-        if(t2.length == 2) {
+        if (t2.length == 2) {
             start = parseInt(t2[0].replace(/(,)/g, ""))
             end = parseInt(t2[1].replace(/(,)/g, ""))
         } else {
