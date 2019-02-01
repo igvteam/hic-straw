@@ -76,8 +76,7 @@ See examples/straw.html
 ...
 
  const straw = new HicStraw({
-            "path": "https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic",
-            "nvi": "863389571,18679"
+            "path": "https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic"
         })
 
         straw.getContactRecords(
