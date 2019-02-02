@@ -12,6 +12,9 @@ if (a.options.has("--meta") && a.positional.length === 1) {
 
     printMetaData(a.positional[0])
 
+} else if (a.options.has("--norms") && a.positional.length === 1) {
+    printNormalization(a.positional[0])
+
 } else if (a.options.has("--nvi") && a.positional.length === 1) {
     printNVI(a.positional[0])
 }
@@ -43,6 +46,12 @@ async function printNVI(filepath) {
     const straw = new Straw({path: filepath})
     const nvi = await straw.getNVI()
     console.log('nvi=' + nvi)
+}
+
+async function printNormalization(filepath) {
+    const straw = new Straw({path: filepath})
+    const norms = await straw.getNormalizationOptions()
+    console.log(norms)
 }
 
 async function printMetaData(filepath) {

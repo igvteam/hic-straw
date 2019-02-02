@@ -17,22 +17,36 @@ npm install hic-straw
 
 ### Command line
 
-* Get file metadata
+* Extract file metadata.
+
+  * genome identifier
+  * sequences (chromosomes)
+  * bin sizes (resolutions)
 
 ```bash
-straw --meta https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic
+straw --meta test/data/test_chr22.hic 
 ```
 
-* Extract values from a local hic file between 40MB and 50MB on chromosome 22 at 100KB resolution with KR (balanced) normalization and 
-print to stdout
+* Extract normalization options.
 
+  * Array of normalization options
+
+```
+straw --norms test/data/test_chr22.hic 
+
+```  
+
+* Extract values from a local hic file between 40MB and 50MB on chromosome 22 at 100KB resolution with KR (balanced) normalization and 
+print to stdout.
+
+    * array of contact records {binX, binY, value}
 
 ```bash
 
 straw KR test/data/test_chr22.hic 22:40,000,000-50,000,000 22:40,000,000-50,000,000 BP 100,000
 
 ```
-* Extract values from a remote hic file by URL
+* Extract values from a remote hic file by URL.
 
 ```bash
 straw KR https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic 8:48,700,000-48,900,000 8:48700000-48900000 BP 10,000
@@ -47,14 +61,21 @@ const Straw = require("../src/straw")
 
 const straw = new Straw({path: "../test/data/test_chr22.hic"})
 
+// Get  metadata 
+straw.getMetaData()
+    .then(function (metaData) {
+        console.log(JSON.stringify(metaData, null, 2))
+    })
+
+
 // Get the normalization options as an array 
 straw.getNormalizationOptions()
     .then(function (normOptions) {
-        
+        console.log(normOptions)
     })
 
 // Get the contact records over a region
-const contacts = straw.getContactRecords(
+straw.getContactRecords(
     "KR",
     {chr: "22", start: 40000000, end: 50000000},
     {chr: "22", start: 40000000, end: 50000000},
