@@ -209,6 +209,9 @@ class HicFile {
 
         await this.init()
 
+        chr1 = this.getFileChrName(chr1)
+        chr2 = this.getFileChrName(chr2)
+
         // TODO -- handle aliases, and not found
         const idx1 = this.chromosomeIndexMap[chr1]
         const idx2 = this.chromosomeIndexMap[chr2]
@@ -648,6 +651,15 @@ class HicFile {
             this.normalizationTypes.push(type);
         }
         this.normVectorIndex[key] = {filePosition: filePosition, size: sizeInBytes};
+    }
+
+    getFileChrName(chrAlias) {
+        if (this.chrAliasTable.hasOwnProperty(chrAlias)) {
+            return this.chrAliasTable[chrAlias]
+        }
+        else {
+            return chrAlias
+        }
     }
 }
 

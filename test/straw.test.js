@@ -68,7 +68,7 @@ suite('Straw', function () {
 
         const contactRecords = await straw.getContactRecords(
             "KR",
-            {chr: "22", start: 50000000, end: 100000000},
+            {chr: "chr22", start: 50000000, end: 100000000},
             {chr: "22", start: 50000000, end: 100000000},
             "BP",
             100000

@@ -21,8 +21,8 @@ class Straw {
         try {
             await this.hicFile.init()
 
-            const chr1 = this.getFileChrName(region1.chr)
-            const chr2 = this.getFileChrName(region2.chr)
+            const chr1 = this.hicFile.getFileChrName(region1.chr)
+            const chr2 = this.hicFile.getFileChrName(region2.chr)
             const x1 = (region1.start === undefined) ? undefined : region1.start / binsize
             const x2 = (region1.end === undefined) ? undefined : region1.end / binsize
             const y1 = (region2.start === undefined) ? undefined : region2.start / binsize
