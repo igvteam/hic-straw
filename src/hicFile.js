@@ -2,7 +2,7 @@ const zlib = require('zlib')
 const fetch = require('cross-fetch')
 
 const NodeLocalFile = require("./io/nodeLocalFile")
-const NodeRemoteFile = require("./io/nodeRemoteFile")
+const RemoteFile = require("./io/remoteFile")
 const BinaryParser = require("./binary")
 const Matrix = require("./matrix")
 const MatrixZoomData = require("./matrixZoomData")
@@ -33,7 +33,7 @@ class HicFile {
         // if local file && if node
         if (this.path.startsWith("http://") || this.path.startsWith("https://")) {
             this.remote = true
-            this.file = new NodeRemoteFile(this.path)
+            this.file = new RemoteFile(this.path)
         } else {
             this.file = new NodeLocalFile(this.path)
         }

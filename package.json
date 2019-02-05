@@ -8,6 +8,7 @@
     "src/**"
   ],
   "dependencies": {
+    "browser-or-node": "^1.1.0",
     "cross-fetch": "^3.0.0"
   },
   "devDependencies": {
@@ -20,7 +21,8 @@
     "babel-preset-stage-2": "^6.18.0",
     "chai": "^4.2.0",
     "mocha": "^5.2.0",
-    "webpack": "^4.28.4"
+    "webpack": "^4.28.4",
+    "webpack-cli": "^3.2.3"
   },
   "scripts": {
     "build": "webpack",

@@ -1,6 +1,6 @@
 const {assert} = require('chai')
 
-const NodeRemoteFile = require("../src/io/nodeRemoteFile")
+const RemoteFile = require("../src/io/remoteFile")
 
 const range = {start: 25, size: 100};
 
@@ -25,7 +25,7 @@ suite('NodeRemoteFile', function () {
     test('test load', (done) => {
 
         const path = "https://s3.amazonaws.com/igv.org.test/data/BufferedReaderTest.bin"
-        const file = new NodeRemoteFile(path)
+        const file = new RemoteFile(path)
         file.read(range.start, range.size)
             .then(function (arrayBuffer) {
                 testRangeByte(arrayBuffer)

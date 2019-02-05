@@ -1,7 +1,7 @@
 const fetch = require('cross-fetch')
+const jsEnv = require('browser-or-node')
 
-
-class NodeRemoteFile {
+class RemoteFile {
 
     constructor(url) {
         this.url = url
@@ -12,9 +12,13 @@ class NodeRemoteFile {
 
         const rangeString = "bytes=" + position + "-" + (position + length - 1)
         const headers = {
-            'Range': rangeString,
-            'User-Agent': 'straw'
+            'Range': rangeString
         }
+
+        if(jsEnv.isNode) {
+            headers['User-Agent'] = 'straw'
+        }
+
         const response = await fetch(this.url, {
             method: 'GET',
             headers: headers,
@@ -34,8 +38,7 @@ class NodeRemoteFile {
             return await response.arrayBuffer();
         }
     }
-
-
 }
 
-module.exports = NodeRemoteFile
+
+module.exports = RemoteFile
