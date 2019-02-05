@@ -76,20 +76,4 @@ suite('HicFile', function () {
 
     })
 
-    test('remote file norm vector index', async function () {
-
-        const hicFile = new HicFile({
-            "path": "https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic"
-        })
-        const type = "KR"
-        const chr = "22"
-        const unit = "BP"
-        const binSize = 100000
-
-        const normVector = await hicFile.getNormalizationVector(type, chr, unit, binSize)
-        assert.equal(normVector.data.length, 515)
-        assert.ok(normVector)
-
-    })
-
 })
