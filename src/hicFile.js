@@ -118,17 +118,17 @@ class HicFile {
         }
 
         // Build lookup table for well-known chr aliases
-        this.chrAliasTable = {}
-        for(let chrName of Object.keys(this.chromosomeIndexMap)) {
+        // this.chrAliasTable = {}
+        // for(let chrName of Object.keys(this.chromosomeIndexMap)) {
 
-            if(chrName.startsWith("chr")) {
-                this.chrAliasTable[chrName.substr(3)] = chrName
-            } else if(chrName === "MT") {
-                this.chrAliasTable["chrM"] = chrName
-            } else {
-                this.chrAliasTable["chr" + chrName] = chrName
-            }
-        }
+        //     if(chrName.startsWith("chr")) {
+        //         this.chrAliasTable[chrName.substr(3)] = chrName
+        //     } else if(chrName === "MT") {
+        //         this.chrAliasTable["chrM"] = chrName
+        //     } else {
+        //         this.chrAliasTable["chr" + chrName] = chrName
+        //     }
+        // }
 
 
         // Meta data for the API

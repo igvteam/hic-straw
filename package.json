@@ -20,7 +20,8 @@
     "babel-preset-stage-2": "^6.18.0",
     "chai": "^4.2.0",
     "mocha": "^5.2.0",
-    "webpack": "^4.28.4"
+    "webpack": "^4.28.4",
+    "webpack-cli": "^3.2.1"
   },
   "scripts": {
     "build": "webpack",

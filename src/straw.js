@@ -118,13 +118,15 @@ class Straw {
         return this.hicFile.config.nvi;
     }
 
-    getFileChrName(chrAlias) {
-        if (this.hicFile.chrAliasTable.hasOwnProperty(chrAlias)) {
-            return this.hicFile.chrAliasTable[chrAlias]
+    getFileChrName(name) {
+        let found = this.hicFile.chromosomes.find(chromosome => chromosome.name === name);
+        if (found !== undefined) {
+            return found.name;
         }
-        else {
-            return chrAlias
-        }
+        let alias = name.replace("chrM", "MT");
+        alias = alias.replace("chr", "");
+        found = this.hicFile.chromosomes.find(chromosome => chromosome.name.toUpperCase() === alias.toUpperCase());
+        return found !== undefined ? found.name : name;
     }
 }
 
