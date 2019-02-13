@@ -95,6 +95,21 @@ suite('Straw', function () {
         assert.ok(contactRecords)
         assert.equal(contactRecords.length, 70)
     })
+
+    test('norm vectors', async function () {
+
+        const straw = new Straw({
+            "path": "https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic"
+        })
+
+        const getNormOptions = async () => {
+            const normOptions = await straw.getNormalizationOptions();
+            console.log(normOptions)
+        }
+
+        getNormOptions()
+
+    })
 })
 
 
