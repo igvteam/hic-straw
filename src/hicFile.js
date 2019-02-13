@@ -442,43 +442,41 @@ class HicFile {
         if (!this.normVectorIndex) {
 
             // If nvi is not supplied, try reading from remote lambda service
-            if(!this.config.nvi && this.remote) {
-                    const url = new URL(this.path)
-                    const key = encodeURIComponent(url.hostname + url.pathname)
-                    const nviResponse =  await fetch('https://t5dvc6kn3f.execute-api.us-east-1.amazonaws.com/dev/nvi/' + key)
-                    if(nviResponse.status === 200) {
-                        const nvi = await nviResponse.text()
-                        if(nvi) {
-                            this.config.nvi = nvi
-                        }
+            if (!this.config.nvi && this.remote) {
+                const url = new URL(this.path)
+                const key = encodeURIComponent(url.hostname + url.pathname)
+                const nviResponse = await fetch('https://t5dvc6kn3f.execute-api.us-east-1.amazonaws.com/dev/nvi/' + key)
+                if (nviResponse.status === 200) {
+                    const nvi = await nviResponse.text()
+                    if (nvi) {
+                        this.config.nvi = nvi
                     }
+                }
             }
 
             if (this.config.nvi) {
                 const nviArray = decodeURIComponent(this.config.nvi).split(",")
                 const range = {start: parseInt(nviArray[0]), size: parseInt(nviArray[1])};
                 await this.readNormVectorIndex(range)
-                return this.normVectorIndex
             }
             else {
-
-
                 try {
                     await this.readNormExpectedValuesAndNormVectorIndex()
                     return this.normVectorIndex
                 } catch (e) {
-                    if(e.code === "416" || e.code === 416) {
+                    if (e.code === "416" || e.code === 416) {
                         // This is expected if file does not contain norm vectors
                         this.normExpectedValueVectorsPosition = undefined
-                    }  else {
+                    } else {
                         console.error(e)
                     }
-                    return undefined
                 }
             }
         }
 
+        return this.normVectorIndex
     }
+
 
     /**
      * Return a promise to load the normalization vector index
