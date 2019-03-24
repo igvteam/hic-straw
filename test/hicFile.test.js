@@ -20,17 +20,7 @@ suite('HicFile', function () {
             "path": require.resolve("./data/test_chr22.hic"),
         })
 
-        const matrix = await hicFile.readMatrix("22", "22")
-        assert.ok(matrix)
-    })
-
-    test('local file read matrix -- alt chr name', async function () {
-
-        const hicFile = new HicFile({
-            "path": require.resolve("./data/test_chr22.hic"),
-        })
-
-        const matrix = await hicFile.readMatrix("chr22", "chr22")
+        const matrix = await hicFile.readMatrix(22, 22)
         assert.ok(matrix)
     })
 

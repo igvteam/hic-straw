@@ -4,26 +4,6 @@ const Straw = require('../src/straw')
 
 suite('Straw', function () {
 
-    test('remote file contact records', async function () {
-
-        this.timeout(60000);
-        const straw = new Straw({
-            "path": "https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic",
-            "nvi": "863389571,18679"
-        })
-
-        const contactRecords = await straw.getContactRecords(
-            "KR",
-            {chr: "8", start: 48700000, end: 48900000},
-            {chr: "8", start: 48700000, end: 48900000},
-            "BP",
-            10000
-        )
-
-        assert.equal(contactRecords.length, 341)
-
-    })
-
     test('local file meta data', async function () {
 
         const straw = new Straw({
@@ -96,6 +76,45 @@ suite('Straw', function () {
         assert.equal(contactRecords.length, 70)
     })
 
+    test('remote file contact records', async function () {
+
+        this.timeout(60000);
+        const straw = new Straw({
+            "path": "https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic",
+            "nvi": "863389571,18679"
+        })
+
+        const contactRecords = await straw.getContactRecords(
+            "KR",
+            {chr: "8", start: 48700000, end: 48900000},
+            {chr: "8", start: 48700000, end: 48900000},
+            "BP",
+            10000
+        )
+
+        assert.equal(contactRecords.length, 341)
+
+    })
+
+    test('Version 7 file', async function () {
+
+        this.timeout(60000);
+        const straw = new Straw({
+            "path": "https://data.broadinstitute.org/igvdata/test/data/hic/inter.hic"
+        })
+
+        const contactRecords = await straw.getContactRecords(
+            "NONE",
+            {chr: "1", start: 0, end: 1000000},
+            {chr: "1", start: 0, end: 1000000},
+            "BP",
+            250000
+        )
+
+        assert.ok (contactRecords.length > 0)
+
+    })
+
     test('norm vectors', async function () {
 
         const straw = new Straw({
@@ -111,6 +130,3 @@ suite('Straw', function () {
 
     })
 })
-
-
-//8:57,482,012-115,882,011 8:55,082,012-113,482,011

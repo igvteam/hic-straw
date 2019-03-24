@@ -6,32 +6,22 @@ const range = {start: 25, size: 100};
 
 suite('NodeRemoteFile', function () {
 
-    function testRangeByte(arrayBuffer) {
+    test('test read range', async function () {
 
+        const path = "https://s3.amazonaws.com/igv.org.test/data/BufferedReaderTest.bin"
+
+        const file = new RemoteFile({url: path})
+        const arrayBuffer = await file.read(range.start, range.size)
         assert.ok(arrayBuffer);
 
-        var i;
-        var dataView = new DataView(arrayBuffer);
+        const dataView = new DataView(arrayBuffer);
 
-        for (i = 0; i < range.size; i++) {
-
-            var expectedValue = -128 + range.start + i;
-            var value = dataView.getInt8(i);
+        for (let i = 0; i < range.size; i++) {
+            const expectedValue = -128 + range.start + i;
+            const value = dataView.getInt8(i);
             assert.equal(expectedValue, value);
 
         }
-    }
-
-    test('test load', (done) => {
-
-        const path = "https://s3.amazonaws.com/igv.org.test/data/BufferedReaderTest.bin"
-        const file = new RemoteFile(path)
-        file.read(range.start, range.size)
-            .then(function (arrayBuffer) {
-                testRangeByte(arrayBuffer)
-                done()
-            })
-
 
     })
 

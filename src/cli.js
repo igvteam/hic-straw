@@ -68,10 +68,14 @@ async function printContacts(args) {
     const region2 = args[3]
     const units = args[4]
     const resolution = parseInt(args[5].replace(/(,)/g, ""))
-    const contactRecords = await fetchContacts(normalization, filepath, region1, region2, units, resolution)
+    try {
+        const contactRecords = await fetchContacts(normalization, filepath, region1, region2, units, resolution)
 
-    for (record of contactRecords) {
-        console.log(record.bin1.toString() + "\t" + record.bin2.toString() + "\t" + record.counts.toString())
+        for (record of contactRecords) {
+            console.log(record.bin1.toString() + "\t" + record.bin2.toString() + "\t" + record.counts.toString())
+        }
+    } catch (e) {
+        console.error(e)
     }
 }
 

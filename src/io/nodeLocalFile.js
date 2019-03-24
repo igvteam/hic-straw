@@ -9,15 +9,15 @@ const fsReadFile = fs && util.promisify(fs.readFile)
 
 class NodeLocalFile {
 
-    constructor(source) {
-        this.filename = source
+    constructor(args) {
+        this.path = args.path
     }
 
 
     async read(position, length) {
 
         const buffer = Buffer.alloc(length)
-        const fd = await fsOpen(this.filename, 'r')
+        const fd = await fsOpen(this.path, 'r')
         const result = await fsRead(fd, buffer, 0, length, position)
 
        fs.close(fd, function (error) {
