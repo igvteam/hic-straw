@@ -9,12 +9,14 @@ const MatrixZoomData = require("./matrixZoomData")
 const NormalizationVector = require("./normalizationVector")
 const ContactRecord = require("./contactRecord")
 
+const Short_MIN_VALUE = -32768;
 
 class Block {
-    constructor(blockNumber, zoomData, records) {
+    constructor(blockNumber, zoomData, records, idx) {
         this.blockNumber = blockNumber;
         this.zoomData = zoomData;
         this.records = records;
+        this.idx = idx
     }
 }
 
@@ -23,19 +25,25 @@ class HicFile {
     constructor(args) {
 
         this.config = args
-        this.path = args.path
+
         this.loadFragData = args.loadFragData
 
         this.fragmentSitesCache = {}
         this.normVectorCache = {}
         this.normalizationTypes = ['NONE'];
 
-        // if local file && if node
-        if (this.path.startsWith("http://") || this.path.startsWith("https://")) {
-            this.remote = true
-            this.file = new RemoteFile(this.path)
-        } else {
-            this.file = new NodeLocalFile(this.path)
+        // args may specify an io.File objec, a local path (Node only), or a url
+        if (args.file) {
+            this.file = args.file
+        }
+        else {
+            this.path = args.path || args.url
+            if (this.path.startsWith("http://") || this.path.startsWith("https://")) {
+                this.remote = true
+                this.file = new RemoteFile(args)
+            } else {
+                this.file = new NodeLocalFile(args)
+            }
         }
     };
 
@@ -119,11 +127,11 @@ class HicFile {
 
         // Build lookup table for well-known chr aliases
         this.chrAliasTable = {}
-        for(let chrName of Object.keys(this.chromosomeIndexMap)) {
+        for (let chrName of Object.keys(this.chromosomeIndexMap)) {
 
-            if(chrName.startsWith("chr")) {
+            if (chrName.startsWith("chr")) {
                 this.chrAliasTable[chrName.substr(3)] = chrName
-            } else if(chrName === "MT") {
+            } else if (chrName === "MT") {
                 this.chrAliasTable["chrM"] = chrName
             } else {
                 this.chrAliasTable["chr" + chrName] = chrName
@@ -144,38 +152,33 @@ class HicFile {
 
     async readFooter() {
 
-        let range = {start: this.masterIndexPos, size: 4};
-        let data = await this.file.read(range.start, range.size)
 
+        let data = await this.file.read(this.masterIndexPos, 8)
         if (!data) {
             return null;
         }
 
-        let binaryParser = new BinaryParser(new DataView(data));
-        const nBytes = binaryParser.getInt();
-        range = {start: this.masterIndexPos + 4, size: nBytes};
+        let binaryParser = new BinaryParser(new DataView(data))
+        const nBytes = binaryParser.getInt()   // Total size, master index + expected values
+        let nEntries = binaryParser.getInt()
 
-        data = await this.file.read(range.start, range.size)
-
-
-        if (!data) {
-            return undefined;
-        }
-
+        // Estimate the size of the master index. String length of key is unknown, be conservative (100 bytes)
+        const miSize = nEntries * (100 + 64 + 32)
+        let range = {start: this.masterIndexPos + 8, size: Math.min(miSize, nBytes - 4)}
+        data = await this.file.read(this.masterIndexPos + 8, Math.min(miSize, nBytes - 4))
         binaryParser = new BinaryParser(new DataView(data));
-        this.masterIndex = {};
-        let nEntries = binaryParser.getInt();
 
+        this.masterIndex = {}
         while (nEntries-- > 0) {
-            const key = binaryParser.getString();
-            const pos = binaryParser.getLong();
-            const size = binaryParser.getInt();
-            this.masterIndex[key] = {start: pos, size: size};
+            const key = binaryParser.getString()
+            const pos = binaryParser.getLong()
+            const size = binaryParser.getInt()
+            this.masterIndex[key] = {start: pos, size: size}
         }
 
-        this.expectedValueVectors = {};
+        this.expectedValueVectors = {}
 
-        nEntries = binaryParser.getInt();
+        nEntries = binaryParser.getInt()
 
         // Expected values
         // while (nEntries-- > 0) {
@@ -205,17 +208,17 @@ class HicFile {
         return this;
     };
 
-    async readMatrix(chr1, chr2) {
+    async readMatrix(chrIdx1, chrIdx2) {
 
         await this.init()
 
-        chr1 = this.getFileChrName(chr1)
-        chr2 = this.getFileChrName(chr2)
+        if (chrIdx1 > chrIdx2) {
+            const tmp = chrIdx1
+            chrIdx1 = chrIdx2
+            chrIdx2 = tmp
+        }
 
-        // TODO -- handle aliases, and not found
-        const idx1 = this.chromosomeIndexMap[chr1]
-        const idx2 = this.chromosomeIndexMap[chr2]
-        const key = "" + idx1 + "_" + idx2
+        const key = "" + chrIdx1 + "_" + chrIdx2
 
         const idx = this.masterIndex[key]
         if (!idx) {
@@ -228,32 +231,62 @@ class HicFile {
         }
 
         const dis = new BinaryParser(new DataView(data));
-        const c1 = dis.getInt();
-        const c2 = dis.getInt();
+        const c1 = dis.getInt();     // Should equal chrIdx1
+        const c2 = dis.getInt();     // Should equal chrIdx2
 
         // TODO validate this
-        //const chr1 = this.chromosomes[c1];
-        //const chr2 = this.chromosomes[c2];
+        const chr1 = this.chromosomes[c1];
+        const chr2 = this.chromosomes[c2];
 
         // # of resolution levels (bp and frags)
         let nResolutions = dis.getInt();
         const zdList = [];
-        const p1 = this.getSites.call(this, chr1.name);
-        const p2 = this.getSites.call(this, chr2.name);
 
-        return Promise.all([p1, p2])
+        const sites1 = await this.getSites.call(this, chr1.name)
+        const sites2 = await this.getSites.call(this, chr2.name)
 
-            .then(function (results) {
-                const sites1 = results[0];
-                const sites2 = results[1];
+        let bytesAvailable = dis.available()
+        let z = 0
+        let filePosition = idx.start
+        while (nResolutions-- > 0) {
 
-                while (nResolutions-- > 0) {
-                    const zd = parseMatixZoomData(chr1, chr2, sites1, sites2, dis);
-                    zdList.push(zd);
-                }
-                return new Matrix(c1, c2, zdList);
+            const zd = parseMatixZoomData(chr1, chr2, sites1, sites2, dis);
+            const bytesUsed = bytesAvailable - dis.available()
+            zd.idx = {
+                start: filePosition,
+                size: bytesUsed
+            }
+            bytesAvailable = dis.available()
+            zdList.push(zd);
+            //console.log(`zd${z++}: ${bytesUsed}`)
+        }
+        return new Matrix(chrIdx1, chrIdx2, zdList);
 
-            })
+    }
+
+    /***
+     * Return the raw data for the block.  Function provided for testing and development
+     * @param blockNumber
+     * @param zd
+     * @returns {Promise<void>}
+     */
+    async readBlockData(blockNumber, zd) {
+
+        var self = this,
+            idx = null,
+            i, j;
+
+        var blockIndex = zd.blockIndexMap;
+        if (blockIndex) {
+            var idx = blockIndex[blockNumber];
+        }
+        if (!idx) {
+            return undefined
+        }
+        else {
+
+            return this.file.read(idx.filePosition, idx.size)
+        }
     }
 
     async readBlock(blockNumber, zd) {
@@ -267,7 +300,7 @@ class HicFile {
             var idx = blockIndex[blockNumber];
         }
         if (!idx) {
-            undefined
+            return undefined
         }
         else {
 
@@ -349,7 +382,7 @@ class HicFile {
 
             }
 
-            return new Block(blockNumber, zd, records);
+            return new Block(blockNumber, zd, records, idx);
 
 
         }
@@ -387,11 +420,18 @@ class HicFile {
 
     }
 
-    async getNormalizationVector(type, chrName, unit, binSize) {
+    async getNormalizationVector(type, chr, unit, binSize) {
 
         await this.init()
 
-        const chrIdx = this.chromosomeIndexMap[chrName]
+        let chrIdx
+        if (Number.isInteger(chr)) {
+            chrIdx = chr
+        } else {
+            const canonicalName = this.getFileChrName(chr)
+            chrIdx = this.chromosomeIndexMap[canonicalName]
+        }
+
 
         const key = getNormalizationVectorKey(type, chrIdx, unit.toString(), binSize);
 
@@ -401,7 +441,7 @@ class HicFile {
 
         const normVectorIndex = await this.getNormVectorIndex()
 
-        if(!normVectorIndex) {
+        if (!normVectorIndex) {
             console.log("Normalization vectors not present in this file")
             return undefined
         }
@@ -442,7 +482,7 @@ class HicFile {
         if (!this.normVectorIndex) {
 
             // If nvi is not supplied, try reading from remote lambda service
-            if (!this.config.nvi && this.remote) {
+            if (!this.config.nvi && this.remote && this.path) {
                 const url = new URL(this.path)
                 const key = encodeURIComponent(url.hostname + url.pathname)
                 const nviResponse = await fetch('https://t5dvc6kn3f.execute-api.us-east-1.amazonaws.com/dev/nvi/' + key)
@@ -477,6 +517,12 @@ class HicFile {
         return this.normVectorIndex
     }
 
+    async getNormalizationOptions() {
+        // Normalization options are computed as a side effect of loading the index.  A bit
+        // ugly but alternatives are worse.
+        await this.getNormVectorIndex()
+        return this.normalizationTypes;
+    }
 
     /**
      * Return a promise to load the normalization vector index
