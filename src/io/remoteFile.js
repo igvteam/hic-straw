@@ -16,6 +16,7 @@ class RemoteFile {
         const rangeString = "bytes=" + position + "-" + (position + length - 1)
         headers['Range'] = rangeString
 
+        let url = this.url
         if(jsEnv.isNode) {
             headers['User-Agent'] = 'straw'
         } else {
@@ -27,14 +28,15 @@ class RemoteFile {
 
             const isChrome = navigator.userAgent.indexOf('Chrome') > -1
             const isAmazonV4Signed = this.url.indexOf("X-Amz-Signature") > -1
+
             if (isChrome && !isAmazonV4Signed) {
                 // Hack to prevent caching for byte-ranges. Attempt to fix net:err-cache errors in Chrome
-                this.url += this.url.includes("?") ? "&" : "?";
-                this.url += "someRandomSeed=" + Math.random().toString(36);
+                url += this.url.includes("?") ? "&" : "?";
+                url += "someRandomSeed=" + Math.random().toString(36);
             }
         }
 
-        const response = await fetch(this.url, {
+        const response = await fetch(url, {
             method: 'GET',
             headers: headers,
             redirect: 'follow',
