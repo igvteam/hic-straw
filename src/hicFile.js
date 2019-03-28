@@ -3,6 +3,7 @@ const fetch = require('cross-fetch')
 
 const NodeLocalFile = require("./io/nodeLocalFile")
 const RemoteFile = require("./io/remoteFile")
+const BufferedFile = require("./io/bufferedFile")
 const BinaryParser = require("./binary")
 const Matrix = require("./matrix")
 const MatrixZoomData = require("./matrixZoomData")
@@ -497,7 +498,7 @@ class HicFile {
             if (this.config.nvi) {
                 const nviArray = decodeURIComponent(this.config.nvi).split(",")
                 const range = {start: parseInt(nviArray[0]), size: parseInt(nviArray[1])};
-                await this.readNormVectorIndex(range)
+                return this.readNormVectorIndex(range)
             }
             else {
                 try {
@@ -580,6 +581,7 @@ class HicFile {
         this.normalizedExpectedValueVectors = {};
         this.normVectorIndex = {};
 
+        // Recursively process entries
         await processEntries.call(this, nEntries, data)
 
         this.config.nvi = nviStart.toString() + "," + byteCount
@@ -617,9 +619,9 @@ class HicFile {
      */
     async skipExpectedValues(start) {
 
-        const file = this.file
+        const file = new BufferedFile({file: this.file, size: 256000})
         const range = {start: start, size: 4};
-        const data = await this.file.read(range.start, range.size)
+        const data = await file.read(range.start, range.size)
         const binaryParser = new BinaryParser(new DataView(data));
         const nEntries = binaryParser.getInt();   // Total # of expected value chunks
         if (nEntries === 0) {

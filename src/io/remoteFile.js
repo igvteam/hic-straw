@@ -16,7 +16,7 @@ class RemoteFile {
         const rangeString = "bytes=" + position + "-" + (position + length - 1)
         headers['Range'] = rangeString
 
-        let url = this.url
+        let url = this.url.slice()    // slice => copy
         if(jsEnv.isNode) {
             headers['User-Agent'] = 'straw'
         } else {

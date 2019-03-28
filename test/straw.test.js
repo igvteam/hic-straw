@@ -129,4 +129,20 @@ suite('Straw', function () {
         getNormOptions()
 
     })
+
+    test('norm vectors - no NVI', async function () {
+
+        this.timeout(60000);
+        const straw = new Straw({
+            "path": "https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined_30.hic"
+        })
+
+        const getNormOptions = async () => {
+            const normOptions = await straw.getNormalizationOptions();
+            console.log(normOptions)
+        }
+
+        getNormOptions()
+
+    })
 })

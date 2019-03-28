@@ -1,6 +1,6 @@
 {
   "name": "hic-straw",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Utilities for reading .files (contact matrix files)",
   "main": "src/index.js",
   "files": [
@@ -21,6 +21,7 @@
     "babel-preset-stage-2": "^6.18.0",
     "chai": "^4.2.0",
     "mocha": "^5.2.0",
+    "nyc": "^13.3.0",
     "webpack": "^4.28.4",
     "webpack-cli": "^3.2.3"
   },
