@@ -14,11 +14,11 @@ suite('BufferedFile', function () {
         const file = new BufferedFile({file: new LocalFile({path: path}), size: 50})
 
         let nTests = 10000
-        while(nTests-- > 0) {
+        while (nTests-- > 0) {
 
             const start = Math.floor(Math.random() * 256)
-            let length =  Math.floor(Math.random() * 100)
-            if(length === 0) continue
+            let length = Math.floor(Math.random() * 100)
+            if (length === 0) continue
 
             const arrayBuffer = await file.read(start, length)
             assert.ok(arrayBuffer);
@@ -42,18 +42,58 @@ suite('BufferedFile', function () {
 
         const path = "https://s3.amazonaws.com/igv.org.test/data/BufferedReaderTest.bin"
 
-        const file = new BufferedFile({file: new RemoteFile({url: path}), size: 50})
+        const file = new BufferedFile({file: new RemoteFile({url: path}), size: 51})
 
-        let nTests = 50
-        while(nTests-- > 0) {
+        // Request > than buffer size
+        let start = 10
+        let length = 100
+        let arrayBuffer = await file.read(start, length)
+        assert.ok(arrayBuffer);
+        testBuffer(arrayBuffer, length, start)
 
-            const start = Math.floor(Math.random() * 256)
-            let length =  Math.floor(Math.random() * 100)
-            if(length === 0) continue
+        // Create buffer from 100 -> 150
+        start = 100
+        length = 50
+        arrayBuffer = await file.read(start, length)
+        assert.ok(arrayBuffer);
+        testBuffer(arrayBuffer, length, start)
 
-            const arrayBuffer = await file.read(start, length)
-            assert.ok(arrayBuffer);
+        // Within buffer
+        start = 110
+        length = 30
+        arrayBuffer = await file.read(start, length)
+        assert.ok(arrayBuffer);
+        testBuffer(arrayBuffer, length, start)
 
+        // Left overlap
+        start = 90
+        length = 30
+        arrayBuffer = await file.read(start, length)
+        assert.ok(arrayBuffer);
+        testBuffer(arrayBuffer, length, start)
+
+        // Right overlap
+        start = 140
+        length = 30
+        arrayBuffer = await file.read(start, length)
+        assert.ok(arrayBuffer);
+        testBuffer(arrayBuffer, length, start)
+
+        // Outside of buffer
+        start = 205
+        length = 50
+        arrayBuffer = await file.read(start, length)
+        assert.ok(arrayBuffer);
+        testBuffer(arrayBuffer, length, start)
+
+        // Past end of file
+        start = 240
+        length = 50
+        arrayBuffer = await file.read(start, length)
+        assert.ok(arrayBuffer);
+        testBuffer(arrayBuffer, length, start)
+
+        function testBuffer(arrayBuffer, length, start) {
             const dataView = new DataView(arrayBuffer);
 
             // Only test to end of file
@@ -65,6 +105,7 @@ suite('BufferedFile', function () {
 
             }
         }
+
     })
 
 })

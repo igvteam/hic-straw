@@ -20,6 +20,7 @@ class BufferedFile {
 
         if (length > this.size) {
             // Request larger than max buffer size,  pass through to underlying file
+            //console.log("0")
             this.buffer = undefined
             this.bufferStart = 0
             this.bufferLength = 0
@@ -28,6 +29,7 @@ class BufferedFile {
 
         if (start >= bufferStart && end <= bufferEnd) {
             // Request within buffer bounds
+            //console.log("1")
             const sliceStart = start - bufferStart
             const sliceEnd = sliceStart + length
             return this.buffer.slice(sliceStart, sliceEnd)
@@ -35,6 +37,7 @@ class BufferedFile {
 
         else if (start < bufferStart && end > bufferStart) {
             // Overlap left, here for completness but this is an unexpected case in straw.  We don't adjust the buffer.
+            //console.log("2")
             const l1 = bufferStart - start
             const a1 = await this.file.read(position, l1)
             const l2 = length - l1
@@ -50,17 +53,28 @@ class BufferedFile {
 
         else if (start < bufferEnd && end > bufferEnd) {
             // Overlap right
+            // console.log("3")
             const l1 = bufferEnd - start
             const sliceStart = this.bufferLength - l1
             const a1 = this.buffer.slice(sliceStart, this.bufferLength)
 
             const l2 = length - l1
             if (l2 > 0) {
-                this.buffer = await this.file.read(bufferEnd, this.size)
-                this.bufferStart = bufferEnd
-                this.bufferLength = this.buffer.byteLength
-                const a2 = this.buffer.slice(0, l2)
-                return concatBuffers(a1, a2)
+                try {
+                    this.buffer = await this.file.read(bufferEnd, this.size)
+                    this.bufferStart = bufferEnd
+                    this.bufferLength = this.buffer.byteLength
+                    const a2 = this.buffer.slice(0, l2)
+                    return concatBuffers(a1, a2)
+                } catch (e) {
+                    // A "unsatisfiable range" error is expected here if we overlap past the end of file
+                    if (e.code && e.code === 416) {
+                        return a1
+                    }
+                    else {
+                        throw e
+                    }
+                }
 
             } else {
                 return a1
@@ -70,6 +84,7 @@ class BufferedFile {
 
         else {
             // No overlap with buffer
+            // console.log("4")
             this.buffer = await this.file.read(position, this.size)
             this.bufferStart = position
             this.bufferLength = this.buffer.byteLength
