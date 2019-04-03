@@ -1,6 +1,7 @@
 const zlib = require('zlib')
 const fetch = require('cross-fetch')
 
+const BrowserLocalFile = require("./io/browserLocalFile")
 const NodeLocalFile = require("./io/nodeLocalFile")
 const RemoteFile = require("./io/remoteFile")
 const BufferedFile = require("./io/bufferedFile")
@@ -36,6 +37,8 @@ class HicFile {
         // args may specify an io.File objec, a local path (Node only), or a url
         if (args.file) {
             this.file = args.file
+        } else if (args.blob) {
+            this.file = new BrowserLocalFile(args.blob)
         }
         else {
             this.path = args.path || args.url
