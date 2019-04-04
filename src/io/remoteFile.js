@@ -77,9 +77,6 @@ function mapUrl(url) {
 
     if (url.includes("//www.dropbox.com")) {
         return url.replace("//www.dropbox.com", "//dl.dropboxusercontent.com");
-    }
-    else if (url.includes("//drive.google.com")) {
-        return driveDownloadURL(url);
     } else {
         return url
     }
