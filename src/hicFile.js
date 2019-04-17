@@ -4,6 +4,8 @@ const fetch = require('cross-fetch')
 const BrowserLocalFile = require("./io/browserLocalFile")
 const NodeLocalFile = require("./io/nodeLocalFile")
 const RemoteFile = require("./io/remoteFile")
+const ThrottledFile = require("./io/throttledFile")
+const RateLimiter = require("./io/rateLimiter")
 const BufferedFile = require("./io/bufferedFile")
 const BinaryParser = require("./binary")
 const Matrix = require("./matrix")
@@ -12,6 +14,8 @@ const NormalizationVector = require("./normalizationVector")
 const ContactRecord = require("./contactRecord")
 
 const Short_MIN_VALUE = -32768;
+
+const googleRateLimiter = new RateLimiter(100)
 
 class Block {
     constructor(blockNumber, zoomData, records, idx) {
@@ -42,9 +46,18 @@ class HicFile {
         }
         else {
             this.path = args.path || args.url
+
             if (this.path.startsWith("http://") || this.path.startsWith("https://")) {
                 this.remote = true
-                this.file = new RemoteFile(args)
+
+                // Google drive must be rate limited.  Perhaps all
+                const remoteFile = new RemoteFile(args)
+                if(isGoogle(this.path)) {
+                    this.file = new ThrottledFile(remoteFile, googleRateLimiter)
+                } else {
+                    this.file = remoteFile
+                }
+
             } else {
                 this.file = new NodeLocalFile(args)
             }
@@ -763,6 +776,10 @@ function parseMatixZoomData(chr1, chr2, chr1Sites, chr2Sites, dis) {
 
 function getNormalizationVectorKey(type, chrIdx, unit, resolution) {
     return type + "_" + chrIdx + "_" + unit + "_" + resolution;
+}
+
+function isGoogle(url) {
+    return url.indexOf("drive.google.com") >= 0 || url.indexOf("www.googleapis.com") > 0
 }
 
 
