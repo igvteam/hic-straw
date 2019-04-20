@@ -43,8 +43,7 @@ class HicFile {
             this.file = args.file
         } else if (args.blob) {
             this.file = new BrowserLocalFile(args.blob)
-        }
-        else {
+        }  else {
             this.path = args.path || args.url
 
             if (this.path.startsWith("http://") || this.path.startsWith("https://")) {
