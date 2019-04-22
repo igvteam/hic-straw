@@ -123,7 +123,7 @@ suite('Straw', function () {
 
         const getNormOptions = async () => {
             const normOptions = await straw.getNormalizationOptions();
-            console.log(normOptions)
+            assert.equal(normOptions.length, 4)
         }
 
         getNormOptions()
@@ -139,7 +139,7 @@ suite('Straw', function () {
 
         const getNormOptions = async () => {
             const normOptions = await straw.getNormalizationOptions();
-            console.log(normOptions)
+            assert.equal(normOptions.length, 8)
         }
 
         getNormOptions()
