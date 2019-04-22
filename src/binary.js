@@ -1,6 +1,6 @@
 // TODO -- big endian
 
-BinaryParser = function (dataView, littleEndian) {
+const BinaryParser = function (dataView, littleEndian) {
 
     this.littleEndian = littleEndian !== undefined ? littleEndian : true
     this.position = 0;

@@ -1,4 +1,4 @@
-BrowserLocalFile = class {
+class BrowserLocalFile {
 
     constructor(blob) {
         this.file = blob

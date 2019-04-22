@@ -20,13 +20,14 @@
     "babel-preset-env": "^1.1.8",
     "babel-preset-stage-2": "^6.18.0",
     "chai": "^4.2.0",
+    "concat": "^1.0.3",
     "mocha": "^5.2.0",
     "nyc": "^13.3.0",
     "webpack": "^4.28.4",
     "webpack-cli": "^3.2.3"
   },
   "scripts": {
-    "build": "webpack",
+    "build": "webpack; node wrapper/build.js",
     "test": "mocha -u tdd"
   },
   "repository": {

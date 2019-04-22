@@ -53,7 +53,7 @@ class RemoteFile {
             throw err
         }
         else {
-            return await response.arrayBuffer();
+            return response.arrayBuffer();
         }
 
         /**
