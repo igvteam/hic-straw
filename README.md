@@ -98,11 +98,11 @@ straw.getContactRecords(
 
 ### In a web page
 
-Script tag - examples/straw.html
+Script tag - see examples/straw.html
 
 ```html
 
-<script src="../dist/hic-straw.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hic-straw@0.9.3/dist/hic-straw.js"></script>
 
 ...
 
@@ -122,26 +122,27 @@ Script tag - examples/straw.html
 ```
       
 
-ES6 module - examples/straw-es6.html
+ES6 module - see examples/straw-es6.html
 
-```html
+```js
 
-<script src="../dist/hic-straw.js"></script>
 
-...
+    import HicStraw from '../dist/hic-straw_es6.js'
 
- const straw = new HicStraw({
-            "url": "https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic"
-        })
+    const straw = new HicStraw({
+        "path": "https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic"
+    })
 
-        straw.getContactRecords(
-            "KR",
-            {chr: "8",start: 50000000, end: 60000000},
-            {chr: "8",start: 50000000, end: 60000000},
-            "BP",
-            1000000
-        )
-            .then(function (contactRecords) {...})
+    straw.getContactRecords(
+        "KR",
+        {chr: "8",start: 50000000, end: 60000000},
+        {chr: "8",start: 50000000, end: 60000000},
+        "BP",
+        1000000
+     )
+        .then(function (contactRecords) {...})
+
+
 
 ```
       
