@@ -8,9 +8,9 @@ suite('NodeRemoteFile', function () {
 
     test('test read range', async function () {
 
-        const path = "https://s3.amazonaws.com/igv.org.test/data/BufferedReaderTest.bin"
+        const url = "https://s3.amazonaws.com/igv.org.test/data/BufferedReaderTest.bin"
 
-        const file = new RemoteFile({url: path})
+        const file = new RemoteFile({url: url})
         const arrayBuffer = await file.read(range.start, range.size)
         assert.ok(arrayBuffer);
 

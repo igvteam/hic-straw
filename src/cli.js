@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const Straw = require("./straw")
+const NodeLocalFile = require("./io/nodeLocalFile")
 
 const [, , ...args] = process.argv
 
@@ -43,19 +44,22 @@ function prepArgs(args) {
 }
 
 async function printNVI(filepath) {
-    const straw = new Straw({path: filepath})
+    const file = new NodeLocalFile({path: filepath})
+    const straw = new Straw({file: file})
     const nvi = await straw.getNVI()
     console.log('nvi=' + nvi)
 }
 
 async function printNormalization(filepath) {
-    const straw = new Straw({path: filepath})
+    const file = new NodeLocalFile({path: filepath})
+    const straw = new Straw({file: file})
     const norms = await straw.getNormalizationOptions()
     console.log(norms)
 }
 
 async function printMetaData(filepath) {
-    const straw = new Straw({path: filepath})
+    const file = new NodeLocalFile({path: filepath})
+    const straw = new Straw({file: file})
     const meta = await straw.getMetaData()
     console.log(JSON.stringify(meta, null, 2))
 }
@@ -83,7 +87,8 @@ async function fetchContacts(normalization, filepath, region1, region2, units, r
 
     const r1 = parseRegion(region1)
     const r2 = parseRegion(region2)
-    const straw = new Straw({path: filepath})
+    const file = new NodeLocalFile({path: filepath})
+    const straw = new Straw({file: file})
     return straw.getContactRecords(normalization, r1, r2, units, resolution)
 
 }

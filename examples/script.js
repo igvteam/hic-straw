@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
 const Straw = require("../src/straw")
+const NodeLocalFile = require("../src/io/nodeLocalFile")
 
-const straw = new Straw({path: "../test/data/test_chr22.hic"})
+const file = new NodeLocalFile({path: "../test/data/test_chr22.hic"})
+const straw = new Straw({file: file})
 
 // Get  metadata
 straw.getMetaData()

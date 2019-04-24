@@ -58,8 +58,10 @@ See examples/script.js
 
 ```js
 const Straw = require("../src/straw")
+const NodeLocalFile = require("../src/io/nodeLocalFile")
 
-const straw = new Straw({path: "../test/data/test_chr22.hic"})
+const file = new NodeLocalFile({path: "../test/data/test_chr22.hic"})
+const straw = new Straw({file: file})
 
 // Get  metadata 
 straw.getMetaData()
@@ -105,7 +107,7 @@ Script tag - examples/straw.html
 ...
 
  const straw = new HicStraw({
-            "path": "https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic"
+            "url": "https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic"
         })
 
         straw.getContactRecords(
@@ -129,7 +131,7 @@ ES6 module - examples/straw-es6.html
 ...
 
  const straw = new HicStraw({
-            "path": "https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic"
+            "url": "https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic"
         })
 
         straw.getContactRecords(

@@ -1,14 +1,16 @@
 const {assert} = require('chai')
 
 const Straw = require('../src/straw')
+const NodeLocalFile = require('../src/io/nodeLocalFile')
 
 suite('Straw', function () {
 
     test('local file meta data', async function () {
 
-        const straw = new Straw({
+        const file = new NodeLocalFile({
             "path": require.resolve("./data/test_chr22.hic")
         })
+        const straw = new Straw({file: file})
 
         const meta = await straw.getMetaData()
         assert.ok(meta)
@@ -21,9 +23,10 @@ suite('Straw', function () {
 
     test('local file norm vector options', async function () {
 
-        const straw = new Straw({
+        const file = new NodeLocalFile({
             "path": require.resolve("./data/test_chr22.hic")
         })
+        const straw = new Straw({file: file})
 
         const normalizationOptions = await straw.getNormalizationOptions()
         assert.ok(normalizationOptions)
@@ -32,9 +35,10 @@ suite('Straw', function () {
 
     test('local file nvi', async function () {
 
-        const straw = new Straw({
+        const file = new NodeLocalFile({
             "path": require.resolve("./data/test_chr22.hic")
         })
+        const straw = new Straw({file: file})
 
         const nvi = await straw.getNVI()
         assert.equal(nvi, "1720269,751")
@@ -42,9 +46,10 @@ suite('Straw', function () {
 
     test('local file contact records', async function () {
 
-        const straw = new Straw({
+        const file = new NodeLocalFile({
             "path": require.resolve("./data/test_chr22.hic")
         })
+        const straw = new Straw({file: file})
 
         const contactRecords = await straw.getContactRecords(
             "KR",
@@ -60,9 +65,10 @@ suite('Straw', function () {
 
     test('local file contact records - with NVI', async function () {
 
-        const straw = new Straw({
-            "path": require.resolve("./data/test_chr22.hic"),
+        const file = new NodeLocalFile({
+            "path": require.resolve("./data/test_chr22.hic")
         })
+        const straw = new Straw({file: file})
 
         const contactRecords = await straw.getContactRecords(
             "KR",

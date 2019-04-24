@@ -40,9 +40,9 @@ suite('BufferedFile', function () {
 
         this.timeout(60000)
 
-        const path = "https://s3.amazonaws.com/igv.org.test/data/BufferedReaderTest.bin"
+        const url = "https://s3.amazonaws.com/igv.org.test/data/BufferedReaderTest.bin"
 
-        const file = new BufferedFile({file: new RemoteFile({url: path}), size: 51})
+        const file = new BufferedFile({file: new RemoteFile({url: url}), size: 51})
 
         // Request > than buffer size
         let start = 10

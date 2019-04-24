@@ -2,7 +2,6 @@ const zlib = require('zlib')
 const fetch = require('cross-fetch')
 
 const BrowserLocalFile = require("./io/browserLocalFile")
-const NodeLocalFile = require("./io/nodeLocalFile")
 const RemoteFile = require("./io/remoteFile")
 const ThrottledFile = require("./io/throttledFile")
 const RateLimiter = require("./io/rateLimiter")
@@ -38,27 +37,27 @@ class HicFile {
         this.normVectorCache = {}
         this.normalizationTypes = ['NONE'];
 
-        // args may specify an io.File objec, a local path (Node only), or a url
+        // args may specify an io.File object, a local path (Node only), or a url
         if (args.file) {
             this.file = args.file
         } else if (args.blob) {
             this.file = new BrowserLocalFile(args.blob)
         }  else {
-            this.path = args.path || args.url
+            this.url = args.path || args.url
 
-            if (this.path.startsWith("http://") || this.path.startsWith("https://")) {
+            if (this.url.startsWith("http://") || this.url.startsWith("https://")) {
                 this.remote = true
 
                 // Google drive must be rate limited.  Perhaps all
                 const remoteFile = new RemoteFile(args)
-                if(isGoogle(this.path)) {
+                if(isGoogle(this.url)) {
                     this.file = new ThrottledFile(remoteFile, googleRateLimiter)
                 } else {
                     this.file = remoteFile
                 }
 
             } else {
-                this.file = new NodeLocalFile(args)
+                throw Error("Arguments must include file, blob, or url")
             }
         }
     };
@@ -498,8 +497,8 @@ class HicFile {
         if (!this.normVectorIndex) {
 
             // If nvi is not supplied, try reading from remote lambda service
-            if (!this.config.nvi && this.remote && this.path) {
-                const url = new URL(this.path)
+            if (!this.config.nvi && this.remote && this.url) {
+                const url = new URL(this.url)
                 const key = encodeURIComponent(url.hostname + url.pathname)
                 const nviResponse = await fetch('https://t5dvc6kn3f.execute-api.us-east-1.amazonaws.com/dev/nvi/' + key)
                 if (nviResponse.status === 200) {

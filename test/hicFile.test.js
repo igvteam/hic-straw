@@ -1,14 +1,16 @@
 const {assert} = require('chai')
 
 const HicFile = require('../src/hicFile')
+const NodeLocalFile = require('../src/io/nodeLocalFile')
 
 suite('HicFile', function () {
 
     test('local file read header', async function () {
 
-        const hicFile = new HicFile({
+        const file = new NodeLocalFile({
             "path": require.resolve("./data/test_chr22.hic"),
         })
+        const hicFile = new HicFile({file: file})
 
         await hicFile.readHeader()
         assert.equal(hicFile.magic, "HIC")
@@ -16,9 +18,10 @@ suite('HicFile', function () {
 
     test('local file read matrix', async function () {
 
-        const hicFile = new HicFile({
+        const file = new NodeLocalFile({
             "path": require.resolve("./data/test_chr22.hic"),
         })
+        const hicFile = new HicFile({file: file})
 
         const matrix = await hicFile.readMatrix(22, 22)
         assert.ok(matrix)
@@ -27,9 +30,10 @@ suite('HicFile', function () {
 
     test('local file read norm vector index', async function () {
 
-        const hicFile = new HicFile({
+        const file = new NodeLocalFile({
             "path": require.resolve("./data/test_chr22.hic"),
         })
+        const hicFile = new HicFile({file: file})
 
         const normVectorIndex = await hicFile.getNormVectorIndex()
         assert.ok(normVectorIndex)
@@ -40,9 +44,10 @@ suite('HicFile', function () {
 
     test('local file read norm vector', async function () {
 
-        const hicFile = new HicFile({
+        const file = new NodeLocalFile({
             "path": require.resolve("./data/test_chr22.hic"),
         })
+        const hicFile = new HicFile({file: file})
 
         const type = "KR"
         const chr = "22"
@@ -57,7 +62,7 @@ suite('HicFile', function () {
     test('remote file read header', async function () {
 
         const hicFile = new HicFile({
-            "path": "https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic",
+            "url": "https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic",
             "loadFragData": false
         })
 

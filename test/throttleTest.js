@@ -11,10 +11,10 @@ suite('ThrottledFile', function () {
 
         this.timeout(600000);
 
-        const path = "https://s3.amazonaws.com/igv.org.test/data/BufferedReaderTest.bin"
+        const url = "https://s3.amazonaws.com/igv.org.test/data/BufferedReaderTest.bin"
 
         const limiter = new RateLimiter(100)
-        const file = new ThrottledFile(new RemoteFile({url: path}), limiter)
+        const file = new ThrottledFile(new RemoteFile({url: url}), limiter)
 
 
         for (let start = 25; start < 125; start += 10) {
