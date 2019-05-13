@@ -50,7 +50,7 @@ class HicFile {
 
                 // Google drive must be rate limited.  Perhaps all
                 const remoteFile = new RemoteFile(args)
-                if(isGoogle(this.url)) {
+                if(isGoogleDrive(this.url)) {
                     this.file = new ThrottledFile(remoteFile, googleRateLimiter)
                 } else {
                     this.file = remoteFile
@@ -776,8 +776,8 @@ function getNormalizationVectorKey(type, chrIdx, unit, resolution) {
     return type + "_" + chrIdx + "_" + unit + "_" + resolution;
 }
 
-function isGoogle(url) {
-    return url.indexOf("drive.google.com") >= 0 || url.indexOf("www.googleapis.com") > 0
+function isGoogleDrive(url) {
+    return url.indexOf("drive.google.com") >= 0 || url.indexOf("www.googleapis.com/drive") > 0
 }
 
 
