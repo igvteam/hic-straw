@@ -1,1 +1,1 @@
-export default exports["HicStraw"]
+export default HicStraw

@@ -25,7 +25,7 @@
     "webpack-cli": "^3.3.1"
   },
   "scripts": {
-    "build": "webpack; webpack --config webpack.config.var.js; node wrapper/build.js",
+    "build": "webpack; webpack --config webpack.config.es.js; node wrapper/build.js",
     "test": "mocha -u tdd"
   },
   "repository": {
