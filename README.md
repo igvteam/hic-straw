@@ -102,7 +102,7 @@ Script tag - see examples/straw.html
 
 ```html
 
-<script src="https://cdn.jsdelivr.net/npm/hic-straw@0.9.3/dist/hic-straw.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hic-straw@0.9.4/dist/hic-straw.js"></script>
 
 ...
 
