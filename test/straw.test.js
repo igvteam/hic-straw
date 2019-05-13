@@ -151,4 +151,24 @@ suite('Straw', function () {
         getNormOptions()
 
     })
+
+    test('GEO file', async function () {
+
+        this.timeout(60000);
+        const straw = new Straw({
+            "path": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM2583nnn/GSM2583729/suppl/GSM2583729_H3K27ac_HiChIP_2.hic"
+        })
+
+        const contactRecords = await straw.getContactRecords(
+            "NONE",
+            {chr: "arm_2L", start: 0, end: 1000000},
+            {chr: "arm_2L", start: 0, end: 1000000},
+            "BP",
+            50000
+        )
+
+        assert.ok (contactRecords.length > 0)
+
+    })
+
 })
