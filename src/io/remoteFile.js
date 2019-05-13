@@ -17,10 +17,10 @@ class RemoteFile {
         headers['Range'] = rangeString
 
         let url = this.url.slice()    // slice => copy
-        if(jsEnv.isNode) {
+        if (jsEnv.isNode) {
             headers['User-Agent'] = 'straw'
         } else {
-            if(this.config.oauthToken) {
+            if (this.config.oauthToken) {
                 const token = resolveToken(this.config.oauthToken)
                 headers['Authorization'] = `Bearer ${token}`
             }
@@ -33,7 +33,7 @@ class RemoteFile {
             }
         }
 
-        if(this.config.apiKey) {
+        if (this.config.apiKey) {
             url = addParameter(url, "key", this.config.apiKey)
         }
 
@@ -51,8 +51,7 @@ class RemoteFile {
             const err = Error(response.statusText)
             err.code = status
             throw err
-        }
-        else {
+        } else {
             return response.arrayBuffer();
         }
 
@@ -62,7 +61,7 @@ class RemoteFile {
          * @returns {Promise<*>}
          */
         async function resolveToken(token) {
-            if(typeof token === 'function') {
+            if (typeof token === 'function') {
                 return await Promise.resolve(token())    // Normalize the result to a promise, since we don't know what the function returns
             } else {
                 return token
@@ -77,6 +76,8 @@ function mapUrl(url) {
 
     if (url.includes("//www.dropbox.com")) {
         return url.replace("//www.dropbox.com", "//dl.dropboxusercontent.com");
+    } else if (url.startsWith("ftp://ftp.ncbi.nlm.nih.gov")) {
+        return url.replace("ftp://", "https://")
     } else {
         return url
     }
@@ -84,7 +85,7 @@ function mapUrl(url) {
 
 
 function addParameter(url, name, value) {
-    const  paramSeparator = url.includes("?") ? "&" : "?";
+    const paramSeparator = url.includes("?") ? "&" : "?";
     return url + paramSeparator + name + "=" + value;
 }
 
