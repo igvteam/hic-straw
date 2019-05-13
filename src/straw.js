@@ -22,12 +22,26 @@ class Straw {
         const chr2 = this.hicFile.getFileChrName(region2.chr)
         const idx1 = this.hicFile.chromosomeIndexMap[chr1]
         const idx2 = this.hicFile.chromosomeIndexMap[chr2]
+
+        if(idx1 === undefined) {
+            console.log("No chromosome named: " + region1.chr)
+            return []
+        }
+        if(idx2 === undefined) {
+            console.log("No chromosome named: " + region2.chr)
+            return []
+        }
+
         const x1 = (region1.start === undefined) ? undefined : region1.start / binsize
         const x2 = (region1.end === undefined) ? undefined : region1.end / binsize
         const y1 = (region2.start === undefined) ? undefined : region2.start / binsize
         const y2 = (region2.end === undefined) ? undefined : region2.end / binsize
 
         const matrix = await this.hicFile.readMatrix(idx1, idx2)
+        if(!matrix) {
+            console.log("No matrix for " + region1.chr + "-" + region2.chr)
+            return []
+        }
 
         // Find the requested resolution
         const z = undefined === binsize ? 0 : this.hicFile.getZoomIndexForBinSize(binsize, units);
@@ -64,6 +78,10 @@ class Straw {
     async getContactRecords(normalization, region1, region2, units, binsize) {
 
         const blocks = await this.getBlocks(region1, region2, units, binsize)
+
+        if(!blocks || blocks.length === 0) {
+            return []
+        }
 
         const chr1 = this.hicFile.getFileChrName(region1.chr)
         const chr2 = this.hicFile.getFileChrName(region2.chr)
