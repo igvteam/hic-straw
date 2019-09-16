@@ -1,7 +1,6 @@
-const {assert} = require('chai')
-
-const Straw = require('../src/straw')
-const NodeLocalFile = require('../src/io/nodeLocalFile')
+import { assert } from 'chai';
+import Straw from '../src/straw';
+import NodeLocalFile from '../src/io/nodeLocalFile';
 
 suite('Straw', function () {
 
@@ -160,11 +159,11 @@ suite('Straw', function () {
         })
 
         const contactRecords = await straw.getContactRecords(
-            "NONE",
+            "KR",
             {chr: "arm_2L", start: 0, end: 1000000},
             {chr: "arm_2L", start: 0, end: 1000000},
             "BP",
-            50000
+            100000
         )
 
         assert.ok (contactRecords.length > 0)

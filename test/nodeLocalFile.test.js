@@ -1,6 +1,6 @@
-const {assert} = require('chai')
+import { assert } from 'chai';
 
-const NodeLocalFile = require("../src/io/nodeLocalFile")
+import NodeLocalFile from '../src/io/nodeLocalFile.js'
 
 const range = {start: 25, size: 100};
 

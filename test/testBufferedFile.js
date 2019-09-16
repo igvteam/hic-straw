@@ -1,8 +1,7 @@
-const {assert} = require('chai')
-
-const BufferedFile = require("../src/io/bufferedFile")
-const LocalFile = require("../src/io/nodeLocalFile")
-const RemoteFile = require("../src/io/remoteFile")
+import { assert } from 'chai';
+import BufferedFile from '../src/io/bufferedFile';
+import LocalFile from '../src/io/nodeLocalFile';
+import RemoteFile from '../src/io/remoteFile';
 
 
 suite('BufferedFile', function () {

@@ -1,5 +1,5 @@
-const HicFile = require("./hicFile")
-const ContactRecord = require("./contactRecord")
+import HicFile from "./hicFile.js"
+import ContactRecord from "./contactRecord.js"
 
 class Straw {
 
@@ -50,6 +50,11 @@ class Straw {
         }
 
         const zd = matrix.bpZoomData[z]
+        if(zd === null) {
+            let msg = `No data avalailble for resolution: ${binsize}  for map ${region1.chr}-${region2.chr}`
+            throw new Error(msg)
+        }
+      
         const blockBinCount = zd.blockBinCount   // Dimension in bins of a block (width = height = blockBinCount)
         const col1 = x1 === undefined ? 0 : Math.floor(x1 / blockBinCount)
         const col2 = x1 === undefined ? zd.blockColumnCount : Math.floor(x2 / blockBinCount)
@@ -152,4 +157,4 @@ class Straw {
 }
 
 
-module.exports = Straw
+export default Straw

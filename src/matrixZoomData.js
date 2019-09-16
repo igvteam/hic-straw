@@ -18,4 +18,4 @@ class MatrixZoomData {
     }
 }
 
-module.exports = MatrixZoomData
+export default MatrixZoomData;

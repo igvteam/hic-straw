@@ -1,5 +1,6 @@
-const fetch = require('cross-fetch')
-const jsEnv = require('browser-or-node')
+import fetch from 'cross-fetch';
+
+const  isNode = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
 
 class RemoteFile {
 
@@ -17,7 +18,7 @@ class RemoteFile {
         headers['Range'] = rangeString
 
         let url = this.url.slice()    // slice => copy
-        if (jsEnv.isNode) {
+        if (isNode) {
             headers['User-Agent'] = 'straw'
         } else {
             if (this.config.oauthToken) {
@@ -90,4 +91,4 @@ function addParameter(url, name, value) {
 }
 
 
-module.exports = RemoteFile
+export default RemoteFile;

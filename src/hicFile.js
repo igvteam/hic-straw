@@ -1,16 +1,15 @@
-const zlib = require('zlib')
-const fetch = require('cross-fetch')
-
-const BrowserLocalFile = require("./io/browserLocalFile")
-const RemoteFile = require("./io/remoteFile")
-const ThrottledFile = require("./io/throttledFile")
-const RateLimiter = require("./io/rateLimiter")
-const BufferedFile = require("./io/bufferedFile")
-const BinaryParser = require("./binary")
-const Matrix = require("./matrix")
-const MatrixZoomData = require("./matrixZoomData")
-const NormalizationVector = require("./normalizationVector")
-const ContactRecord = require("./contactRecord")
+import zlib from 'zlib';
+import fetch from 'cross-fetch';
+import BrowserLocalFile from './io/browserLocalFile.js';
+import RemoteFile from './io/remoteFile.js';
+import ThrottledFile from './io/throttledFile.js';
+import RateLimiter from './io/rateLimiter.js';
+import BufferedFile from './io/bufferedFile.js';
+import BinaryParser from './binary.js';
+import Matrix from './matrix.js';
+import MatrixZoomData from './matrixZoomData.js';
+import NormalizationVector from './normalizationVector.js';
+import ContactRecord from './contactRecord.js';
 
 const Short_MIN_VALUE = -32768;
 
@@ -781,4 +780,4 @@ function isGoogleDrive(url) {
 }
 
 
-module.exports = HicFile
+export default HicFile;

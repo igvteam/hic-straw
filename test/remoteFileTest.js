@@ -1,6 +1,5 @@
-const {assert} = require('chai')
-
-const RemoteFile = require("../src/io/remoteFile")
+import { assert } from 'chai';
+import RemoteFile from '../src/io/remoteFile.js';
 
 const range = {start: 25, size: 100};
 

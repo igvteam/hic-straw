@@ -3,12 +3,11 @@
   "version": "0.9.4",
   "description": "Utilities for reading .files (contact matrix files)",
   "main": "src/index.js",
+  "module": "hic-straw_es6.js",
   "files": [
-    "dist/**",
-    "src/**"
+    "dist/**"
   ],
   "dependencies": {
-    "browser-or-node": "^1.2.1",
     "cross-fetch": "^3.0.2"
   },
   "devDependencies": {
@@ -20,6 +19,7 @@
     "babel-preset-stage-2": "^6.18.0",
     "chai": "^4.2.0",
     "concat": "^1.0.3",
+    "esm": "^3.2.25",
     "mocha": "^5.2.0",
     "webpack": "^4.30.0",
     "webpack-cli": "^3.3.1"

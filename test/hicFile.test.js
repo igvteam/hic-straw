@@ -1,7 +1,7 @@
-const {assert} = require('chai')
+import { assert } from 'chai';
 
-const HicFile = require('../src/hicFile')
-const NodeLocalFile = require('../src/io/nodeLocalFile')
+import HicFile from '../src/hicFile'
+import NodeLocalFile from '../src/io/nodeLocalFile'
 
 suite('HicFile', function () {
 

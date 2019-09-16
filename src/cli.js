@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
-const Straw = require("./straw")
-const NodeLocalFile = require("./io/nodeLocalFile")
+import Straw from './straw.js';
+
+import NodeLocalFile from './io/nodeLocalFile';
 
 const [, , ...args] = process.argv
 

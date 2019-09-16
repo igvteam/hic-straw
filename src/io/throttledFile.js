@@ -25,4 +25,4 @@ class ThrottledFile {
 }
 
 
-module.exports = ThrottledFile
+export default ThrottledFile;
