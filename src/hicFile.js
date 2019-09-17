@@ -1,4 +1,4 @@
-import zlib from 'zlib';
+import Zlib from "./vendor/zlib_and_gzip.js"
 import fetch from 'cross-fetch';
 import BrowserLocalFile from './io/browserLocalFile.js';
 import RemoteFile from './io/remoteFile.js';
@@ -324,8 +324,8 @@ class HicFile {
                 return undefined;
             }
 
-            //var inflate = new Zlib.Inflate(new Uint8Array(data));
-            var plain = zlib.inflateSync(Buffer.from(data))   //.decompress();
+            var plain = new Zlib.Inflate(new Uint8Array(data));
+            //var plain = zlib.inflateSync(Buffer.from(data))   //.decompress();
             data = plain.buffer;
 
 
