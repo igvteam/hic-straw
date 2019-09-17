@@ -198,4 +198,4 @@ VPointer.prototype.print = function () {
 }
 
 
-module.exports = BinaryParser
+export default BinaryParser;

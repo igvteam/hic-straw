@@ -1,15 +1,9217 @@
-!function(t,e){"object"==typeof exports&&"object"==typeof module?module.exports=e():"function"==typeof define&&define.amd?define("HicStraw",[],e):"object"==typeof exports?exports.HicStraw=e():t.HicStraw=e()}(window,function(){return function(t){var e={};function n(r){if(e[r])return e[r].exports;var i=e[r]={i:r,l:!1,exports:{}};return t[r].call(i.exports,i,i.exports,n),i.l=!0,i.exports}return n.m=t,n.c=e,n.d=function(t,e,r){n.o(t,e)||Object.defineProperty(t,e,{enumerable:!0,get:r})},n.r=function(t){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(t,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(t,"__esModule",{value:!0})},n.t=function(t,e){if(1&e&&(t=n(t)),8&e)return t;if(4&e&&"object"==typeof t&&t&&t.__esModule)return t;var r=Object.create(null);if(n.r(r),Object.defineProperty(r,"default",{enumerable:!0,value:t}),2&e&&"string"!=typeof t)for(var i in t)n.d(r,i,function(e){return t[e]}.bind(null,i));return r},n.n=function(t){var e=t&&t.__esModule?function(){return t.default}:function(){return t};return n.d(e,"a",e),e},n.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},n.p="",n(n.s=25)}([function(t,e){var n,r,i=t.exports={};function o(){throw new Error("setTimeout has not been defined")}function s(){throw new Error("clearTimeout has not been defined")}function a(t){if(n===setTimeout)return setTimeout(t,0);if((n===o||!n)&&setTimeout)return n=setTimeout,setTimeout(t,0);try{return n(t,0)}catch(e){try{return n.call(null,t,0)}catch(e){return n.call(this,t,0)}}}!function(){try{n="function"==typeof setTimeout?setTimeout:o}catch(t){n=o}try{r="function"==typeof clearTimeout?clearTimeout:s}catch(t){r=s}}();var h,u=[],l=!1,f=-1;function c(){l&&h&&(l=!1,h.length?u=h.concat(u):f=-1,u.length&&d())}function d(){if(!l){var t=a(c);l=!0;for(var e=u.length;e;){for(h=u,u=[];++f<e;)h&&h[f].run();f=-1,e=u.length}h=null,l=!1,function(t){if(r===clearTimeout)return clearTimeout(t);if((r===s||!r)&&clearTimeout)return r=clearTimeout,clearTimeout(t);try{r(t)}catch(e){try{return r.call(null,t)}catch(e){return r.call(this,t)}}}(t)}}function p(t,e){this.fun=t,this.array=e}function g(){}i.nextTick=function(t){var e=new Array(arguments.length-1);if(arguments.length>1)for(var n=1;n<arguments.length;n++)e[n-1]=arguments[n];u.push(new p(t,e)),1!==u.length||l||a(d)},p.prototype.run=function(){this.fun.apply(null,this.array)},i.title="browser",i.browser=!0,i.env={},i.argv=[],i.version="",i.versions={},i.on=g,i.addListener=g,i.once=g,i.off=g,i.removeListener=g,i.removeAllListeners=g,i.emit=g,i.prependListener=g,i.prependOnceListener=g,i.listeners=function(t){return[]},i.binding=function(t){throw new Error("process.binding is not supported")},i.cwd=function(){return"/"},i.chdir=function(t){throw new Error("process.chdir is not supported")},i.umask=function(){return 0}},function(t,e){var n;n=function(){return this}();try{n=n||new Function("return this")()}catch(t){"object"==typeof window&&(n=window)}t.exports=n},function(t,e){"function"==typeof Object.create?t.exports=function(t,e){t.super_=e,t.prototype=Object.create(e.prototype,{constructor:{value:t,enumerable:!1,writable:!0,configurable:!0}})}:t.exports=function(t,e){t.super_=e;var n=function(){};n.prototype=e.prototype,t.prototype=new n,t.prototype.constructor=t}},function(t,e,n){"use strict";var r=n(6),i=Object.keys||function(t){var e=[];for(var n in t)e.push(n);return e};t.exports=f;var o=n(5);o.inherits=n(2);var s=n(14),a=n(11);o.inherits(f,s);for(var h=i(a.prototype),u=0;u<h.length;u++){var l=h[u];f.prototype[l]||(f.prototype[l]=a.prototype[l])}function f(t){if(!(this instanceof f))return new f(t);s.call(this,t),a.call(this,t),t&&!1===t.readable&&(this.readable=!1),t&&!1===t.writable&&(this.writable=!1),this.allowHalfOpen=!0,t&&!1===t.allowHalfOpen&&(this.allowHalfOpen=!1),this.once("end",c)}function c(){this.allowHalfOpen||this._writableState.ended||r.nextTick(d,this)}function d(t){t.end()}Object.defineProperty(f.prototype,"writableHighWaterMark",{enumerable:!1,get:function(){return this._writableState.highWaterMark}}),Object.defineProperty(f.prototype,"destroyed",{get:function(){return void 0!==this._readableState&&void 0!==this._writableState&&(this._readableState.destroyed&&this._writableState.destroyed)},set:function(t){void 0!==this._readableState&&void 0!==this._writableState&&(this._readableState.destroyed=t,this._writableState.destroyed=t)}}),f.prototype._destroy=function(t,e){this.push(null),this.end(),r.nextTick(e,t)}},function(t,e,n){"use strict";(function(t){
-/*!
- * The buffer module from node.js, for the browser.
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+  typeof define === 'function' && define.amd ? define(factory) :
+  (global = global || self, global.HicStraw = factory());
+}(this, function () { 'use strict';
+
+/**
+ * Copyright (c) 2014-present, Facebook, Inc.
  *
- * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
- * @license  MIT
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
-var r=n(27),i=n(28),o=n(13);function s(){return h.TYPED_ARRAY_SUPPORT?2147483647:1073741823}function a(t,e){if(s()<e)throw new RangeError("Invalid typed array length");return h.TYPED_ARRAY_SUPPORT?(t=new Uint8Array(e)).__proto__=h.prototype:(null===t&&(t=new h(e)),t.length=e),t}function h(t,e,n){if(!(h.TYPED_ARRAY_SUPPORT||this instanceof h))return new h(t,e,n);if("number"==typeof t){if("string"==typeof e)throw new Error("If encoding is specified then the first argument must be a string");return f(this,t)}return u(this,t,e,n)}function u(t,e,n,r){if("number"==typeof e)throw new TypeError('"value" argument must not be a number');return"undefined"!=typeof ArrayBuffer&&e instanceof ArrayBuffer?function(t,e,n,r){if(e.byteLength,n<0||e.byteLength<n)throw new RangeError("'offset' is out of bounds");if(e.byteLength<n+(r||0))throw new RangeError("'length' is out of bounds");e=void 0===n&&void 0===r?new Uint8Array(e):void 0===r?new Uint8Array(e,n):new Uint8Array(e,n,r);h.TYPED_ARRAY_SUPPORT?(t=e).__proto__=h.prototype:t=c(t,e);return t}(t,e,n,r):"string"==typeof e?function(t,e,n){"string"==typeof n&&""!==n||(n="utf8");if(!h.isEncoding(n))throw new TypeError('"encoding" must be a valid string encoding');var r=0|p(e,n),i=(t=a(t,r)).write(e,n);i!==r&&(t=t.slice(0,i));return t}(t,e,n):function(t,e){if(h.isBuffer(e)){var n=0|d(e.length);return 0===(t=a(t,n)).length?t:(e.copy(t,0,0,n),t)}if(e){if("undefined"!=typeof ArrayBuffer&&e.buffer instanceof ArrayBuffer||"length"in e)return"number"!=typeof e.length||(r=e.length)!=r?a(t,0):c(t,e);if("Buffer"===e.type&&o(e.data))return c(t,e.data)}var r;throw new TypeError("First argument must be a string, Buffer, ArrayBuffer, Array, or array-like object.")}(t,e)}function l(t){if("number"!=typeof t)throw new TypeError('"size" argument must be a number');if(t<0)throw new RangeError('"size" argument must not be negative')}function f(t,e){if(l(e),t=a(t,e<0?0:0|d(e)),!h.TYPED_ARRAY_SUPPORT)for(var n=0;n<e;++n)t[n]=0;return t}function c(t,e){var n=e.length<0?0:0|d(e.length);t=a(t,n);for(var r=0;r<n;r+=1)t[r]=255&e[r];return t}function d(t){if(t>=s())throw new RangeError("Attempt to allocate Buffer larger than maximum size: 0x"+s().toString(16)+" bytes");return 0|t}function p(t,e){if(h.isBuffer(t))return t.length;if("undefined"!=typeof ArrayBuffer&&"function"==typeof ArrayBuffer.isView&&(ArrayBuffer.isView(t)||t instanceof ArrayBuffer))return t.byteLength;"string"!=typeof t&&(t=""+t);var n=t.length;if(0===n)return 0;for(var r=!1;;)switch(e){case"ascii":case"latin1":case"binary":return n;case"utf8":case"utf-8":case void 0:return C(t).length;case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return 2*n;case"hex":return n>>>1;case"base64":return Z(t).length;default:if(r)return C(t).length;e=(""+e).toLowerCase(),r=!0}}function g(t,e,n){var r=t[e];t[e]=t[n],t[n]=r}function _(t,e,n,r,i){if(0===t.length)return-1;if("string"==typeof n?(r=n,n=0):n>2147483647?n=2147483647:n<-2147483648&&(n=-2147483648),n=+n,isNaN(n)&&(n=i?0:t.length-1),n<0&&(n=t.length+n),n>=t.length){if(i)return-1;n=t.length-1}else if(n<0){if(!i)return-1;n=0}if("string"==typeof e&&(e=h.from(e,r)),h.isBuffer(e))return 0===e.length?-1:b(t,e,n,r,i);if("number"==typeof e)return e&=255,h.TYPED_ARRAY_SUPPORT&&"function"==typeof Uint8Array.prototype.indexOf?i?Uint8Array.prototype.indexOf.call(t,e,n):Uint8Array.prototype.lastIndexOf.call(t,e,n):b(t,[e],n,r,i);throw new TypeError("val must be string, number or Buffer")}function b(t,e,n,r,i){var o,s=1,a=t.length,h=e.length;if(void 0!==r&&("ucs2"===(r=String(r).toLowerCase())||"ucs-2"===r||"utf16le"===r||"utf-16le"===r)){if(t.length<2||e.length<2)return-1;s=2,a/=2,h/=2,n/=2}function u(t,e){return 1===s?t[e]:t.readUInt16BE(e*s)}if(i){var l=-1;for(o=n;o<a;o++)if(u(t,o)===u(e,-1===l?0:o-l)){if(-1===l&&(l=o),o-l+1===h)return l*s}else-1!==l&&(o-=o-l),l=-1}else for(n+h>a&&(n=a-h),o=n;o>=0;o--){for(var f=!0,c=0;c<h;c++)if(u(t,o+c)!==u(e,c)){f=!1;break}if(f)return o}return-1}function y(t,e,n,r){n=Number(n)||0;var i=t.length-n;r?(r=Number(r))>i&&(r=i):r=i;var o=e.length;if(o%2!=0)throw new TypeError("Invalid hex string");r>o/2&&(r=o/2);for(var s=0;s<r;++s){var a=parseInt(e.substr(2*s,2),16);if(isNaN(a))return s;t[n+s]=a}return s}function m(t,e,n,r){return j(C(e,t.length-n),t,n,r)}function w(t,e,n,r){return j(function(t){for(var e=[],n=0;n<t.length;++n)e.push(255&t.charCodeAt(n));return e}(e),t,n,r)}function v(t,e,n,r){return w(t,e,n,r)}function E(t,e,n,r){return j(Z(e),t,n,r)}function k(t,e,n,r){return j(function(t,e){for(var n,r,i,o=[],s=0;s<t.length&&!((e-=2)<0);++s)n=t.charCodeAt(s),r=n>>8,i=n%256,o.push(i),o.push(r);return o}(e,t.length-n),t,n,r)}function x(t,e,n){return 0===e&&n===t.length?r.fromByteArray(t):r.fromByteArray(t.slice(e,n))}function S(t,e,n){n=Math.min(t.length,n);for(var r=[],i=e;i<n;){var o,s,a,h,u=t[i],l=null,f=u>239?4:u>223?3:u>191?2:1;if(i+f<=n)switch(f){case 1:u<128&&(l=u);break;case 2:128==(192&(o=t[i+1]))&&(h=(31&u)<<6|63&o)>127&&(l=h);break;case 3:o=t[i+1],s=t[i+2],128==(192&o)&&128==(192&s)&&(h=(15&u)<<12|(63&o)<<6|63&s)>2047&&(h<55296||h>57343)&&(l=h);break;case 4:o=t[i+1],s=t[i+2],a=t[i+3],128==(192&o)&&128==(192&s)&&128==(192&a)&&(h=(15&u)<<18|(63&o)<<12|(63&s)<<6|63&a)>65535&&h<1114112&&(l=h)}null===l?(l=65533,f=1):l>65535&&(l-=65536,r.push(l>>>10&1023|55296),l=56320|1023&l),r.push(l),i+=f}return function(t){var e=t.length;if(e<=T)return String.fromCharCode.apply(String,t);var n="",r=0;for(;r<e;)n+=String.fromCharCode.apply(String,t.slice(r,r+=T));return n}(r)}e.Buffer=h,e.SlowBuffer=function(t){+t!=t&&(t=0);return h.alloc(+t)},e.INSPECT_MAX_BYTES=50,h.TYPED_ARRAY_SUPPORT=void 0!==t.TYPED_ARRAY_SUPPORT?t.TYPED_ARRAY_SUPPORT:function(){try{var t=new Uint8Array(1);return t.__proto__={__proto__:Uint8Array.prototype,foo:function(){return 42}},42===t.foo()&&"function"==typeof t.subarray&&0===t.subarray(1,1).byteLength}catch(t){return!1}}(),e.kMaxLength=s(),h.poolSize=8192,h._augment=function(t){return t.__proto__=h.prototype,t},h.from=function(t,e,n){return u(null,t,e,n)},h.TYPED_ARRAY_SUPPORT&&(h.prototype.__proto__=Uint8Array.prototype,h.__proto__=Uint8Array,"undefined"!=typeof Symbol&&Symbol.species&&h[Symbol.species]===h&&Object.defineProperty(h,Symbol.species,{value:null,configurable:!0})),h.alloc=function(t,e,n){return function(t,e,n,r){return l(e),e<=0?a(t,e):void 0!==n?"string"==typeof r?a(t,e).fill(n,r):a(t,e).fill(n):a(t,e)}(null,t,e,n)},h.allocUnsafe=function(t){return f(null,t)},h.allocUnsafeSlow=function(t){return f(null,t)},h.isBuffer=function(t){return!(null==t||!t._isBuffer)},h.compare=function(t,e){if(!h.isBuffer(t)||!h.isBuffer(e))throw new TypeError("Arguments must be Buffers");if(t===e)return 0;for(var n=t.length,r=e.length,i=0,o=Math.min(n,r);i<o;++i)if(t[i]!==e[i]){n=t[i],r=e[i];break}return n<r?-1:r<n?1:0},h.isEncoding=function(t){switch(String(t).toLowerCase()){case"hex":case"utf8":case"utf-8":case"ascii":case"latin1":case"binary":case"base64":case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return!0;default:return!1}},h.concat=function(t,e){if(!o(t))throw new TypeError('"list" argument must be an Array of Buffers');if(0===t.length)return h.alloc(0);var n;if(void 0===e)for(e=0,n=0;n<t.length;++n)e+=t[n].length;var r=h.allocUnsafe(e),i=0;for(n=0;n<t.length;++n){var s=t[n];if(!h.isBuffer(s))throw new TypeError('"list" argument must be an Array of Buffers');s.copy(r,i),i+=s.length}return r},h.byteLength=p,h.prototype._isBuffer=!0,h.prototype.swap16=function(){var t=this.length;if(t%2!=0)throw new RangeError("Buffer size must be a multiple of 16-bits");for(var e=0;e<t;e+=2)g(this,e,e+1);return this},h.prototype.swap32=function(){var t=this.length;if(t%4!=0)throw new RangeError("Buffer size must be a multiple of 32-bits");for(var e=0;e<t;e+=4)g(this,e,e+3),g(this,e+1,e+2);return this},h.prototype.swap64=function(){var t=this.length;if(t%8!=0)throw new RangeError("Buffer size must be a multiple of 64-bits");for(var e=0;e<t;e+=8)g(this,e,e+7),g(this,e+1,e+6),g(this,e+2,e+5),g(this,e+3,e+4);return this},h.prototype.toString=function(){var t=0|this.length;return 0===t?"":0===arguments.length?S(this,0,t):function(t,e,n){var r=!1;if((void 0===e||e<0)&&(e=0),e>this.length)return"";if((void 0===n||n>this.length)&&(n=this.length),n<=0)return"";if((n>>>=0)<=(e>>>=0))return"";for(t||(t="utf8");;)switch(t){case"hex":return I(this,e,n);case"utf8":case"utf-8":return S(this,e,n);case"ascii":return A(this,e,n);case"latin1":case"binary":return R(this,e,n);case"base64":return x(this,e,n);case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return L(this,e,n);default:if(r)throw new TypeError("Unknown encoding: "+t);t=(t+"").toLowerCase(),r=!0}}.apply(this,arguments)},h.prototype.equals=function(t){if(!h.isBuffer(t))throw new TypeError("Argument must be a Buffer");return this===t||0===h.compare(this,t)},h.prototype.inspect=function(){var t="",n=e.INSPECT_MAX_BYTES;return this.length>0&&(t=this.toString("hex",0,n).match(/.{2}/g).join(" "),this.length>n&&(t+=" ... ")),"<Buffer "+t+">"},h.prototype.compare=function(t,e,n,r,i){if(!h.isBuffer(t))throw new TypeError("Argument must be a Buffer");if(void 0===e&&(e=0),void 0===n&&(n=t?t.length:0),void 0===r&&(r=0),void 0===i&&(i=this.length),e<0||n>t.length||r<0||i>this.length)throw new RangeError("out of range index");if(r>=i&&e>=n)return 0;if(r>=i)return-1;if(e>=n)return 1;if(this===t)return 0;for(var o=(i>>>=0)-(r>>>=0),s=(n>>>=0)-(e>>>=0),a=Math.min(o,s),u=this.slice(r,i),l=t.slice(e,n),f=0;f<a;++f)if(u[f]!==l[f]){o=u[f],s=l[f];break}return o<s?-1:s<o?1:0},h.prototype.includes=function(t,e,n){return-1!==this.indexOf(t,e,n)},h.prototype.indexOf=function(t,e,n){return _(this,t,e,n,!0)},h.prototype.lastIndexOf=function(t,e,n){return _(this,t,e,n,!1)},h.prototype.write=function(t,e,n,r){if(void 0===e)r="utf8",n=this.length,e=0;else if(void 0===n&&"string"==typeof e)r=e,n=this.length,e=0;else{if(!isFinite(e))throw new Error("Buffer.write(string, encoding, offset[, length]) is no longer supported");e|=0,isFinite(n)?(n|=0,void 0===r&&(r="utf8")):(r=n,n=void 0)}var i=this.length-e;if((void 0===n||n>i)&&(n=i),t.length>0&&(n<0||e<0)||e>this.length)throw new RangeError("Attempt to write outside buffer bounds");r||(r="utf8");for(var o=!1;;)switch(r){case"hex":return y(this,t,e,n);case"utf8":case"utf-8":return m(this,t,e,n);case"ascii":return w(this,t,e,n);case"latin1":case"binary":return v(this,t,e,n);case"base64":return E(this,t,e,n);case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return k(this,t,e,n);default:if(o)throw new TypeError("Unknown encoding: "+r);r=(""+r).toLowerCase(),o=!0}},h.prototype.toJSON=function(){return{type:"Buffer",data:Array.prototype.slice.call(this._arr||this,0)}};var T=4096;function A(t,e,n){var r="";n=Math.min(t.length,n);for(var i=e;i<n;++i)r+=String.fromCharCode(127&t[i]);return r}function R(t,e,n){var r="";n=Math.min(t.length,n);for(var i=e;i<n;++i)r+=String.fromCharCode(t[i]);return r}function I(t,e,n){var r=t.length;(!e||e<0)&&(e=0),(!n||n<0||n>r)&&(n=r);for(var i="",o=e;o<n;++o)i+=M(t[o]);return i}function L(t,e,n){for(var r=t.slice(e,n),i="",o=0;o<r.length;o+=2)i+=String.fromCharCode(r[o]+256*r[o+1]);return i}function O(t,e,n){if(t%1!=0||t<0)throw new RangeError("offset is not uint");if(t+e>n)throw new RangeError("Trying to access beyond buffer length")}function z(t,e,n,r,i,o){if(!h.isBuffer(t))throw new TypeError('"buffer" argument must be a Buffer instance');if(e>i||e<o)throw new RangeError('"value" argument is out of bounds');if(n+r>t.length)throw new RangeError("Index out of range")}function N(t,e,n,r){e<0&&(e=65535+e+1);for(var i=0,o=Math.min(t.length-n,2);i<o;++i)t[n+i]=(e&255<<8*(r?i:1-i))>>>8*(r?i:1-i)}function B(t,e,n,r){e<0&&(e=4294967295+e+1);for(var i=0,o=Math.min(t.length-n,4);i<o;++i)t[n+i]=e>>>8*(r?i:3-i)&255}function D(t,e,n,r,i,o){if(n+r>t.length)throw new RangeError("Index out of range");if(n<0)throw new RangeError("Index out of range")}function F(t,e,n,r,o){return o||D(t,0,n,4),i.write(t,e,n,r,23,4),n+4}function P(t,e,n,r,o){return o||D(t,0,n,8),i.write(t,e,n,r,52,8),n+8}h.prototype.slice=function(t,e){var n,r=this.length;if((t=~~t)<0?(t+=r)<0&&(t=0):t>r&&(t=r),(e=void 0===e?r:~~e)<0?(e+=r)<0&&(e=0):e>r&&(e=r),e<t&&(e=t),h.TYPED_ARRAY_SUPPORT)(n=this.subarray(t,e)).__proto__=h.prototype;else{var i=e-t;n=new h(i,void 0);for(var o=0;o<i;++o)n[o]=this[o+t]}return n},h.prototype.readUIntLE=function(t,e,n){t|=0,e|=0,n||O(t,e,this.length);for(var r=this[t],i=1,o=0;++o<e&&(i*=256);)r+=this[t+o]*i;return r},h.prototype.readUIntBE=function(t,e,n){t|=0,e|=0,n||O(t,e,this.length);for(var r=this[t+--e],i=1;e>0&&(i*=256);)r+=this[t+--e]*i;return r},h.prototype.readUInt8=function(t,e){return e||O(t,1,this.length),this[t]},h.prototype.readUInt16LE=function(t,e){return e||O(t,2,this.length),this[t]|this[t+1]<<8},h.prototype.readUInt16BE=function(t,e){return e||O(t,2,this.length),this[t]<<8|this[t+1]},h.prototype.readUInt32LE=function(t,e){return e||O(t,4,this.length),(this[t]|this[t+1]<<8|this[t+2]<<16)+16777216*this[t+3]},h.prototype.readUInt32BE=function(t,e){return e||O(t,4,this.length),16777216*this[t]+(this[t+1]<<16|this[t+2]<<8|this[t+3])},h.prototype.readIntLE=function(t,e,n){t|=0,e|=0,n||O(t,e,this.length);for(var r=this[t],i=1,o=0;++o<e&&(i*=256);)r+=this[t+o]*i;return r>=(i*=128)&&(r-=Math.pow(2,8*e)),r},h.prototype.readIntBE=function(t,e,n){t|=0,e|=0,n||O(t,e,this.length);for(var r=e,i=1,o=this[t+--r];r>0&&(i*=256);)o+=this[t+--r]*i;return o>=(i*=128)&&(o-=Math.pow(2,8*e)),o},h.prototype.readInt8=function(t,e){return e||O(t,1,this.length),128&this[t]?-1*(255-this[t]+1):this[t]},h.prototype.readInt16LE=function(t,e){e||O(t,2,this.length);var n=this[t]|this[t+1]<<8;return 32768&n?4294901760|n:n},h.prototype.readInt16BE=function(t,e){e||O(t,2,this.length);var n=this[t+1]|this[t]<<8;return 32768&n?4294901760|n:n},h.prototype.readInt32LE=function(t,e){return e||O(t,4,this.length),this[t]|this[t+1]<<8|this[t+2]<<16|this[t+3]<<24},h.prototype.readInt32BE=function(t,e){return e||O(t,4,this.length),this[t]<<24|this[t+1]<<16|this[t+2]<<8|this[t+3]},h.prototype.readFloatLE=function(t,e){return e||O(t,4,this.length),i.read(this,t,!0,23,4)},h.prototype.readFloatBE=function(t,e){return e||O(t,4,this.length),i.read(this,t,!1,23,4)},h.prototype.readDoubleLE=function(t,e){return e||O(t,8,this.length),i.read(this,t,!0,52,8)},h.prototype.readDoubleBE=function(t,e){return e||O(t,8,this.length),i.read(this,t,!1,52,8)},h.prototype.writeUIntLE=function(t,e,n,r){(t=+t,e|=0,n|=0,r)||z(this,t,e,n,Math.pow(2,8*n)-1,0);var i=1,o=0;for(this[e]=255&t;++o<n&&(i*=256);)this[e+o]=t/i&255;return e+n},h.prototype.writeUIntBE=function(t,e,n,r){(t=+t,e|=0,n|=0,r)||z(this,t,e,n,Math.pow(2,8*n)-1,0);var i=n-1,o=1;for(this[e+i]=255&t;--i>=0&&(o*=256);)this[e+i]=t/o&255;return e+n},h.prototype.writeUInt8=function(t,e,n){return t=+t,e|=0,n||z(this,t,e,1,255,0),h.TYPED_ARRAY_SUPPORT||(t=Math.floor(t)),this[e]=255&t,e+1},h.prototype.writeUInt16LE=function(t,e,n){return t=+t,e|=0,n||z(this,t,e,2,65535,0),h.TYPED_ARRAY_SUPPORT?(this[e]=255&t,this[e+1]=t>>>8):N(this,t,e,!0),e+2},h.prototype.writeUInt16BE=function(t,e,n){return t=+t,e|=0,n||z(this,t,e,2,65535,0),h.TYPED_ARRAY_SUPPORT?(this[e]=t>>>8,this[e+1]=255&t):N(this,t,e,!1),e+2},h.prototype.writeUInt32LE=function(t,e,n){return t=+t,e|=0,n||z(this,t,e,4,4294967295,0),h.TYPED_ARRAY_SUPPORT?(this[e+3]=t>>>24,this[e+2]=t>>>16,this[e+1]=t>>>8,this[e]=255&t):B(this,t,e,!0),e+4},h.prototype.writeUInt32BE=function(t,e,n){return t=+t,e|=0,n||z(this,t,e,4,4294967295,0),h.TYPED_ARRAY_SUPPORT?(this[e]=t>>>24,this[e+1]=t>>>16,this[e+2]=t>>>8,this[e+3]=255&t):B(this,t,e,!1),e+4},h.prototype.writeIntLE=function(t,e,n,r){if(t=+t,e|=0,!r){var i=Math.pow(2,8*n-1);z(this,t,e,n,i-1,-i)}var o=0,s=1,a=0;for(this[e]=255&t;++o<n&&(s*=256);)t<0&&0===a&&0!==this[e+o-1]&&(a=1),this[e+o]=(t/s>>0)-a&255;return e+n},h.prototype.writeIntBE=function(t,e,n,r){if(t=+t,e|=0,!r){var i=Math.pow(2,8*n-1);z(this,t,e,n,i-1,-i)}var o=n-1,s=1,a=0;for(this[e+o]=255&t;--o>=0&&(s*=256);)t<0&&0===a&&0!==this[e+o+1]&&(a=1),this[e+o]=(t/s>>0)-a&255;return e+n},h.prototype.writeInt8=function(t,e,n){return t=+t,e|=0,n||z(this,t,e,1,127,-128),h.TYPED_ARRAY_SUPPORT||(t=Math.floor(t)),t<0&&(t=255+t+1),this[e]=255&t,e+1},h.prototype.writeInt16LE=function(t,e,n){return t=+t,e|=0,n||z(this,t,e,2,32767,-32768),h.TYPED_ARRAY_SUPPORT?(this[e]=255&t,this[e+1]=t>>>8):N(this,t,e,!0),e+2},h.prototype.writeInt16BE=function(t,e,n){return t=+t,e|=0,n||z(this,t,e,2,32767,-32768),h.TYPED_ARRAY_SUPPORT?(this[e]=t>>>8,this[e+1]=255&t):N(this,t,e,!1),e+2},h.prototype.writeInt32LE=function(t,e,n){return t=+t,e|=0,n||z(this,t,e,4,2147483647,-2147483648),h.TYPED_ARRAY_SUPPORT?(this[e]=255&t,this[e+1]=t>>>8,this[e+2]=t>>>16,this[e+3]=t>>>24):B(this,t,e,!0),e+4},h.prototype.writeInt32BE=function(t,e,n){return t=+t,e|=0,n||z(this,t,e,4,2147483647,-2147483648),t<0&&(t=4294967295+t+1),h.TYPED_ARRAY_SUPPORT?(this[e]=t>>>24,this[e+1]=t>>>16,this[e+2]=t>>>8,this[e+3]=255&t):B(this,t,e,!1),e+4},h.prototype.writeFloatLE=function(t,e,n){return F(this,t,e,!0,n)},h.prototype.writeFloatBE=function(t,e,n){return F(this,t,e,!1,n)},h.prototype.writeDoubleLE=function(t,e,n){return P(this,t,e,!0,n)},h.prototype.writeDoubleBE=function(t,e,n){return P(this,t,e,!1,n)},h.prototype.copy=function(t,e,n,r){if(n||(n=0),r||0===r||(r=this.length),e>=t.length&&(e=t.length),e||(e=0),r>0&&r<n&&(r=n),r===n)return 0;if(0===t.length||0===this.length)return 0;if(e<0)throw new RangeError("targetStart out of bounds");if(n<0||n>=this.length)throw new RangeError("sourceStart out of bounds");if(r<0)throw new RangeError("sourceEnd out of bounds");r>this.length&&(r=this.length),t.length-e<r-n&&(r=t.length-e+n);var i,o=r-n;if(this===t&&n<e&&e<r)for(i=o-1;i>=0;--i)t[i+e]=this[i+n];else if(o<1e3||!h.TYPED_ARRAY_SUPPORT)for(i=0;i<o;++i)t[i+e]=this[i+n];else Uint8Array.prototype.set.call(t,this.subarray(n,n+o),e);return o},h.prototype.fill=function(t,e,n,r){if("string"==typeof t){if("string"==typeof e?(r=e,e=0,n=this.length):"string"==typeof n&&(r=n,n=this.length),1===t.length){var i=t.charCodeAt(0);i<256&&(t=i)}if(void 0!==r&&"string"!=typeof r)throw new TypeError("encoding must be a string");if("string"==typeof r&&!h.isEncoding(r))throw new TypeError("Unknown encoding: "+r)}else"number"==typeof t&&(t&=255);if(e<0||this.length<e||this.length<n)throw new RangeError("Out of range index");if(n<=e)return this;var o;if(e>>>=0,n=void 0===n?this.length:n>>>0,t||(t=0),"number"==typeof t)for(o=e;o<n;++o)this[o]=t;else{var s=h.isBuffer(t)?t:C(new h(t,r).toString()),a=s.length;for(o=0;o<n-e;++o)this[o+e]=s[o%a]}return this};var U=/[^+\/0-9A-Za-z-_]/g;function M(t){return t<16?"0"+t.toString(16):t.toString(16)}function C(t,e){var n;e=e||1/0;for(var r=t.length,i=null,o=[],s=0;s<r;++s){if((n=t.charCodeAt(s))>55295&&n<57344){if(!i){if(n>56319){(e-=3)>-1&&o.push(239,191,189);continue}if(s+1===r){(e-=3)>-1&&o.push(239,191,189);continue}i=n;continue}if(n<56320){(e-=3)>-1&&o.push(239,191,189),i=n;continue}n=65536+(i-55296<<10|n-56320)}else i&&(e-=3)>-1&&o.push(239,191,189);if(i=null,n<128){if((e-=1)<0)break;o.push(n)}else if(n<2048){if((e-=2)<0)break;o.push(n>>6|192,63&n|128)}else if(n<65536){if((e-=3)<0)break;o.push(n>>12|224,n>>6&63|128,63&n|128)}else{if(!(n<1114112))throw new Error("Invalid code point");if((e-=4)<0)break;o.push(n>>18|240,n>>12&63|128,n>>6&63|128,63&n|128)}}return o}function Z(t){return r.toByteArray(function(t){if((t=function(t){return t.trim?t.trim():t.replace(/^\s+|\s+$/g,"")}(t).replace(U,"")).length<2)return"";for(;t.length%4!=0;)t+="=";return t}(t))}function j(t,e,n,r){for(var i=0;i<r&&!(i+n>=e.length||i>=t.length);++i)e[i+n]=t[i];return i}}).call(this,n(1))},function(t,e,n){(function(t){function n(t){return Object.prototype.toString.call(t)}e.isArray=function(t){return Array.isArray?Array.isArray(t):"[object Array]"===n(t)},e.isBoolean=function(t){return"boolean"==typeof t},e.isNull=function(t){return null===t},e.isNullOrUndefined=function(t){return null==t},e.isNumber=function(t){return"number"==typeof t},e.isString=function(t){return"string"==typeof t},e.isSymbol=function(t){return"symbol"==typeof t},e.isUndefined=function(t){return void 0===t},e.isRegExp=function(t){return"[object RegExp]"===n(t)},e.isObject=function(t){return"object"==typeof t&&null!==t},e.isDate=function(t){return"[object Date]"===n(t)},e.isError=function(t){return"[object Error]"===n(t)||t instanceof Error},e.isFunction=function(t){return"function"==typeof t},e.isPrimitive=function(t){return null===t||"boolean"==typeof t||"number"==typeof t||"string"==typeof t||"symbol"==typeof t||void 0===t},e.isBuffer=t.isBuffer}).call(this,n(4).Buffer)},function(t,e,n){"use strict";(function(e){!e.version||0===e.version.indexOf("v0.")||0===e.version.indexOf("v1.")&&0!==e.version.indexOf("v1.8.")?t.exports={nextTick:function(t,n,r,i){if("function"!=typeof t)throw new TypeError('"callback" argument must be a function');var o,s,a=arguments.length;switch(a){case 0:case 1:return e.nextTick(t);case 2:return e.nextTick(function(){t.call(null,n)});case 3:return e.nextTick(function(){t.call(null,n,r)});case 4:return e.nextTick(function(){t.call(null,n,r,i)});default:for(o=new Array(a-1),s=0;s<o.length;)o[s++]=arguments[s];return e.nextTick(function(){t.apply(null,o)})}}}:t.exports=e}).call(this,n(0))},function(t,e,n){var r=n(4),i=r.Buffer;function o(t,e){for(var n in t)e[n]=t[n]}function s(t,e,n){return i(t,e,n)}i.from&&i.alloc&&i.allocUnsafe&&i.allocUnsafeSlow?t.exports=r:(o(r,e),e.Buffer=s),o(i,s),s.from=function(t,e,n){if("number"==typeof t)throw new TypeError("Argument must not be a number");return i(t,e,n)},s.alloc=function(t,e,n){if("number"!=typeof t)throw new TypeError("Argument must be a number");var r=i(t);return void 0!==e?"string"==typeof n?r.fill(e,n):r.fill(e):r.fill(0),r},s.allocUnsafe=function(t){if("number"!=typeof t)throw new TypeError("Argument must be a number");return i(t)},s.allocUnsafeSlow=function(t){if("number"!=typeof t)throw new TypeError("Argument must be a number");return r.SlowBuffer(t)}},function(t,e,n){"use strict";var r="undefined"!=typeof Uint8Array&&"undefined"!=typeof Uint16Array&&"undefined"!=typeof Int32Array;function i(t,e){return Object.prototype.hasOwnProperty.call(t,e)}e.assign=function(t){for(var e=Array.prototype.slice.call(arguments,1);e.length;){var n=e.shift();if(n){if("object"!=typeof n)throw new TypeError(n+"must be non-object");for(var r in n)i(n,r)&&(t[r]=n[r])}}return t},e.shrinkBuf=function(t,e){return t.length===e?t:t.subarray?t.subarray(0,e):(t.length=e,t)};var o={arraySet:function(t,e,n,r,i){if(e.subarray&&t.subarray)t.set(e.subarray(n,n+r),i);else for(var o=0;o<r;o++)t[i+o]=e[n+o]},flattenChunks:function(t){var e,n,r,i,o,s;for(r=0,e=0,n=t.length;e<n;e++)r+=t[e].length;for(s=new Uint8Array(r),i=0,e=0,n=t.length;e<n;e++)o=t[e],s.set(o,i),i+=o.length;return s}},s={arraySet:function(t,e,n,r,i){for(var o=0;o<r;o++)t[i+o]=e[n+o]},flattenChunks:function(t){return[].concat.apply([],t)}};e.setTyped=function(t){t?(e.Buf8=Uint8Array,e.Buf16=Uint16Array,e.Buf32=Int32Array,e.assign(e,o)):(e.Buf8=Array,e.Buf16=Array,e.Buf32=Array,e.assign(e,s))},e.setTyped(r)},function(t,e,n){"use strict";var r,i="object"==typeof Reflect?Reflect:null,o=i&&"function"==typeof i.apply?i.apply:function(t,e,n){return Function.prototype.apply.call(t,e,n)};r=i&&"function"==typeof i.ownKeys?i.ownKeys:Object.getOwnPropertySymbols?function(t){return Object.getOwnPropertyNames(t).concat(Object.getOwnPropertySymbols(t))}:function(t){return Object.getOwnPropertyNames(t)};var s=Number.isNaN||function(t){return t!=t};function a(){a.init.call(this)}t.exports=a,a.EventEmitter=a,a.prototype._events=void 0,a.prototype._eventsCount=0,a.prototype._maxListeners=void 0;var h=10;function u(t){return void 0===t._maxListeners?a.defaultMaxListeners:t._maxListeners}function l(t,e,n,r){var i,o,s,a;if("function"!=typeof n)throw new TypeError('The "listener" argument must be of type Function. Received type '+typeof n);if(void 0===(o=t._events)?(o=t._events=Object.create(null),t._eventsCount=0):(void 0!==o.newListener&&(t.emit("newListener",e,n.listener?n.listener:n),o=t._events),s=o[e]),void 0===s)s=o[e]=n,++t._eventsCount;else if("function"==typeof s?s=o[e]=r?[n,s]:[s,n]:r?s.unshift(n):s.push(n),(i=u(t))>0&&s.length>i&&!s.warned){s.warned=!0;var h=new Error("Possible EventEmitter memory leak detected. "+s.length+" "+String(e)+" listeners added. Use emitter.setMaxListeners() to increase limit");h.name="MaxListenersExceededWarning",h.emitter=t,h.type=e,h.count=s.length,a=h,console&&console.warn&&console.warn(a)}return t}function f(t,e,n){var r={fired:!1,wrapFn:void 0,target:t,type:e,listener:n},i=function(){for(var t=[],e=0;e<arguments.length;e++)t.push(arguments[e]);this.fired||(this.target.removeListener(this.type,this.wrapFn),this.fired=!0,o(this.listener,this.target,t))}.bind(r);return i.listener=n,r.wrapFn=i,i}function c(t,e,n){var r=t._events;if(void 0===r)return[];var i=r[e];return void 0===i?[]:"function"==typeof i?n?[i.listener||i]:[i]:n?function(t){for(var e=new Array(t.length),n=0;n<e.length;++n)e[n]=t[n].listener||t[n];return e}(i):p(i,i.length)}function d(t){var e=this._events;if(void 0!==e){var n=e[t];if("function"==typeof n)return 1;if(void 0!==n)return n.length}return 0}function p(t,e){for(var n=new Array(e),r=0;r<e;++r)n[r]=t[r];return n}Object.defineProperty(a,"defaultMaxListeners",{enumerable:!0,get:function(){return h},set:function(t){if("number"!=typeof t||t<0||s(t))throw new RangeError('The value of "defaultMaxListeners" is out of range. It must be a non-negative number. Received '+t+".");h=t}}),a.init=function(){void 0!==this._events&&this._events!==Object.getPrototypeOf(this)._events||(this._events=Object.create(null),this._eventsCount=0),this._maxListeners=this._maxListeners||void 0},a.prototype.setMaxListeners=function(t){if("number"!=typeof t||t<0||s(t))throw new RangeError('The value of "n" is out of range. It must be a non-negative number. Received '+t+".");return this._maxListeners=t,this},a.prototype.getMaxListeners=function(){return u(this)},a.prototype.emit=function(t){for(var e=[],n=1;n<arguments.length;n++)e.push(arguments[n]);var r="error"===t,i=this._events;if(void 0!==i)r=r&&void 0===i.error;else if(!r)return!1;if(r){var s;if(e.length>0&&(s=e[0]),s instanceof Error)throw s;var a=new Error("Unhandled error."+(s?" ("+s.message+")":""));throw a.context=s,a}var h=i[t];if(void 0===h)return!1;if("function"==typeof h)o(h,this,e);else{var u=h.length,l=p(h,u);for(n=0;n<u;++n)o(l[n],this,e)}return!0},a.prototype.addListener=function(t,e){return l(this,t,e,!1)},a.prototype.on=a.prototype.addListener,a.prototype.prependListener=function(t,e){return l(this,t,e,!0)},a.prototype.once=function(t,e){if("function"!=typeof e)throw new TypeError('The "listener" argument must be of type Function. Received type '+typeof e);return this.on(t,f(this,t,e)),this},a.prototype.prependOnceListener=function(t,e){if("function"!=typeof e)throw new TypeError('The "listener" argument must be of type Function. Received type '+typeof e);return this.prependListener(t,f(this,t,e)),this},a.prototype.removeListener=function(t,e){var n,r,i,o,s;if("function"!=typeof e)throw new TypeError('The "listener" argument must be of type Function. Received type '+typeof e);if(void 0===(r=this._events))return this;if(void 0===(n=r[t]))return this;if(n===e||n.listener===e)0==--this._eventsCount?this._events=Object.create(null):(delete r[t],r.removeListener&&this.emit("removeListener",t,n.listener||e));else if("function"!=typeof n){for(i=-1,o=n.length-1;o>=0;o--)if(n[o]===e||n[o].listener===e){s=n[o].listener,i=o;break}if(i<0)return this;0===i?n.shift():function(t,e){for(;e+1<t.length;e++)t[e]=t[e+1];t.pop()}(n,i),1===n.length&&(r[t]=n[0]),void 0!==r.removeListener&&this.emit("removeListener",t,s||e)}return this},a.prototype.off=a.prototype.removeListener,a.prototype.removeAllListeners=function(t){var e,n,r;if(void 0===(n=this._events))return this;if(void 0===n.removeListener)return 0===arguments.length?(this._events=Object.create(null),this._eventsCount=0):void 0!==n[t]&&(0==--this._eventsCount?this._events=Object.create(null):delete n[t]),this;if(0===arguments.length){var i,o=Object.keys(n);for(r=0;r<o.length;++r)"removeListener"!==(i=o[r])&&this.removeAllListeners(i);return this.removeAllListeners("removeListener"),this._events=Object.create(null),this._eventsCount=0,this}if("function"==typeof(e=n[t]))this.removeListener(t,e);else if(void 0!==e)for(r=e.length-1;r>=0;r--)this.removeListener(t,e[r]);return this},a.prototype.listeners=function(t){return c(this,t,!0)},a.prototype.rawListeners=function(t){return c(this,t,!1)},a.listenerCount=function(t,e){return"function"==typeof t.listenerCount?t.listenerCount(e):d.call(t,e)},a.prototype.listenerCount=d,a.prototype.eventNames=function(){return this._eventsCount>0?r(this._events):[]}},function(t,e,n){(e=t.exports=n(14)).Stream=e,e.Readable=e,e.Writable=n(11),e.Duplex=n(3),e.Transform=n(18),e.PassThrough=n(37)},function(t,e,n){"use strict";(function(e,r,i){var o=n(6);function s(t){var e=this;this.next=null,this.entry=null,this.finish=function(){!function(t,e,n){var r=t.entry;t.entry=null;for(;r;){var i=r.callback;e.pendingcb--,i(n),r=r.next}e.corkedRequestsFree?e.corkedRequestsFree.next=t:e.corkedRequestsFree=t}(e,t)}}t.exports=y;var a,h=!e.browser&&["v0.10","v0.9."].indexOf(e.version.slice(0,5))>-1?r:o.nextTick;y.WritableState=b;var u=n(5);u.inherits=n(2);var l={deprecate:n(36)},f=n(15),c=n(7).Buffer,d=i.Uint8Array||function(){};var p,g=n(16);function _(){}function b(t,e){a=a||n(3),t=t||{};var r=e instanceof a;this.objectMode=!!t.objectMode,r&&(this.objectMode=this.objectMode||!!t.writableObjectMode);var i=t.highWaterMark,u=t.writableHighWaterMark,l=this.objectMode?16:16384;this.highWaterMark=i||0===i?i:r&&(u||0===u)?u:l,this.highWaterMark=Math.floor(this.highWaterMark),this.finalCalled=!1,this.needDrain=!1,this.ending=!1,this.ended=!1,this.finished=!1,this.destroyed=!1;var f=!1===t.decodeStrings;this.decodeStrings=!f,this.defaultEncoding=t.defaultEncoding||"utf8",this.length=0,this.writing=!1,this.corked=0,this.sync=!0,this.bufferProcessing=!1,this.onwrite=function(t){!function(t,e){var n=t._writableState,r=n.sync,i=n.writecb;if(function(t){t.writing=!1,t.writecb=null,t.length-=t.writelen,t.writelen=0}(n),e)!function(t,e,n,r,i){--e.pendingcb,n?(o.nextTick(i,r),o.nextTick(x,t,e),t._writableState.errorEmitted=!0,t.emit("error",r)):(i(r),t._writableState.errorEmitted=!0,t.emit("error",r),x(t,e))}(t,n,r,e,i);else{var s=E(n);s||n.corked||n.bufferProcessing||!n.bufferedRequest||v(t,n),r?h(w,t,n,s,i):w(t,n,s,i)}}(e,t)},this.writecb=null,this.writelen=0,this.bufferedRequest=null,this.lastBufferedRequest=null,this.pendingcb=0,this.prefinished=!1,this.errorEmitted=!1,this.bufferedRequestCount=0,this.corkedRequestsFree=new s(this)}function y(t){if(a=a||n(3),!(p.call(y,this)||this instanceof a))return new y(t);this._writableState=new b(t,this),this.writable=!0,t&&("function"==typeof t.write&&(this._write=t.write),"function"==typeof t.writev&&(this._writev=t.writev),"function"==typeof t.destroy&&(this._destroy=t.destroy),"function"==typeof t.final&&(this._final=t.final)),f.call(this)}function m(t,e,n,r,i,o,s){e.writelen=r,e.writecb=s,e.writing=!0,e.sync=!0,n?t._writev(i,e.onwrite):t._write(i,o,e.onwrite),e.sync=!1}function w(t,e,n,r){n||function(t,e){0===e.length&&e.needDrain&&(e.needDrain=!1,t.emit("drain"))}(t,e),e.pendingcb--,r(),x(t,e)}function v(t,e){e.bufferProcessing=!0;var n=e.bufferedRequest;if(t._writev&&n&&n.next){var r=e.bufferedRequestCount,i=new Array(r),o=e.corkedRequestsFree;o.entry=n;for(var a=0,h=!0;n;)i[a]=n,n.isBuf||(h=!1),n=n.next,a+=1;i.allBuffers=h,m(t,e,!0,e.length,i,"",o.finish),e.pendingcb++,e.lastBufferedRequest=null,o.next?(e.corkedRequestsFree=o.next,o.next=null):e.corkedRequestsFree=new s(e),e.bufferedRequestCount=0}else{for(;n;){var u=n.chunk,l=n.encoding,f=n.callback;if(m(t,e,!1,e.objectMode?1:u.length,u,l,f),n=n.next,e.bufferedRequestCount--,e.writing)break}null===n&&(e.lastBufferedRequest=null)}e.bufferedRequest=n,e.bufferProcessing=!1}function E(t){return t.ending&&0===t.length&&null===t.bufferedRequest&&!t.finished&&!t.writing}function k(t,e){t._final(function(n){e.pendingcb--,n&&t.emit("error",n),e.prefinished=!0,t.emit("prefinish"),x(t,e)})}function x(t,e){var n=E(e);return n&&(!function(t,e){e.prefinished||e.finalCalled||("function"==typeof t._final?(e.pendingcb++,e.finalCalled=!0,o.nextTick(k,t,e)):(e.prefinished=!0,t.emit("prefinish")))}(t,e),0===e.pendingcb&&(e.finished=!0,t.emit("finish"))),n}u.inherits(y,f),b.prototype.getBuffer=function(){for(var t=this.bufferedRequest,e=[];t;)e.push(t),t=t.next;return e},function(){try{Object.defineProperty(b.prototype,"buffer",{get:l.deprecate(function(){return this.getBuffer()},"_writableState.buffer is deprecated. Use _writableState.getBuffer instead.","DEP0003")})}catch(t){}}(),"function"==typeof Symbol&&Symbol.hasInstance&&"function"==typeof Function.prototype[Symbol.hasInstance]?(p=Function.prototype[Symbol.hasInstance],Object.defineProperty(y,Symbol.hasInstance,{value:function(t){return!!p.call(this,t)||this===y&&(t&&t._writableState instanceof b)}})):p=function(t){return t instanceof this},y.prototype.pipe=function(){this.emit("error",new Error("Cannot pipe, not readable"))},y.prototype.write=function(t,e,n){var r,i=this._writableState,s=!1,a=!i.objectMode&&(r=t,c.isBuffer(r)||r instanceof d);return a&&!c.isBuffer(t)&&(t=function(t){return c.from(t)}(t)),"function"==typeof e&&(n=e,e=null),a?e="buffer":e||(e=i.defaultEncoding),"function"!=typeof n&&(n=_),i.ended?function(t,e){var n=new Error("write after end");t.emit("error",n),o.nextTick(e,n)}(this,n):(a||function(t,e,n,r){var i=!0,s=!1;return null===n?s=new TypeError("May not write null values to stream"):"string"==typeof n||void 0===n||e.objectMode||(s=new TypeError("Invalid non-string/buffer chunk")),s&&(t.emit("error",s),o.nextTick(r,s),i=!1),i}(this,i,t,n))&&(i.pendingcb++,s=function(t,e,n,r,i,o){if(!n){var s=function(t,e,n){t.objectMode||!1===t.decodeStrings||"string"!=typeof e||(e=c.from(e,n));return e}(e,r,i);r!==s&&(n=!0,i="buffer",r=s)}var a=e.objectMode?1:r.length;e.length+=a;var h=e.length<e.highWaterMark;h||(e.needDrain=!0);if(e.writing||e.corked){var u=e.lastBufferedRequest;e.lastBufferedRequest={chunk:r,encoding:i,isBuf:n,callback:o,next:null},u?u.next=e.lastBufferedRequest:e.bufferedRequest=e.lastBufferedRequest,e.bufferedRequestCount+=1}else m(t,e,!1,a,r,i,o);return h}(this,i,a,t,e,n)),s},y.prototype.cork=function(){this._writableState.corked++},y.prototype.uncork=function(){var t=this._writableState;t.corked&&(t.corked--,t.writing||t.corked||t.finished||t.bufferProcessing||!t.bufferedRequest||v(this,t))},y.prototype.setDefaultEncoding=function(t){if("string"==typeof t&&(t=t.toLowerCase()),!(["hex","utf8","utf-8","ascii","binary","base64","ucs2","ucs-2","utf16le","utf-16le","raw"].indexOf((t+"").toLowerCase())>-1))throw new TypeError("Unknown encoding: "+t);return this._writableState.defaultEncoding=t,this},Object.defineProperty(y.prototype,"writableHighWaterMark",{enumerable:!1,get:function(){return this._writableState.highWaterMark}}),y.prototype._write=function(t,e,n){n(new Error("_write() is not implemented"))},y.prototype._writev=null,y.prototype.end=function(t,e,n){var r=this._writableState;"function"==typeof t?(n=t,t=null,e=null):"function"==typeof e&&(n=e,e=null),null!=t&&this.write(t,e),r.corked&&(r.corked=1,this.uncork()),r.ending||r.finished||function(t,e,n){e.ending=!0,x(t,e),n&&(e.finished?o.nextTick(n):t.once("finish",n));e.ended=!0,t.writable=!1}(this,r,n)},Object.defineProperty(y.prototype,"destroyed",{get:function(){return void 0!==this._writableState&&this._writableState.destroyed},set:function(t){this._writableState&&(this._writableState.destroyed=t)}}),y.prototype.destroy=g.destroy,y.prototype._undestroy=g.undestroy,y.prototype._destroy=function(t,e){this.end(),e(t)}}).call(this,n(0),n(34).setImmediate,n(1))},function(t,e,n){(function(e){const r=n(29),i=n(23),o=n(52),s=n(53),a=n(55),h=n(56),u=n(57),l=n(58),f=n(59),c=n(60),d=n(61),p=n(24),g=-32768,_=new h(100);class b{constructor(t,e,n,r){this.blockNumber=t,this.zoomData=e,this.records=n,this.idx=r}}function y(t,e,n,r,i){var o,s,a,h,u,l,f,d,p,g,_,b,y,m,w,v;for(o=i.getString(),i.getInt(),s=i.getFloat(),a=i.getFloat(),h=i.getFloat(),u=i.getFloat(),f={unit:o,binSize:l=i.getInt()},d=i.getInt(),p=i.getInt(),g=new c(t,e,f,d,p,n,r),_=i.getInt(),b={};_-- >0;)m=i.getInt(),w=i.getLong(),v=i.getInt(),b[m]={filePosition:w,size:v};return g.blockIndexMap=b,y=s/(t.size/l)/(e.size/l),g.averageCount=y,g.sumCounts=s,g.stdDev=h,g.occupiedCellCount=a,g.percent95=u,g}t.exports=class{constructor(t){if(this.config=t,this.loadFragData=t.loadFragData,this.fragmentSitesCache={},this.normVectorCache={},this.normalizationTypes=["NONE"],t.file)this.file=t.file;else if(t.blob)this.file=new o(t.blob);else{if(this.url=t.path||t.url,!this.url.startsWith("http://")&&!this.url.startsWith("https://"))throw Error("Arguments must include file, blob, or url");{this.remote=!0;const n=new s(t);(e=this.url).indexOf("drive.google.com")>=0||e.indexOf("www.googleapis.com/drive")>0?this.file=new a(n,_):this.file=n}}var e}async init(){this.initialized||(await this.readHeader(),await this.readFooter(),this.initialized=!0)}async getMetaData(){return await this.init(),this.meta}async readHeader(){const t=await this.file.read(0,64e3);if(!t)return;const e=new l(new DataView(t));this.magic=e.getString(),this.version=e.getInt(),this.masterIndexPos=e.getLong(),this.genomeId=e.getString(),this.attributes={};let n=e.getInt();for(;n-- >0;)this.attributes[e.getString()]=e.getString();this.chromosomes=[],this.chromosomeIndexMap={};let r=e.getInt(),i=0;for(;r-- >0;){const t={index:i,name:e.getString(),size:e.getInt()};"all"===t.name.toLowerCase()&&(this.wholeGenomeChromosome=t,this.wholeGenomeResolution=Math.round(2*t.size)),this.chromosomes.push(t),this.chromosomeIndexMap[t.name]=t.index,i++}this.bpResolutions=[];let o=e.getInt();for(;o-- >0;)this.bpResolutions.push(e.getInt());if(this.loadFragData){this.fragResolutions=[];let t=e.getInt();for(;t-- >0;)this.fragResolutions.push(e.getInt());if(t>0){this.sites=[];let t=e.getInt();for(;t-- >0;)this.sites.push(e.getInt())}}this.chrAliasTable={};for(let t of Object.keys(this.chromosomeIndexMap))t.startsWith("chr")?this.chrAliasTable[t.substr(3)]=t:"MT"===t?this.chrAliasTable.chrM=t:this.chrAliasTable["chr"+t]=t;this.meta={version:this.version,genome:this.genomeId,chromosomes:this.chromosomes,resolutions:this.bpResolutions}}async readFooter(){let t=await this.file.read(this.masterIndexPos,8);if(!t)return null;let e=new l(new DataView(t));const n=e.getInt();let r=e.getInt();const i=196*r;for(this.masterIndexPos,Math.min(i,n-4),t=await this.file.read(this.masterIndexPos+8,Math.min(i,n-4)),e=new l(new DataView(t)),this.masterIndex={};r-- >0;){const t=e.getString(),n=e.getLong(),r=e.getInt();this.masterIndex[t]={start:n,size:r}}return this.expectedValueVectors={},r=e.getInt(),this.normExpectedValueVectorsPosition=this.masterIndexPos+4+n,this}async readMatrix(t,e){if(await this.init(),t>e){const n=t;t=e,e=n}const n=t+"_"+e,r=this.masterIndex[n];if(!r)return;const i=await this.file.read(r.start,r.size);if(!i)return;const o=new l(new DataView(i)),s=o.getInt(),a=o.getInt(),h=this.chromosomes[s],u=this.chromosomes[a];let c=o.getInt();const d=[],p=await this.getSites.call(this,h.name),g=await this.getSites.call(this,u.name);let _=o.available(),b=r.start;for(;c-- >0;){const t=y(h,u,p,g,o),e=_-o.available();t.idx={start:b,size:e},_=o.available(),d.push(t)}return new f(t,e,d)}async readBlockData(t,e){var n=null,r=e.blockIndexMap;return r&&(n=r[t]),n?this.file.read(n.filePosition,n.size):void 0}async readBlock(t,n){var i,o,s=null,a=n.blockIndexMap;if(a&&(s=a[t]),s){let a=await this.file.read(s.filePosition,s.size);if(!a)return;a=r.inflateSync(e.from(a)).buffer;var h=new l(new DataView(a)),u=h.getInt(),f=[];if(this.version<7)for(i=0;i<u;i++){var c=h.getInt(),d=h.getInt(),_=h.getFloat();f.push(new p(c,d,_))}else{var y=h.getInt(),m=h.getInt(),w=0==h.getByte(),v=h.getByte();if(1===v){var E=h.getShort();for(i=0;i<E;i++){d=m+h.getShort();var k=h.getShort();for(o=0;o<k;o++)c=y+h.getShort(),_=w?h.getShort():h.getFloat(),f.push(new p(c,d,_))}}else{if(2!=v)throw new Error("Unknown block type: "+v);var x=h.getInt(),S=h.getShort();for(i=0;i<x;i++){var T=Math.floor(i/S),A=y+(i-T*S),R=m+T;w?(_=h.getShort())!=g&&f.push(new p(A,R,_)):(_=h.getFloat(),isNaN(_)||f.push(new p(A,R,_)))}}}return new b(t,n,f,s)}}async getSites(t){}async getNormalizationVector(t,e,n,r){let i;if(await this.init(),Number.isInteger(e))i=e;else{const t=this.getFileChrName(e);i=this.chromosomeIndexMap[t]}const o=function(t,e,n,r){return t+"_"+e+"_"+n+"_"+r}(t,i,n.toString(),r);if(this.normVectorCache.hasOwnProperty(o))return Promise.resolve(this.normVectorCache[o]);const s=await this.getNormVectorIndex();if(!s)return void console.log("Normalization vectors not present in this file");const a=s[o];if(!a)return void console.log("Normalization option "+t+" not available at this resolution");const h=await this.file.read(a.filePosition,a.size);if(!h)return;const u=new l(new DataView(h)),f=u.getInt(),c=[];let p=!0;for(let t=0;t<f;t++)c[t]=u.getDouble(),isNaN(c[t])||(p=!1);return p?void 0:new d(t,i,n,r,c)}async getNormVectorIndex(){if(!this.normVectorIndex){if(!this.config.nvi&&this.remote&&this.url){const t=new URL(this.url),e=encodeURIComponent(t.hostname+t.pathname),n=await i("https://t5dvc6kn3f.execute-api.us-east-1.amazonaws.com/dev/nvi/"+e);if(200===n.status){const t=await n.text();t&&(this.config.nvi=t)}}if(this.config.nvi){const t=decodeURIComponent(this.config.nvi).split(","),e={start:parseInt(t[0]),size:parseInt(t[1])};return this.readNormVectorIndex(e)}try{return await this.readNormExpectedValuesAndNormVectorIndex(),this.normVectorIndex}catch(t){"416"===t.code||416===t.code?this.normExpectedValueVectorsPosition=void 0:console.error(t)}}return this.normVectorIndex}async getNormalizationOptions(){return await this.getNormVectorIndex(),this.normalizationTypes}async readNormVectorIndex(t){await this.init(),this.normalizationVectorIndexRange=t;const e=await this.file.read(t.start,t.size),n=new l(new DataView(e));this.normVectorIndex={};let r=n.getInt();for(;r-- >0;)this.parseNormVectorEntry(n);return this.normVectorIndex}async readNormExpectedValuesAndNormVectorIndex(){if(await this.init(),void 0===this.normExpectedValueVectorsPosition)return;const t=await this.skipExpectedValues(this.normExpectedValueVectorsPosition);let e=4,n=await this.file.read(t,4);const r=new l(new DataView(n)).getInt(),i={start:t+e,size:30*r};n=await this.file.read(i.start,i.size),this.normalizedExpectedValueVectors={},this.normVectorIndex={},await async function n(r,i){const o=new l(new DataView(i));for(;r-- >0;){if(o.available()<100){r++,e+=o.position;const i=Math.max(1e3,30*r),s={start:t+e,size:i},a=await this.file.read(s.start,s.size);return n.call(this,r,a)}this.parseNormVectorEntry(o)}e+=o.position}.call(this,r,n),this.config.nvi=t.toString()+","+e}async skipExpectedValues(t){const e=new u({file:this.file,size:256e3}),n={start:t,size:4},r=await e.read(n.start,n.size),i=new l(new DataView(r)).getInt();return 0===i?n.start+n.size:async function t(n,r){let i={start:n,size:500},o=0,s=n,a=await e.read(i.start,i.size),h=new l(new DataView(a));h.getString(),h.getString(),h.getInt();const u=h.getInt();o+=h.position+8*u,i={start:n+o,size:4},a=await e.read(i.start,i.size);const f=(h=new l(new DataView(a))).getInt();return o+=4+12*f,0===--r?Promise.resolve(s+o):t(s+o,r)}(t+4,i)}getZoomIndexForBinSize(t,e){let n;if("BP"===(e=e||"BP"))n=this.bpResolutions;else{if("FRAG"!==e)throw new Error("Invalid unit: "+e);n=this.fragResolutions}for(let e=0;e<n.length;e++)if(n[e]===t)return e;return-1}parseNormVectorEntry(t){const e=t.getString(),n=t.getInt(),r=t.getString(),i=t.getInt(),o=t.getLong(),s=t.getInt(),a=e+"_"+n+"_"+r+"_"+i;this.normalizationTypes.includes(e)||this.normalizationTypes.push(e),this.normVectorIndex[a]={filePosition:o,size:s}}getFileChrName(t){return this.chrAliasTable.hasOwnProperty(t)?this.chrAliasTable[t]:t}}}).call(this,n(4).Buffer)},function(t,e){var n={}.toString;t.exports=Array.isArray||function(t){return"[object Array]"==n.call(t)}},function(t,e,n){"use strict";(function(e,r){var i=n(6);t.exports=m;var o,s=n(13);m.ReadableState=y;n(9).EventEmitter;var a=function(t,e){return t.listeners(e).length},h=n(15),u=n(7).Buffer,l=e.Uint8Array||function(){};var f=n(5);f.inherits=n(2);var c=n(31),d=void 0;d=c&&c.debuglog?c.debuglog("stream"):function(){};var p,g=n(32),_=n(16);f.inherits(m,h);var b=["error","close","destroy","pause","resume"];function y(t,e){t=t||{};var r=e instanceof(o=o||n(3));this.objectMode=!!t.objectMode,r&&(this.objectMode=this.objectMode||!!t.readableObjectMode);var i=t.highWaterMark,s=t.readableHighWaterMark,a=this.objectMode?16:16384;this.highWaterMark=i||0===i?i:r&&(s||0===s)?s:a,this.highWaterMark=Math.floor(this.highWaterMark),this.buffer=new g,this.length=0,this.pipes=null,this.pipesCount=0,this.flowing=null,this.ended=!1,this.endEmitted=!1,this.reading=!1,this.sync=!0,this.needReadable=!1,this.emittedReadable=!1,this.readableListening=!1,this.resumeScheduled=!1,this.destroyed=!1,this.defaultEncoding=t.defaultEncoding||"utf8",this.awaitDrain=0,this.readingMore=!1,this.decoder=null,this.encoding=null,t.encoding&&(p||(p=n(17).StringDecoder),this.decoder=new p(t.encoding),this.encoding=t.encoding)}function m(t){if(o=o||n(3),!(this instanceof m))return new m(t);this._readableState=new y(t,this),this.readable=!0,t&&("function"==typeof t.read&&(this._read=t.read),"function"==typeof t.destroy&&(this._destroy=t.destroy)),h.call(this)}function w(t,e,n,r,i){var o,s=t._readableState;null===e?(s.reading=!1,function(t,e){if(e.ended)return;if(e.decoder){var n=e.decoder.end();n&&n.length&&(e.buffer.push(n),e.length+=e.objectMode?1:n.length)}e.ended=!0,x(t)}(t,s)):(i||(o=function(t,e){var n;r=e,u.isBuffer(r)||r instanceof l||"string"==typeof e||void 0===e||t.objectMode||(n=new TypeError("Invalid non-string/buffer chunk"));var r;return n}(s,e)),o?t.emit("error",o):s.objectMode||e&&e.length>0?("string"==typeof e||s.objectMode||Object.getPrototypeOf(e)===u.prototype||(e=function(t){return u.from(t)}(e)),r?s.endEmitted?t.emit("error",new Error("stream.unshift() after end event")):v(t,s,e,!0):s.ended?t.emit("error",new Error("stream.push() after EOF")):(s.reading=!1,s.decoder&&!n?(e=s.decoder.write(e),s.objectMode||0!==e.length?v(t,s,e,!1):T(t,s)):v(t,s,e,!1))):r||(s.reading=!1));return function(t){return!t.ended&&(t.needReadable||t.length<t.highWaterMark||0===t.length)}(s)}function v(t,e,n,r){e.flowing&&0===e.length&&!e.sync?(t.emit("data",n),t.read(0)):(e.length+=e.objectMode?1:n.length,r?e.buffer.unshift(n):e.buffer.push(n),e.needReadable&&x(t)),T(t,e)}Object.defineProperty(m.prototype,"destroyed",{get:function(){return void 0!==this._readableState&&this._readableState.destroyed},set:function(t){this._readableState&&(this._readableState.destroyed=t)}}),m.prototype.destroy=_.destroy,m.prototype._undestroy=_.undestroy,m.prototype._destroy=function(t,e){this.push(null),e(t)},m.prototype.push=function(t,e){var n,r=this._readableState;return r.objectMode?n=!0:"string"==typeof t&&((e=e||r.defaultEncoding)!==r.encoding&&(t=u.from(t,e),e=""),n=!0),w(this,t,e,!1,n)},m.prototype.unshift=function(t){return w(this,t,null,!0,!1)},m.prototype.isPaused=function(){return!1===this._readableState.flowing},m.prototype.setEncoding=function(t){return p||(p=n(17).StringDecoder),this._readableState.decoder=new p(t),this._readableState.encoding=t,this};var E=8388608;function k(t,e){return t<=0||0===e.length&&e.ended?0:e.objectMode?1:t!=t?e.flowing&&e.length?e.buffer.head.data.length:e.length:(t>e.highWaterMark&&(e.highWaterMark=function(t){return t>=E?t=E:(t--,t|=t>>>1,t|=t>>>2,t|=t>>>4,t|=t>>>8,t|=t>>>16,t++),t}(t)),t<=e.length?t:e.ended?e.length:(e.needReadable=!0,0))}function x(t){var e=t._readableState;e.needReadable=!1,e.emittedReadable||(d("emitReadable",e.flowing),e.emittedReadable=!0,e.sync?i.nextTick(S,t):S(t))}function S(t){d("emit readable"),t.emit("readable"),L(t)}function T(t,e){e.readingMore||(e.readingMore=!0,i.nextTick(A,t,e))}function A(t,e){for(var n=e.length;!e.reading&&!e.flowing&&!e.ended&&e.length<e.highWaterMark&&(d("maybeReadMore read 0"),t.read(0),n!==e.length);)n=e.length;e.readingMore=!1}function R(t){d("readable nexttick read 0"),t.read(0)}function I(t,e){e.reading||(d("resume read 0"),t.read(0)),e.resumeScheduled=!1,e.awaitDrain=0,t.emit("resume"),L(t),e.flowing&&!e.reading&&t.read(0)}function L(t){var e=t._readableState;for(d("flow",e.flowing);e.flowing&&null!==t.read(););}function O(t,e){return 0===e.length?null:(e.objectMode?n=e.buffer.shift():!t||t>=e.length?(n=e.decoder?e.buffer.join(""):1===e.buffer.length?e.buffer.head.data:e.buffer.concat(e.length),e.buffer.clear()):n=function(t,e,n){var r;t<e.head.data.length?(r=e.head.data.slice(0,t),e.head.data=e.head.data.slice(t)):r=t===e.head.data.length?e.shift():n?function(t,e){var n=e.head,r=1,i=n.data;t-=i.length;for(;n=n.next;){var o=n.data,s=t>o.length?o.length:t;if(s===o.length?i+=o:i+=o.slice(0,t),0===(t-=s)){s===o.length?(++r,n.next?e.head=n.next:e.head=e.tail=null):(e.head=n,n.data=o.slice(s));break}++r}return e.length-=r,i}(t,e):function(t,e){var n=u.allocUnsafe(t),r=e.head,i=1;r.data.copy(n),t-=r.data.length;for(;r=r.next;){var o=r.data,s=t>o.length?o.length:t;if(o.copy(n,n.length-t,0,s),0===(t-=s)){s===o.length?(++i,r.next?e.head=r.next:e.head=e.tail=null):(e.head=r,r.data=o.slice(s));break}++i}return e.length-=i,n}(t,e);return r}(t,e.buffer,e.decoder),n);var n}function z(t){var e=t._readableState;if(e.length>0)throw new Error('"endReadable()" called on non-empty stream');e.endEmitted||(e.ended=!0,i.nextTick(N,e,t))}function N(t,e){t.endEmitted||0!==t.length||(t.endEmitted=!0,e.readable=!1,e.emit("end"))}function B(t,e){for(var n=0,r=t.length;n<r;n++)if(t[n]===e)return n;return-1}m.prototype.read=function(t){d("read",t),t=parseInt(t,10);var e=this._readableState,n=t;if(0!==t&&(e.emittedReadable=!1),0===t&&e.needReadable&&(e.length>=e.highWaterMark||e.ended))return d("read: emitReadable",e.length,e.ended),0===e.length&&e.ended?z(this):x(this),null;if(0===(t=k(t,e))&&e.ended)return 0===e.length&&z(this),null;var r,i=e.needReadable;return d("need readable",i),(0===e.length||e.length-t<e.highWaterMark)&&d("length less than watermark",i=!0),e.ended||e.reading?d("reading or ended",i=!1):i&&(d("do read"),e.reading=!0,e.sync=!0,0===e.length&&(e.needReadable=!0),this._read(e.highWaterMark),e.sync=!1,e.reading||(t=k(n,e))),null===(r=t>0?O(t,e):null)?(e.needReadable=!0,t=0):e.length-=t,0===e.length&&(e.ended||(e.needReadable=!0),n!==t&&e.ended&&z(this)),null!==r&&this.emit("data",r),r},m.prototype._read=function(t){this.emit("error",new Error("_read() is not implemented"))},m.prototype.pipe=function(t,e){var n=this,o=this._readableState;switch(o.pipesCount){case 0:o.pipes=t;break;case 1:o.pipes=[o.pipes,t];break;default:o.pipes.push(t)}o.pipesCount+=1,d("pipe count=%d opts=%j",o.pipesCount,e);var h=(!e||!1!==e.end)&&t!==r.stdout&&t!==r.stderr?l:m;function u(e,r){d("onunpipe"),e===n&&r&&!1===r.hasUnpiped&&(r.hasUnpiped=!0,d("cleanup"),t.removeListener("close",b),t.removeListener("finish",y),t.removeListener("drain",f),t.removeListener("error",_),t.removeListener("unpipe",u),n.removeListener("end",l),n.removeListener("end",m),n.removeListener("data",g),c=!0,!o.awaitDrain||t._writableState&&!t._writableState.needDrain||f())}function l(){d("onend"),t.end()}o.endEmitted?i.nextTick(h):n.once("end",h),t.on("unpipe",u);var f=function(t){return function(){var e=t._readableState;d("pipeOnDrain",e.awaitDrain),e.awaitDrain&&e.awaitDrain--,0===e.awaitDrain&&a(t,"data")&&(e.flowing=!0,L(t))}}(n);t.on("drain",f);var c=!1;var p=!1;function g(e){d("ondata"),p=!1,!1!==t.write(e)||p||((1===o.pipesCount&&o.pipes===t||o.pipesCount>1&&-1!==B(o.pipes,t))&&!c&&(d("false write response, pause",n._readableState.awaitDrain),n._readableState.awaitDrain++,p=!0),n.pause())}function _(e){d("onerror",e),m(),t.removeListener("error",_),0===a(t,"error")&&t.emit("error",e)}function b(){t.removeListener("finish",y),m()}function y(){d("onfinish"),t.removeListener("close",b),m()}function m(){d("unpipe"),n.unpipe(t)}return n.on("data",g),function(t,e,n){if("function"==typeof t.prependListener)return t.prependListener(e,n);t._events&&t._events[e]?s(t._events[e])?t._events[e].unshift(n):t._events[e]=[n,t._events[e]]:t.on(e,n)}(t,"error",_),t.once("close",b),t.once("finish",y),t.emit("pipe",n),o.flowing||(d("pipe resume"),n.resume()),t},m.prototype.unpipe=function(t){var e=this._readableState,n={hasUnpiped:!1};if(0===e.pipesCount)return this;if(1===e.pipesCount)return t&&t!==e.pipes?this:(t||(t=e.pipes),e.pipes=null,e.pipesCount=0,e.flowing=!1,t&&t.emit("unpipe",this,n),this);if(!t){var r=e.pipes,i=e.pipesCount;e.pipes=null,e.pipesCount=0,e.flowing=!1;for(var o=0;o<i;o++)r[o].emit("unpipe",this,n);return this}var s=B(e.pipes,t);return-1===s?this:(e.pipes.splice(s,1),e.pipesCount-=1,1===e.pipesCount&&(e.pipes=e.pipes[0]),t.emit("unpipe",this,n),this)},m.prototype.on=function(t,e){var n=h.prototype.on.call(this,t,e);if("data"===t)!1!==this._readableState.flowing&&this.resume();else if("readable"===t){var r=this._readableState;r.endEmitted||r.readableListening||(r.readableListening=r.needReadable=!0,r.emittedReadable=!1,r.reading?r.length&&x(this):i.nextTick(R,this))}return n},m.prototype.addListener=m.prototype.on,m.prototype.resume=function(){var t=this._readableState;return t.flowing||(d("resume"),t.flowing=!0,function(t,e){e.resumeScheduled||(e.resumeScheduled=!0,i.nextTick(I,t,e))}(this,t)),this},m.prototype.pause=function(){return d("call pause flowing=%j",this._readableState.flowing),!1!==this._readableState.flowing&&(d("pause"),this._readableState.flowing=!1,this.emit("pause")),this},m.prototype.wrap=function(t){var e=this,n=this._readableState,r=!1;for(var i in t.on("end",function(){if(d("wrapped end"),n.decoder&&!n.ended){var t=n.decoder.end();t&&t.length&&e.push(t)}e.push(null)}),t.on("data",function(i){(d("wrapped data"),n.decoder&&(i=n.decoder.write(i)),n.objectMode&&null==i)||(n.objectMode||i&&i.length)&&(e.push(i)||(r=!0,t.pause()))}),t)void 0===this[i]&&"function"==typeof t[i]&&(this[i]=function(e){return function(){return t[e].apply(t,arguments)}}(i));for(var o=0;o<b.length;o++)t.on(b[o],this.emit.bind(this,b[o]));return this._read=function(e){d("wrapped _read",e),r&&(r=!1,t.resume())},this},Object.defineProperty(m.prototype,"readableHighWaterMark",{enumerable:!1,get:function(){return this._readableState.highWaterMark}}),m._fromList=O}).call(this,n(1),n(0))},function(t,e,n){t.exports=n(9).EventEmitter},function(t,e,n){"use strict";var r=n(6);function i(t,e){t.emit("error",e)}t.exports={destroy:function(t,e){var n=this,o=this._readableState&&this._readableState.destroyed,s=this._writableState&&this._writableState.destroyed;return o||s?(e?e(t):!t||this._writableState&&this._writableState.errorEmitted||r.nextTick(i,this,t),this):(this._readableState&&(this._readableState.destroyed=!0),this._writableState&&(this._writableState.destroyed=!0),this._destroy(t||null,function(t){!e&&t?(r.nextTick(i,n,t),n._writableState&&(n._writableState.errorEmitted=!0)):e&&e(t)}),this)},undestroy:function(){this._readableState&&(this._readableState.destroyed=!1,this._readableState.reading=!1,this._readableState.ended=!1,this._readableState.endEmitted=!1),this._writableState&&(this._writableState.destroyed=!1,this._writableState.ended=!1,this._writableState.ending=!1,this._writableState.finished=!1,this._writableState.errorEmitted=!1)}}},function(t,e,n){"use strict";var r=n(7).Buffer,i=r.isEncoding||function(t){switch((t=""+t)&&t.toLowerCase()){case"hex":case"utf8":case"utf-8":case"ascii":case"binary":case"base64":case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":case"raw":return!0;default:return!1}};function o(t){var e;switch(this.encoding=function(t){var e=function(t){if(!t)return"utf8";for(var e;;)switch(t){case"utf8":case"utf-8":return"utf8";case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return"utf16le";case"latin1":case"binary":return"latin1";case"base64":case"ascii":case"hex":return t;default:if(e)return;t=(""+t).toLowerCase(),e=!0}}(t);if("string"!=typeof e&&(r.isEncoding===i||!i(t)))throw new Error("Unknown encoding: "+t);return e||t}(t),this.encoding){case"utf16le":this.text=h,this.end=u,e=4;break;case"utf8":this.fillLast=a,e=4;break;case"base64":this.text=l,this.end=f,e=3;break;default:return this.write=c,void(this.end=d)}this.lastNeed=0,this.lastTotal=0,this.lastChar=r.allocUnsafe(e)}function s(t){return t<=127?0:t>>5==6?2:t>>4==14?3:t>>3==30?4:t>>6==2?-1:-2}function a(t){var e=this.lastTotal-this.lastNeed,n=function(t,e,n){if(128!=(192&e[0]))return t.lastNeed=0,"�";if(t.lastNeed>1&&e.length>1){if(128!=(192&e[1]))return t.lastNeed=1,"�";if(t.lastNeed>2&&e.length>2&&128!=(192&e[2]))return t.lastNeed=2,"�"}}(this,t);return void 0!==n?n:this.lastNeed<=t.length?(t.copy(this.lastChar,e,0,this.lastNeed),this.lastChar.toString(this.encoding,0,this.lastTotal)):(t.copy(this.lastChar,e,0,t.length),void(this.lastNeed-=t.length))}function h(t,e){if((t.length-e)%2==0){var n=t.toString("utf16le",e);if(n){var r=n.charCodeAt(n.length-1);if(r>=55296&&r<=56319)return this.lastNeed=2,this.lastTotal=4,this.lastChar[0]=t[t.length-2],this.lastChar[1]=t[t.length-1],n.slice(0,-1)}return n}return this.lastNeed=1,this.lastTotal=2,this.lastChar[0]=t[t.length-1],t.toString("utf16le",e,t.length-1)}function u(t){var e=t&&t.length?this.write(t):"";if(this.lastNeed){var n=this.lastTotal-this.lastNeed;return e+this.lastChar.toString("utf16le",0,n)}return e}function l(t,e){var n=(t.length-e)%3;return 0===n?t.toString("base64",e):(this.lastNeed=3-n,this.lastTotal=3,1===n?this.lastChar[0]=t[t.length-1]:(this.lastChar[0]=t[t.length-2],this.lastChar[1]=t[t.length-1]),t.toString("base64",e,t.length-n))}function f(t){var e=t&&t.length?this.write(t):"";return this.lastNeed?e+this.lastChar.toString("base64",0,3-this.lastNeed):e}function c(t){return t.toString(this.encoding)}function d(t){return t&&t.length?this.write(t):""}e.StringDecoder=o,o.prototype.write=function(t){if(0===t.length)return"";var e,n;if(this.lastNeed){if(void 0===(e=this.fillLast(t)))return"";n=this.lastNeed,this.lastNeed=0}else n=0;return n<t.length?e?e+this.text(t,n):this.text(t,n):e||""},o.prototype.end=function(t){var e=t&&t.length?this.write(t):"";return this.lastNeed?e+"�":e},o.prototype.text=function(t,e){var n=function(t,e,n){var r=e.length-1;if(r<n)return 0;var i=s(e[r]);if(i>=0)return i>0&&(t.lastNeed=i-1),i;if(--r<n||-2===i)return 0;if((i=s(e[r]))>=0)return i>0&&(t.lastNeed=i-2),i;if(--r<n||-2===i)return 0;if((i=s(e[r]))>=0)return i>0&&(2===i?i=0:t.lastNeed=i-3),i;return 0}(this,t,e);if(!this.lastNeed)return t.toString("utf8",e);this.lastTotal=n;var r=t.length-(n-this.lastNeed);return t.copy(this.lastChar,0,r),t.toString("utf8",e,r)},o.prototype.fillLast=function(t){if(this.lastNeed<=t.length)return t.copy(this.lastChar,this.lastTotal-this.lastNeed,0,this.lastNeed),this.lastChar.toString(this.encoding,0,this.lastTotal);t.copy(this.lastChar,this.lastTotal-this.lastNeed,0,t.length),this.lastNeed-=t.length}},function(t,e,n){"use strict";t.exports=s;var r=n(3),i=n(5);function o(t,e){var n=this._transformState;n.transforming=!1;var r=n.writecb;if(!r)return this.emit("error",new Error("write callback called multiple times"));n.writechunk=null,n.writecb=null,null!=e&&this.push(e),r(t);var i=this._readableState;i.reading=!1,(i.needReadable||i.length<i.highWaterMark)&&this._read(i.highWaterMark)}function s(t){if(!(this instanceof s))return new s(t);r.call(this,t),this._transformState={afterTransform:o.bind(this),needTransform:!1,transforming:!1,writecb:null,writechunk:null,writeencoding:null},this._readableState.needReadable=!0,this._readableState.sync=!1,t&&("function"==typeof t.transform&&(this._transform=t.transform),"function"==typeof t.flush&&(this._flush=t.flush)),this.on("prefinish",a)}function a(){var t=this;"function"==typeof this._flush?this._flush(function(e,n){h(t,e,n)}):h(this,null,null)}function h(t,e,n){if(e)return t.emit("error",e);if(null!=n&&t.push(n),t._writableState.length)throw new Error("Calling transform done when ws.length != 0");if(t._transformState.transforming)throw new Error("Calling transform done when still transforming");return t.push(null)}i.inherits=n(2),i.inherits(s,r),s.prototype.push=function(t,e){return this._transformState.needTransform=!1,r.prototype.push.call(this,t,e)},s.prototype._transform=function(t,e,n){throw new Error("_transform() is not implemented")},s.prototype._write=function(t,e,n){var r=this._transformState;if(r.writecb=n,r.writechunk=t,r.writeencoding=e,!r.transforming){var i=this._readableState;(r.needTransform||i.needReadable||i.length<i.highWaterMark)&&this._read(i.highWaterMark)}},s.prototype._read=function(t){var e=this._transformState;null!==e.writechunk&&e.writecb&&!e.transforming?(e.transforming=!0,this._transform(e.writechunk,e.writeencoding,e.afterTransform)):e.needTransform=!0},s.prototype._destroy=function(t,e){var n=this;r.prototype._destroy.call(this,t,function(t){e(t),n.emit("close")})}},function(t,e,n){"use strict";(function(e){
-/*!
- * The buffer module from node.js, for the browser.
- *
- * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
- * @license  MIT
+
+/**
+ * Modified for injection into igv.js after bable translation.  Search for "regeneratorRuntime rollup" for
+ * threads on this topic.  Posted solutions did not work for me or others.
  */
-function r(t,e){if(t===e)return 0;for(var n=t.length,r=e.length,i=0,o=Math.min(n,r);i<o;++i)if(t[i]!==e[i]){n=t[i],r=e[i];break}return n<r?-1:r<n?1:0}function i(t){return e.Buffer&&"function"==typeof e.Buffer.isBuffer?e.Buffer.isBuffer(t):!(null==t||!t._isBuffer)}var o=n(20),s=Object.prototype.hasOwnProperty,a=Array.prototype.slice,h="foo"===function(){}.name;function u(t){return Object.prototype.toString.call(t)}function l(t){return!i(t)&&("function"==typeof e.ArrayBuffer&&("function"==typeof ArrayBuffer.isView?ArrayBuffer.isView(t):!!t&&(t instanceof DataView||!!(t.buffer&&t.buffer instanceof ArrayBuffer))))}var f=t.exports=b,c=/\s*function\s+([^\(\s]*)\s*/;function d(t){if(o.isFunction(t)){if(h)return t.name;var e=t.toString().match(c);return e&&e[1]}}function p(t,e){return"string"==typeof t?t.length<e?t:t.slice(0,e):t}function g(t){if(h||!o.isFunction(t))return o.inspect(t);var e=d(t);return"[Function"+(e?": "+e:"")+"]"}function _(t,e,n,r,i){throw new f.AssertionError({message:n,actual:t,expected:e,operator:r,stackStartFunction:i})}function b(t,e){t||_(t,!0,e,"==",f.ok)}function y(t,e,n,s){if(t===e)return!0;if(i(t)&&i(e))return 0===r(t,e);if(o.isDate(t)&&o.isDate(e))return t.getTime()===e.getTime();if(o.isRegExp(t)&&o.isRegExp(e))return t.source===e.source&&t.global===e.global&&t.multiline===e.multiline&&t.lastIndex===e.lastIndex&&t.ignoreCase===e.ignoreCase;if(null!==t&&"object"==typeof t||null!==e&&"object"==typeof e){if(l(t)&&l(e)&&u(t)===u(e)&&!(t instanceof Float32Array||t instanceof Float64Array))return 0===r(new Uint8Array(t.buffer),new Uint8Array(e.buffer));if(i(t)!==i(e))return!1;var h=(s=s||{actual:[],expected:[]}).actual.indexOf(t);return-1!==h&&h===s.expected.indexOf(e)||(s.actual.push(t),s.expected.push(e),function(t,e,n,r){if(null==t||null==e)return!1;if(o.isPrimitive(t)||o.isPrimitive(e))return t===e;if(n&&Object.getPrototypeOf(t)!==Object.getPrototypeOf(e))return!1;var i=m(t),s=m(e);if(i&&!s||!i&&s)return!1;if(i)return t=a.call(t),e=a.call(e),y(t,e,n);var h,u,l=E(t),f=E(e);if(l.length!==f.length)return!1;for(l.sort(),f.sort(),u=l.length-1;u>=0;u--)if(l[u]!==f[u])return!1;for(u=l.length-1;u>=0;u--)if(h=l[u],!y(t[h],e[h],n,r))return!1;return!0}(t,e,n,s))}return n?t===e:t==e}function m(t){return"[object Arguments]"==Object.prototype.toString.call(t)}function w(t,e){if(!t||!e)return!1;if("[object RegExp]"==Object.prototype.toString.call(e))return e.test(t);try{if(t instanceof e)return!0}catch(t){}return!Error.isPrototypeOf(e)&&!0===e.call({},t)}function v(t,e,n,r){var i;if("function"!=typeof e)throw new TypeError('"block" argument must be a function');"string"==typeof n&&(r=n,n=null),i=function(t){var e;try{t()}catch(t){e=t}return e}(e),r=(n&&n.name?" ("+n.name+").":".")+(r?" "+r:"."),t&&!i&&_(i,n,"Missing expected exception"+r);var s="string"==typeof r,a=!t&&i&&!n;if((!t&&o.isError(i)&&s&&w(i,n)||a)&&_(i,n,"Got unwanted exception"+r),t&&i&&n&&!w(i,n)||!t&&i)throw i}f.AssertionError=function(t){var e;this.name="AssertionError",this.actual=t.actual,this.expected=t.expected,this.operator=t.operator,t.message?(this.message=t.message,this.generatedMessage=!1):(this.message=p(g((e=this).actual),128)+" "+e.operator+" "+p(g(e.expected),128),this.generatedMessage=!0);var n=t.stackStartFunction||_;if(Error.captureStackTrace)Error.captureStackTrace(this,n);else{var r=new Error;if(r.stack){var i=r.stack,o=d(n),s=i.indexOf("\n"+o);if(s>=0){var a=i.indexOf("\n",s+1);i=i.substring(a+1)}this.stack=i}}},o.inherits(f.AssertionError,Error),f.fail=_,f.ok=b,f.equal=function(t,e,n){t!=e&&_(t,e,n,"==",f.equal)},f.notEqual=function(t,e,n){t==e&&_(t,e,n,"!=",f.notEqual)},f.deepEqual=function(t,e,n){y(t,e,!1)||_(t,e,n,"deepEqual",f.deepEqual)},f.deepStrictEqual=function(t,e,n){y(t,e,!0)||_(t,e,n,"deepStrictEqual",f.deepStrictEqual)},f.notDeepEqual=function(t,e,n){y(t,e,!1)&&_(t,e,n,"notDeepEqual",f.notDeepEqual)},f.notDeepStrictEqual=function t(e,n,r){y(e,n,!0)&&_(e,n,r,"notDeepStrictEqual",t)},f.strictEqual=function(t,e,n){t!==e&&_(t,e,n,"===",f.strictEqual)},f.notStrictEqual=function(t,e,n){t===e&&_(t,e,n,"!==",f.notStrictEqual)},f.throws=function(t,e,n){v(!0,t,e,n)},f.doesNotThrow=function(t,e,n){v(!1,t,e,n)},f.ifError=function(t){if(t)throw t};var E=Object.keys||function(t){var e=[];for(var n in t)s.call(t,n)&&e.push(n);return e}}).call(this,n(1))},function(t,e,n){(function(t){var r=Object.getOwnPropertyDescriptors||function(t){for(var e=Object.keys(t),n={},r=0;r<e.length;r++)n[e[r]]=Object.getOwnPropertyDescriptor(t,e[r]);return n},i=/%[sdj%]/g;e.format=function(t){if(!b(t)){for(var e=[],n=0;n<arguments.length;n++)e.push(a(arguments[n]));return e.join(" ")}n=1;for(var r=arguments,o=r.length,s=String(t).replace(i,function(t){if("%%"===t)return"%";if(n>=o)return t;switch(t){case"%s":return String(r[n++]);case"%d":return Number(r[n++]);case"%j":try{return JSON.stringify(r[n++])}catch(t){return"[Circular]"}default:return t}}),h=r[n];n<o;h=r[++n])g(h)||!w(h)?s+=" "+h:s+=" "+a(h);return s},e.deprecate=function(n,r){if(void 0!==t&&!0===t.noDeprecation)return n;if(void 0===t)return function(){return e.deprecate(n,r).apply(this,arguments)};var i=!1;return function(){if(!i){if(t.throwDeprecation)throw new Error(r);t.traceDeprecation?console.trace(r):console.error(r),i=!0}return n.apply(this,arguments)}};var o,s={};function a(t,n){var r={seen:[],stylize:u};return arguments.length>=3&&(r.depth=arguments[2]),arguments.length>=4&&(r.colors=arguments[3]),p(n)?r.showHidden=n:n&&e._extend(r,n),y(r.showHidden)&&(r.showHidden=!1),y(r.depth)&&(r.depth=2),y(r.colors)&&(r.colors=!1),y(r.customInspect)&&(r.customInspect=!0),r.colors&&(r.stylize=h),l(r,t,r.depth)}function h(t,e){var n=a.styles[e];return n?"["+a.colors[n][0]+"m"+t+"["+a.colors[n][1]+"m":t}function u(t,e){return t}function l(t,n,r){if(t.customInspect&&n&&k(n.inspect)&&n.inspect!==e.inspect&&(!n.constructor||n.constructor.prototype!==n)){var i=n.inspect(r,t);return b(i)||(i=l(t,i,r)),i}var o=function(t,e){if(y(e))return t.stylize("undefined","undefined");if(b(e)){var n="'"+JSON.stringify(e).replace(/^"|"$/g,"").replace(/'/g,"\\'").replace(/\\"/g,'"')+"'";return t.stylize(n,"string")}if(_(e))return t.stylize(""+e,"number");if(p(e))return t.stylize(""+e,"boolean");if(g(e))return t.stylize("null","null")}(t,n);if(o)return o;var s=Object.keys(n),a=function(t){var e={};return t.forEach(function(t,n){e[t]=!0}),e}(s);if(t.showHidden&&(s=Object.getOwnPropertyNames(n)),E(n)&&(s.indexOf("message")>=0||s.indexOf("description")>=0))return f(n);if(0===s.length){if(k(n)){var h=n.name?": "+n.name:"";return t.stylize("[Function"+h+"]","special")}if(m(n))return t.stylize(RegExp.prototype.toString.call(n),"regexp");if(v(n))return t.stylize(Date.prototype.toString.call(n),"date");if(E(n))return f(n)}var u,w="",x=!1,S=["{","}"];(d(n)&&(x=!0,S=["[","]"]),k(n))&&(w=" [Function"+(n.name?": "+n.name:"")+"]");return m(n)&&(w=" "+RegExp.prototype.toString.call(n)),v(n)&&(w=" "+Date.prototype.toUTCString.call(n)),E(n)&&(w=" "+f(n)),0!==s.length||x&&0!=n.length?r<0?m(n)?t.stylize(RegExp.prototype.toString.call(n),"regexp"):t.stylize("[Object]","special"):(t.seen.push(n),u=x?function(t,e,n,r,i){for(var o=[],s=0,a=e.length;s<a;++s)A(e,String(s))?o.push(c(t,e,n,r,String(s),!0)):o.push("");return i.forEach(function(i){i.match(/^\d+$/)||o.push(c(t,e,n,r,i,!0))}),o}(t,n,r,a,s):s.map(function(e){return c(t,n,r,a,e,x)}),t.seen.pop(),function(t,e,n){if(t.reduce(function(t,e){return 0,e.indexOf("\n")>=0&&0,t+e.replace(/\u001b\[\d\d?m/g,"").length+1},0)>60)return n[0]+(""===e?"":e+"\n ")+" "+t.join(",\n  ")+" "+n[1];return n[0]+e+" "+t.join(", ")+" "+n[1]}(u,w,S)):S[0]+w+S[1]}function f(t){return"["+Error.prototype.toString.call(t)+"]"}function c(t,e,n,r,i,o){var s,a,h;if((h=Object.getOwnPropertyDescriptor(e,i)||{value:e[i]}).get?a=h.set?t.stylize("[Getter/Setter]","special"):t.stylize("[Getter]","special"):h.set&&(a=t.stylize("[Setter]","special")),A(r,i)||(s="["+i+"]"),a||(t.seen.indexOf(h.value)<0?(a=g(n)?l(t,h.value,null):l(t,h.value,n-1)).indexOf("\n")>-1&&(a=o?a.split("\n").map(function(t){return"  "+t}).join("\n").substr(2):"\n"+a.split("\n").map(function(t){return"   "+t}).join("\n")):a=t.stylize("[Circular]","special")),y(s)){if(o&&i.match(/^\d+$/))return a;(s=JSON.stringify(""+i)).match(/^"([a-zA-Z_][a-zA-Z_0-9]*)"$/)?(s=s.substr(1,s.length-2),s=t.stylize(s,"name")):(s=s.replace(/'/g,"\\'").replace(/\\"/g,'"').replace(/(^"|"$)/g,"'"),s=t.stylize(s,"string"))}return s+": "+a}function d(t){return Array.isArray(t)}function p(t){return"boolean"==typeof t}function g(t){return null===t}function _(t){return"number"==typeof t}function b(t){return"string"==typeof t}function y(t){return void 0===t}function m(t){return w(t)&&"[object RegExp]"===x(t)}function w(t){return"object"==typeof t&&null!==t}function v(t){return w(t)&&"[object Date]"===x(t)}function E(t){return w(t)&&("[object Error]"===x(t)||t instanceof Error)}function k(t){return"function"==typeof t}function x(t){return Object.prototype.toString.call(t)}function S(t){return t<10?"0"+t.toString(10):t.toString(10)}e.debuglog=function(n){if(y(o)&&(o=t.env.NODE_DEBUG||""),n=n.toUpperCase(),!s[n])if(new RegExp("\\b"+n+"\\b","i").test(o)){var r=t.pid;s[n]=function(){var t=e.format.apply(e,arguments);console.error("%s %d: %s",n,r,t)}}else s[n]=function(){};return s[n]},e.inspect=a,a.colors={bold:[1,22],italic:[3,23],underline:[4,24],inverse:[7,27],white:[37,39],grey:[90,39],black:[30,39],blue:[34,39],cyan:[36,39],green:[32,39],magenta:[35,39],red:[31,39],yellow:[33,39]},a.styles={special:"cyan",number:"yellow",boolean:"yellow",undefined:"grey",null:"bold",string:"green",date:"magenta",regexp:"red"},e.isArray=d,e.isBoolean=p,e.isNull=g,e.isNullOrUndefined=function(t){return null==t},e.isNumber=_,e.isString=b,e.isSymbol=function(t){return"symbol"==typeof t},e.isUndefined=y,e.isRegExp=m,e.isObject=w,e.isDate=v,e.isError=E,e.isFunction=k,e.isPrimitive=function(t){return null===t||"boolean"==typeof t||"number"==typeof t||"string"==typeof t||"symbol"==typeof t||void 0===t},e.isBuffer=n(43);var T=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];function A(t,e){return Object.prototype.hasOwnProperty.call(t,e)}e.log=function(){var t,n;console.log("%s - %s",(t=new Date,n=[S(t.getHours()),S(t.getMinutes()),S(t.getSeconds())].join(":"),[t.getDate(),T[t.getMonth()],n].join(" ")),e.format.apply(e,arguments))},e.inherits=n(2),e._extend=function(t,e){if(!e||!w(e))return t;for(var n=Object.keys(e),r=n.length;r--;)t[n[r]]=e[n[r]];return t};var R="undefined"!=typeof Symbol?Symbol("util.promisify.custom"):void 0;function I(t,e){if(!t){var n=new Error("Promise was rejected with a falsy value");n.reason=t,t=n}return e(t)}e.promisify=function(t){if("function"!=typeof t)throw new TypeError('The "original" argument must be of type Function');if(R&&t[R]){var e;if("function"!=typeof(e=t[R]))throw new TypeError('The "util.promisify.custom" argument must be of type Function');return Object.defineProperty(e,R,{value:e,enumerable:!1,writable:!1,configurable:!0}),e}function e(){for(var e,n,r=new Promise(function(t,r){e=t,n=r}),i=[],o=0;o<arguments.length;o++)i.push(arguments[o]);i.push(function(t,r){t?n(t):e(r)});try{t.apply(this,i)}catch(t){n(t)}return r}return Object.setPrototypeOf(e,Object.getPrototypeOf(t)),R&&Object.defineProperty(e,R,{value:e,enumerable:!1,writable:!1,configurable:!0}),Object.defineProperties(e,r(t))},e.promisify.custom=R,e.callbackify=function(e){if("function"!=typeof e)throw new TypeError('The "original" argument must be of type Function');function n(){for(var n=[],r=0;r<arguments.length;r++)n.push(arguments[r]);var i=n.pop();if("function"!=typeof i)throw new TypeError("The last argument must be of type Function");var o=this,s=function(){return i.apply(o,arguments)};e.apply(this,n).then(function(e){t.nextTick(s,null,e)},function(e){t.nextTick(I,e,s)})}return Object.setPrototypeOf(n,Object.getPrototypeOf(e)),Object.defineProperties(n,r(e)),n}}).call(this,n(0))},function(t,e,n){"use strict";t.exports=function(t,e,n,r){for(var i=65535&t|0,o=t>>>16&65535|0,s=0;0!==n;){n-=s=n>2e3?2e3:n;do{o=o+(i=i+e[r++]|0)|0}while(--s);i%=65521,o%=65521}return i|o<<16|0}},function(t,e,n){"use strict";var r=function(){for(var t,e=[],n=0;n<256;n++){t=n;for(var r=0;r<8;r++)t=1&t?3988292384^t>>>1:t>>>1;e[n]=t}return e}();t.exports=function(t,e,n,i){var o=r,s=i+n;t^=-1;for(var a=i;a<s;a++)t=t>>>8^o[255&(t^e[a])];return-1^t}},function(t,e){var n=function(t){function e(){this.fetch=!1}return e.prototype=t,new e}("undefined"!=typeof self?self:this);!function(t){!function(e){var n={searchParams:"URLSearchParams"in t,iterable:"Symbol"in t&&"iterator"in Symbol,blob:"FileReader"in t&&"Blob"in t&&function(){try{return new Blob,!0}catch(t){return!1}}(),formData:"FormData"in t,arrayBuffer:"ArrayBuffer"in t};if(n.arrayBuffer)var r=["[object Int8Array]","[object Uint8Array]","[object Uint8ClampedArray]","[object Int16Array]","[object Uint16Array]","[object Int32Array]","[object Uint32Array]","[object Float32Array]","[object Float64Array]"],i=ArrayBuffer.isView||function(t){return t&&r.indexOf(Object.prototype.toString.call(t))>-1};function o(t){if("string"!=typeof t&&(t=String(t)),/[^a-z0-9\-#$%&'*+.^_`|~]/i.test(t))throw new TypeError("Invalid character in header field name");return t.toLowerCase()}function s(t){return"string"!=typeof t&&(t=String(t)),t}function a(t){var e={next:function(){var e=t.shift();return{done:void 0===e,value:e}}};return n.iterable&&(e[Symbol.iterator]=function(){return e}),e}function h(t){this.map={},t instanceof h?t.forEach(function(t,e){this.append(e,t)},this):Array.isArray(t)?t.forEach(function(t){this.append(t[0],t[1])},this):t&&Object.getOwnPropertyNames(t).forEach(function(e){this.append(e,t[e])},this)}function u(t){if(t.bodyUsed)return Promise.reject(new TypeError("Already read"));t.bodyUsed=!0}function l(t){return new Promise(function(e,n){t.onload=function(){e(t.result)},t.onerror=function(){n(t.error)}})}function f(t){var e=new FileReader,n=l(e);return e.readAsArrayBuffer(t),n}function c(t){if(t.slice)return t.slice(0);var e=new Uint8Array(t.byteLength);return e.set(new Uint8Array(t)),e.buffer}function d(){return this.bodyUsed=!1,this._initBody=function(t){var e;this._bodyInit=t,t?"string"==typeof t?this._bodyText=t:n.blob&&Blob.prototype.isPrototypeOf(t)?this._bodyBlob=t:n.formData&&FormData.prototype.isPrototypeOf(t)?this._bodyFormData=t:n.searchParams&&URLSearchParams.prototype.isPrototypeOf(t)?this._bodyText=t.toString():n.arrayBuffer&&n.blob&&((e=t)&&DataView.prototype.isPrototypeOf(e))?(this._bodyArrayBuffer=c(t.buffer),this._bodyInit=new Blob([this._bodyArrayBuffer])):n.arrayBuffer&&(ArrayBuffer.prototype.isPrototypeOf(t)||i(t))?this._bodyArrayBuffer=c(t):this._bodyText=t=Object.prototype.toString.call(t):this._bodyText="",this.headers.get("content-type")||("string"==typeof t?this.headers.set("content-type","text/plain;charset=UTF-8"):this._bodyBlob&&this._bodyBlob.type?this.headers.set("content-type",this._bodyBlob.type):n.searchParams&&URLSearchParams.prototype.isPrototypeOf(t)&&this.headers.set("content-type","application/x-www-form-urlencoded;charset=UTF-8"))},n.blob&&(this.blob=function(){var t=u(this);if(t)return t;if(this._bodyBlob)return Promise.resolve(this._bodyBlob);if(this._bodyArrayBuffer)return Promise.resolve(new Blob([this._bodyArrayBuffer]));if(this._bodyFormData)throw new Error("could not read FormData body as blob");return Promise.resolve(new Blob([this._bodyText]))},this.arrayBuffer=function(){return this._bodyArrayBuffer?u(this)||Promise.resolve(this._bodyArrayBuffer):this.blob().then(f)}),this.text=function(){var t,e,n,r=u(this);if(r)return r;if(this._bodyBlob)return t=this._bodyBlob,e=new FileReader,n=l(e),e.readAsText(t),n;if(this._bodyArrayBuffer)return Promise.resolve(function(t){for(var e=new Uint8Array(t),n=new Array(e.length),r=0;r<e.length;r++)n[r]=String.fromCharCode(e[r]);return n.join("")}(this._bodyArrayBuffer));if(this._bodyFormData)throw new Error("could not read FormData body as text");return Promise.resolve(this._bodyText)},n.formData&&(this.formData=function(){return this.text().then(_)}),this.json=function(){return this.text().then(JSON.parse)},this}h.prototype.append=function(t,e){t=o(t),e=s(e);var n=this.map[t];this.map[t]=n?n+", "+e:e},h.prototype.delete=function(t){delete this.map[o(t)]},h.prototype.get=function(t){return t=o(t),this.has(t)?this.map[t]:null},h.prototype.has=function(t){return this.map.hasOwnProperty(o(t))},h.prototype.set=function(t,e){this.map[o(t)]=s(e)},h.prototype.forEach=function(t,e){for(var n in this.map)this.map.hasOwnProperty(n)&&t.call(e,this.map[n],n,this)},h.prototype.keys=function(){var t=[];return this.forEach(function(e,n){t.push(n)}),a(t)},h.prototype.values=function(){var t=[];return this.forEach(function(e){t.push(e)}),a(t)},h.prototype.entries=function(){var t=[];return this.forEach(function(e,n){t.push([n,e])}),a(t)},n.iterable&&(h.prototype[Symbol.iterator]=h.prototype.entries);var p=["DELETE","GET","HEAD","OPTIONS","POST","PUT"];function g(t,e){var n,r,i=(e=e||{}).body;if(t instanceof g){if(t.bodyUsed)throw new TypeError("Already read");this.url=t.url,this.credentials=t.credentials,e.headers||(this.headers=new h(t.headers)),this.method=t.method,this.mode=t.mode,this.signal=t.signal,i||null==t._bodyInit||(i=t._bodyInit,t.bodyUsed=!0)}else this.url=String(t);if(this.credentials=e.credentials||this.credentials||"same-origin",!e.headers&&this.headers||(this.headers=new h(e.headers)),this.method=(n=e.method||this.method||"GET",r=n.toUpperCase(),p.indexOf(r)>-1?r:n),this.mode=e.mode||this.mode||null,this.signal=e.signal||this.signal,this.referrer=null,("GET"===this.method||"HEAD"===this.method)&&i)throw new TypeError("Body not allowed for GET or HEAD requests");this._initBody(i)}function _(t){var e=new FormData;return t.trim().split("&").forEach(function(t){if(t){var n=t.split("="),r=n.shift().replace(/\+/g," "),i=n.join("=").replace(/\+/g," ");e.append(decodeURIComponent(r),decodeURIComponent(i))}}),e}function b(t,e){e||(e={}),this.type="default",this.status=void 0===e.status?200:e.status,this.ok=this.status>=200&&this.status<300,this.statusText="statusText"in e?e.statusText:"OK",this.headers=new h(e.headers),this.url=e.url||"",this._initBody(t)}g.prototype.clone=function(){return new g(this,{body:this._bodyInit})},d.call(g.prototype),d.call(b.prototype),b.prototype.clone=function(){return new b(this._bodyInit,{status:this.status,statusText:this.statusText,headers:new h(this.headers),url:this.url})},b.error=function(){var t=new b(null,{status:0,statusText:""});return t.type="error",t};var y=[301,302,303,307,308];b.redirect=function(t,e){if(-1===y.indexOf(e))throw new RangeError("Invalid status code");return new b(null,{status:e,headers:{location:t}})},e.DOMException=t.DOMException;try{new e.DOMException}catch(t){e.DOMException=function(t,e){this.message=t,this.name=e;var n=Error(t);this.stack=n.stack},e.DOMException.prototype=Object.create(Error.prototype),e.DOMException.prototype.constructor=e.DOMException}function m(t,r){return new Promise(function(i,o){var s=new g(t,r);if(s.signal&&s.signal.aborted)return o(new e.DOMException("Aborted","AbortError"));var a=new XMLHttpRequest;function u(){a.abort()}a.onload=function(){var t,e,n={status:a.status,statusText:a.statusText,headers:(t=a.getAllResponseHeaders()||"",e=new h,t.replace(/\r?\n[\t ]+/g," ").split(/\r?\n/).forEach(function(t){var n=t.split(":"),r=n.shift().trim();if(r){var i=n.join(":").trim();e.append(r,i)}}),e)};n.url="responseURL"in a?a.responseURL:n.headers.get("X-Request-URL");var r="response"in a?a.response:a.responseText;i(new b(r,n))},a.onerror=function(){o(new TypeError("Network request failed"))},a.ontimeout=function(){o(new TypeError("Network request failed"))},a.onabort=function(){o(new e.DOMException("Aborted","AbortError"))},a.open(s.method,s.url,!0),"include"===s.credentials?a.withCredentials=!0:"omit"===s.credentials&&(a.withCredentials=!1),"responseType"in a&&n.blob&&(a.responseType="blob"),s.headers.forEach(function(t,e){a.setRequestHeader(e,t)}),s.signal&&(s.signal.addEventListener("abort",u),a.onreadystatechange=function(){4===a.readyState&&s.signal.removeEventListener("abort",u)}),a.send(void 0===s._bodyInit?null:s._bodyInit)})}m.polyfill=!0,t.fetch||(t.fetch=m,t.Headers=h,t.Request=g,t.Response=b),e.Headers=h,e.Request=g,e.Response=b,e.fetch=m}({})}(n),delete n.fetch.polyfill,(e=n.fetch).default=n.fetch,e.fetch=n.fetch,e.Headers=n.Headers,e.Request=n.Request,e.Response=n.Response,t.exports=e},function(t,e){t.exports=class{constructor(t,e,n){this.bin1=t,this.bin2=e,this.counts=n}getKey(){return this.bin1+"_"+this.bin2}}},function(t,e,n){const r=n(26);n(12);t.exports=r},function(t,e,n){const r=n(12),i=n(24);t.exports=class{constructor(t){this.config=t,this.hicFile=new r(t)}async getMetaData(){return await this.hicFile.getMetaData()}async getBlocks(t,e,n,r){await this.hicFile.init();const i=this.hicFile.getFileChrName(t.chr),o=this.hicFile.getFileChrName(e.chr),s=this.hicFile.chromosomeIndexMap[i],a=this.hicFile.chromosomeIndexMap[o];if(void 0===s)return console.log("No chromosome named: "+t.chr),[];if(void 0===a)return console.log("No chromosome named: "+e.chr),[];const h=void 0===t.start?void 0:t.start/r,u=void 0===t.end?void 0:t.end/r,l=void 0===e.start?void 0:e.start/r,f=void 0===e.end?void 0:e.end/r,c=await this.hicFile.readMatrix(s,a);if(!c)return console.log("No matrix for "+t.chr+"-"+e.chr),[];const d=void 0===r?0:this.hicFile.getZoomIndexForBinSize(r,n);if(-1===d)throw new Error("Invalid bin size");const p=c.bpZoomData[d],g=p.blockBinCount,_=void 0===h?0:Math.floor(h/g),b=void 0===h?p.blockColumnCount:Math.floor(u/g),y=void 0===l?0:Math.floor(l/g),m=void 0===f?p.blockColumnCount:Math.floor(f/g),w=[],v=s===a;for(let t=y;t<=m;t++)for(let e=_;e<=b;e++){let n;n=v&&t<e?e*p.blockColumnCount+t:t*p.blockColumnCount+e,w.push(this.hicFile.readBlock(n,p))}return Promise.all(w)}async getContactRecords(t,e,n,r,o){const s=await this.getBlocks(e,n,r,o);if(!s||0===s.length)return[];const a=this.hicFile.getFileChrName(e.chr),h=this.hicFile.getFileChrName(n.chr),u=void 0===e.start?void 0:e.start/o,l=void 0===e.end?void 0:e.end/o,f=void 0===n.start?void 0:n.start/o,c=void 0===n.end?void 0:n.end/o;let d,p;const g=t&&"NONE"!==t;g&&(d=await this.hicFile.getNormalizationVector(t,a,r,o),p=a===h?d:await this.hicFile.getNormalizationVector(t,h,r,o));const _=[];for(let t of s)if(t)for(let e of t.records)if(void 0===u||e.bin1>=u&&e.bin1<=l&&e.bin2>=f&&e.bin2<=c)if(g){const t=e.bin1,n=e.bin2,r=d.data[t]*p.data[n];if(0!==r[t]&&!isNaN(r)){const o=e.counts/r;_.push(new i(t,n,o))}}else _.push(e);return _}async getNormalizationOptions(){return this.hicFile.getNormalizationOptions()}async getNVI(){return await this.hicFile.getNormVectorIndex(),this.hicFile.config.nvi}getFileChrName(t){return this.hicFile.chrAliasTable.hasOwnProperty(t)?this.hicFile.chrAliasTable[t]:t}}},function(t,e,n){"use strict";e.byteLength=function(t){var e=u(t),n=e[0],r=e[1];return 3*(n+r)/4-r},e.toByteArray=function(t){for(var e,n=u(t),r=n[0],s=n[1],a=new o(function(t,e,n){return 3*(e+n)/4-n}(0,r,s)),h=0,l=s>0?r-4:r,f=0;f<l;f+=4)e=i[t.charCodeAt(f)]<<18|i[t.charCodeAt(f+1)]<<12|i[t.charCodeAt(f+2)]<<6|i[t.charCodeAt(f+3)],a[h++]=e>>16&255,a[h++]=e>>8&255,a[h++]=255&e;2===s&&(e=i[t.charCodeAt(f)]<<2|i[t.charCodeAt(f+1)]>>4,a[h++]=255&e);1===s&&(e=i[t.charCodeAt(f)]<<10|i[t.charCodeAt(f+1)]<<4|i[t.charCodeAt(f+2)]>>2,a[h++]=e>>8&255,a[h++]=255&e);return a},e.fromByteArray=function(t){for(var e,n=t.length,i=n%3,o=[],s=0,a=n-i;s<a;s+=16383)o.push(l(t,s,s+16383>a?a:s+16383));1===i?(e=t[n-1],o.push(r[e>>2]+r[e<<4&63]+"==")):2===i&&(e=(t[n-2]<<8)+t[n-1],o.push(r[e>>10]+r[e>>4&63]+r[e<<2&63]+"="));return o.join("")};for(var r=[],i=[],o="undefined"!=typeof Uint8Array?Uint8Array:Array,s="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",a=0,h=s.length;a<h;++a)r[a]=s[a],i[s.charCodeAt(a)]=a;function u(t){var e=t.length;if(e%4>0)throw new Error("Invalid string. Length must be a multiple of 4");var n=t.indexOf("=");return-1===n&&(n=e),[n,n===e?0:4-n%4]}function l(t,e,n){for(var i,o,s=[],a=e;a<n;a+=3)i=(t[a]<<16&16711680)+(t[a+1]<<8&65280)+(255&t[a+2]),s.push(r[(o=i)>>18&63]+r[o>>12&63]+r[o>>6&63]+r[63&o]);return s.join("")}i["-".charCodeAt(0)]=62,i["_".charCodeAt(0)]=63},function(t,e){e.read=function(t,e,n,r,i){var o,s,a=8*i-r-1,h=(1<<a)-1,u=h>>1,l=-7,f=n?i-1:0,c=n?-1:1,d=t[e+f];for(f+=c,o=d&(1<<-l)-1,d>>=-l,l+=a;l>0;o=256*o+t[e+f],f+=c,l-=8);for(s=o&(1<<-l)-1,o>>=-l,l+=r;l>0;s=256*s+t[e+f],f+=c,l-=8);if(0===o)o=1-u;else{if(o===h)return s?NaN:1/0*(d?-1:1);s+=Math.pow(2,r),o-=u}return(d?-1:1)*s*Math.pow(2,o-r)},e.write=function(t,e,n,r,i,o){var s,a,h,u=8*o-i-1,l=(1<<u)-1,f=l>>1,c=23===i?Math.pow(2,-24)-Math.pow(2,-77):0,d=r?0:o-1,p=r?1:-1,g=e<0||0===e&&1/e<0?1:0;for(e=Math.abs(e),isNaN(e)||e===1/0?(a=isNaN(e)?1:0,s=l):(s=Math.floor(Math.log(e)/Math.LN2),e*(h=Math.pow(2,-s))<1&&(s--,h*=2),(e+=s+f>=1?c/h:c*Math.pow(2,1-f))*h>=2&&(s++,h/=2),s+f>=l?(a=0,s=l):s+f>=1?(a=(e*h-1)*Math.pow(2,i),s+=f):(a=e*Math.pow(2,f-1)*Math.pow(2,i),s=0));i>=8;t[n+d]=255&a,d+=p,a/=256,i-=8);for(s=s<<i|a,u+=i;u>0;t[n+d]=255&s,d+=p,s/=256,u-=8);t[n+d-p]|=128*g}},function(t,e,n){"use strict";(function(t){var r=n(4).Buffer,i=n(30).Transform,o=n(42),s=n(20),a=n(19).ok,h=n(4).kMaxLength,u="Cannot create final Buffer. It would be larger than 0x"+h.toString(16)+" bytes";o.Z_MIN_WINDOWBITS=8,o.Z_MAX_WINDOWBITS=15,o.Z_DEFAULT_WINDOWBITS=15,o.Z_MIN_CHUNK=64,o.Z_MAX_CHUNK=1/0,o.Z_DEFAULT_CHUNK=16384,o.Z_MIN_MEMLEVEL=1,o.Z_MAX_MEMLEVEL=9,o.Z_DEFAULT_MEMLEVEL=8,o.Z_MIN_LEVEL=-1,o.Z_MAX_LEVEL=9,o.Z_DEFAULT_LEVEL=o.Z_DEFAULT_COMPRESSION;for(var l=Object.keys(o),f=0;f<l.length;f++){var c=l[f];c.match(/^Z/)&&Object.defineProperty(e,c,{enumerable:!0,value:o[c],writable:!1})}for(var d={Z_OK:o.Z_OK,Z_STREAM_END:o.Z_STREAM_END,Z_NEED_DICT:o.Z_NEED_DICT,Z_ERRNO:o.Z_ERRNO,Z_STREAM_ERROR:o.Z_STREAM_ERROR,Z_DATA_ERROR:o.Z_DATA_ERROR,Z_MEM_ERROR:o.Z_MEM_ERROR,Z_BUF_ERROR:o.Z_BUF_ERROR,Z_VERSION_ERROR:o.Z_VERSION_ERROR},p=Object.keys(d),g=0;g<p.length;g++){var _=p[g];d[d[_]]=_}function b(t,e,n){var i=[],o=0;function s(){for(var e;null!==(e=t.read());)i.push(e),o+=e.length;t.once("readable",s)}function a(){var e,s=null;o>=h?s=new RangeError(u):e=r.concat(i,o),i=[],t.close(),n(s,e)}t.on("error",function(e){t.removeListener("end",a),t.removeListener("readable",s),n(e)}),t.on("end",a),t.end(e),s()}function y(t,e){if("string"==typeof e&&(e=r.from(e)),!r.isBuffer(e))throw new TypeError("Not a string or buffer");var n=t._finishFlushFlag;return t._processChunk(e,n)}function m(t){if(!(this instanceof m))return new m(t);A.call(this,t,o.DEFLATE)}function w(t){if(!(this instanceof w))return new w(t);A.call(this,t,o.INFLATE)}function v(t){if(!(this instanceof v))return new v(t);A.call(this,t,o.GZIP)}function E(t){if(!(this instanceof E))return new E(t);A.call(this,t,o.GUNZIP)}function k(t){if(!(this instanceof k))return new k(t);A.call(this,t,o.DEFLATERAW)}function x(t){if(!(this instanceof x))return new x(t);A.call(this,t,o.INFLATERAW)}function S(t){if(!(this instanceof S))return new S(t);A.call(this,t,o.UNZIP)}function T(t){return t===o.Z_NO_FLUSH||t===o.Z_PARTIAL_FLUSH||t===o.Z_SYNC_FLUSH||t===o.Z_FULL_FLUSH||t===o.Z_FINISH||t===o.Z_BLOCK}function A(t,n){var s=this;if(this._opts=t=t||{},this._chunkSize=t.chunkSize||e.Z_DEFAULT_CHUNK,i.call(this,t),t.flush&&!T(t.flush))throw new Error("Invalid flush flag: "+t.flush);if(t.finishFlush&&!T(t.finishFlush))throw new Error("Invalid flush flag: "+t.finishFlush);if(this._flushFlag=t.flush||o.Z_NO_FLUSH,this._finishFlushFlag=void 0!==t.finishFlush?t.finishFlush:o.Z_FINISH,t.chunkSize&&(t.chunkSize<e.Z_MIN_CHUNK||t.chunkSize>e.Z_MAX_CHUNK))throw new Error("Invalid chunk size: "+t.chunkSize);if(t.windowBits&&(t.windowBits<e.Z_MIN_WINDOWBITS||t.windowBits>e.Z_MAX_WINDOWBITS))throw new Error("Invalid windowBits: "+t.windowBits);if(t.level&&(t.level<e.Z_MIN_LEVEL||t.level>e.Z_MAX_LEVEL))throw new Error("Invalid compression level: "+t.level);if(t.memLevel&&(t.memLevel<e.Z_MIN_MEMLEVEL||t.memLevel>e.Z_MAX_MEMLEVEL))throw new Error("Invalid memLevel: "+t.memLevel);if(t.strategy&&t.strategy!=e.Z_FILTERED&&t.strategy!=e.Z_HUFFMAN_ONLY&&t.strategy!=e.Z_RLE&&t.strategy!=e.Z_FIXED&&t.strategy!=e.Z_DEFAULT_STRATEGY)throw new Error("Invalid strategy: "+t.strategy);if(t.dictionary&&!r.isBuffer(t.dictionary))throw new Error("Invalid dictionary: it should be a Buffer instance");this._handle=new o.Zlib(n);var a=this;this._hadError=!1,this._handle.onerror=function(t,n){R(a),a._hadError=!0;var r=new Error(t);r.errno=n,r.code=e.codes[n],a.emit("error",r)};var h=e.Z_DEFAULT_COMPRESSION;"number"==typeof t.level&&(h=t.level);var u=e.Z_DEFAULT_STRATEGY;"number"==typeof t.strategy&&(u=t.strategy),this._handle.init(t.windowBits||e.Z_DEFAULT_WINDOWBITS,h,t.memLevel||e.Z_DEFAULT_MEMLEVEL,u,t.dictionary),this._buffer=r.allocUnsafe(this._chunkSize),this._offset=0,this._level=h,this._strategy=u,this.once("end",this.close),Object.defineProperty(this,"_closed",{get:function(){return!s._handle},configurable:!0,enumerable:!0})}function R(e,n){n&&t.nextTick(n),e._handle&&(e._handle.close(),e._handle=null)}function I(t){t.emit("close")}Object.defineProperty(e,"codes",{enumerable:!0,value:Object.freeze(d),writable:!1}),e.Deflate=m,e.Inflate=w,e.Gzip=v,e.Gunzip=E,e.DeflateRaw=k,e.InflateRaw=x,e.Unzip=S,e.createDeflate=function(t){return new m(t)},e.createInflate=function(t){return new w(t)},e.createDeflateRaw=function(t){return new k(t)},e.createInflateRaw=function(t){return new x(t)},e.createGzip=function(t){return new v(t)},e.createGunzip=function(t){return new E(t)},e.createUnzip=function(t){return new S(t)},e.deflate=function(t,e,n){return"function"==typeof e&&(n=e,e={}),b(new m(e),t,n)},e.deflateSync=function(t,e){return y(new m(e),t)},e.gzip=function(t,e,n){return"function"==typeof e&&(n=e,e={}),b(new v(e),t,n)},e.gzipSync=function(t,e){return y(new v(e),t)},e.deflateRaw=function(t,e,n){return"function"==typeof e&&(n=e,e={}),b(new k(e),t,n)},e.deflateRawSync=function(t,e){return y(new k(e),t)},e.unzip=function(t,e,n){return"function"==typeof e&&(n=e,e={}),b(new S(e),t,n)},e.unzipSync=function(t,e){return y(new S(e),t)},e.inflate=function(t,e,n){return"function"==typeof e&&(n=e,e={}),b(new w(e),t,n)},e.inflateSync=function(t,e){return y(new w(e),t)},e.gunzip=function(t,e,n){return"function"==typeof e&&(n=e,e={}),b(new E(e),t,n)},e.gunzipSync=function(t,e){return y(new E(e),t)},e.inflateRaw=function(t,e,n){return"function"==typeof e&&(n=e,e={}),b(new x(e),t,n)},e.inflateRawSync=function(t,e){return y(new x(e),t)},s.inherits(A,i),A.prototype.params=function(n,r,i){if(n<e.Z_MIN_LEVEL||n>e.Z_MAX_LEVEL)throw new RangeError("Invalid compression level: "+n);if(r!=e.Z_FILTERED&&r!=e.Z_HUFFMAN_ONLY&&r!=e.Z_RLE&&r!=e.Z_FIXED&&r!=e.Z_DEFAULT_STRATEGY)throw new TypeError("Invalid strategy: "+r);if(this._level!==n||this._strategy!==r){var s=this;this.flush(o.Z_SYNC_FLUSH,function(){a(s._handle,"zlib binding closed"),s._handle.params(n,r),s._hadError||(s._level=n,s._strategy=r,i&&i())})}else t.nextTick(i)},A.prototype.reset=function(){return a(this._handle,"zlib binding closed"),this._handle.reset()},A.prototype._flush=function(t){this._transform(r.alloc(0),"",t)},A.prototype.flush=function(e,n){var i=this,s=this._writableState;("function"==typeof e||void 0===e&&!n)&&(n=e,e=o.Z_FULL_FLUSH),s.ended?n&&t.nextTick(n):s.ending?n&&this.once("end",n):s.needDrain?n&&this.once("drain",function(){return i.flush(e,n)}):(this._flushFlag=e,this.write(r.alloc(0),"",n))},A.prototype.close=function(e){R(this,e),t.nextTick(I,this)},A.prototype._transform=function(t,e,n){var i,s=this._writableState,a=(s.ending||s.ended)&&(!t||s.length===t.length);return null===t||r.isBuffer(t)?this._handle?(a?i=this._finishFlushFlag:(i=this._flushFlag,t.length>=s.length&&(this._flushFlag=this._opts.flush||o.Z_NO_FLUSH)),void this._processChunk(t,i,n)):n(new Error("zlib binding closed")):n(new Error("invalid input"))},A.prototype._processChunk=function(t,e,n){var i=t&&t.length,o=this._chunkSize-this._offset,s=0,l=this,f="function"==typeof n;if(!f){var c,d=[],p=0;this.on("error",function(t){c=t}),a(this._handle,"zlib binding closed");do{var g=this._handle.writeSync(e,t,s,i,this._buffer,this._offset,o)}while(!this._hadError&&y(g[0],g[1]));if(this._hadError)throw c;if(p>=h)throw R(this),new RangeError(u);var _=r.concat(d,p);return R(this),_}a(this._handle,"zlib binding closed");var b=this._handle.write(e,t,s,i,this._buffer,this._offset,o);function y(h,u){if(this&&(this.buffer=null,this.callback=null),!l._hadError){var c=o-u;if(a(c>=0,"have should not go down"),c>0){var g=l._buffer.slice(l._offset,l._offset+c);l._offset+=c,f?l.push(g):(d.push(g),p+=g.length)}if((0===u||l._offset>=l._chunkSize)&&(o=l._chunkSize,l._offset=0,l._buffer=r.allocUnsafe(l._chunkSize)),0===u){if(s+=i-h,i=h,!f)return!0;var _=l._handle.write(e,t,s,i,l._buffer,l._offset,l._chunkSize);return _.callback=y,void(_.buffer=t)}if(!f)return!1;n()}}b.buffer=t,b.callback=y},s.inherits(m,A),s.inherits(w,A),s.inherits(v,A),s.inherits(E,A),s.inherits(k,A),s.inherits(x,A),s.inherits(S,A)}).call(this,n(0))},function(t,e,n){t.exports=i;var r=n(9).EventEmitter;function i(){r.call(this)}n(2)(i,r),i.Readable=n(10),i.Writable=n(38),i.Duplex=n(39),i.Transform=n(40),i.PassThrough=n(41),i.Stream=i,i.prototype.pipe=function(t,e){var n=this;function i(e){t.writable&&!1===t.write(e)&&n.pause&&n.pause()}function o(){n.readable&&n.resume&&n.resume()}n.on("data",i),t.on("drain",o),t._isStdio||e&&!1===e.end||(n.on("end",a),n.on("close",h));var s=!1;function a(){s||(s=!0,t.end())}function h(){s||(s=!0,"function"==typeof t.destroy&&t.destroy())}function u(t){if(l(),0===r.listenerCount(this,"error"))throw t}function l(){n.removeListener("data",i),t.removeListener("drain",o),n.removeListener("end",a),n.removeListener("close",h),n.removeListener("error",u),t.removeListener("error",u),n.removeListener("end",l),n.removeListener("close",l),t.removeListener("close",l)}return n.on("error",u),t.on("error",u),n.on("end",l),n.on("close",l),t.on("close",l),t.emit("pipe",n),t}},function(t,e){},function(t,e,n){"use strict";var r=n(7).Buffer,i=n(33);t.exports=function(){function t(){!function(t,e){if(!(t instanceof e))throw new TypeError("Cannot call a class as a function")}(this,t),this.head=null,this.tail=null,this.length=0}return t.prototype.push=function(t){var e={data:t,next:null};this.length>0?this.tail.next=e:this.head=e,this.tail=e,++this.length},t.prototype.unshift=function(t){var e={data:t,next:this.head};0===this.length&&(this.tail=e),this.head=e,++this.length},t.prototype.shift=function(){if(0!==this.length){var t=this.head.data;return 1===this.length?this.head=this.tail=null:this.head=this.head.next,--this.length,t}},t.prototype.clear=function(){this.head=this.tail=null,this.length=0},t.prototype.join=function(t){if(0===this.length)return"";for(var e=this.head,n=""+e.data;e=e.next;)n+=t+e.data;return n},t.prototype.concat=function(t){if(0===this.length)return r.alloc(0);if(1===this.length)return this.head.data;for(var e,n,i,o=r.allocUnsafe(t>>>0),s=this.head,a=0;s;)e=s.data,n=o,i=a,e.copy(n,i),a+=s.data.length,s=s.next;return o},t}(),i&&i.inspect&&i.inspect.custom&&(t.exports.prototype[i.inspect.custom]=function(){var t=i.inspect({length:this.length});return this.constructor.name+" "+t})},function(t,e){},function(t,e,n){(function(t){var r=void 0!==t&&t||"undefined"!=typeof self&&self||window,i=Function.prototype.apply;function o(t,e){this._id=t,this._clearFn=e}e.setTimeout=function(){return new o(i.call(setTimeout,r,arguments),clearTimeout)},e.setInterval=function(){return new o(i.call(setInterval,r,arguments),clearInterval)},e.clearTimeout=e.clearInterval=function(t){t&&t.close()},o.prototype.unref=o.prototype.ref=function(){},o.prototype.close=function(){this._clearFn.call(r,this._id)},e.enroll=function(t,e){clearTimeout(t._idleTimeoutId),t._idleTimeout=e},e.unenroll=function(t){clearTimeout(t._idleTimeoutId),t._idleTimeout=-1},e._unrefActive=e.active=function(t){clearTimeout(t._idleTimeoutId);var e=t._idleTimeout;e>=0&&(t._idleTimeoutId=setTimeout(function(){t._onTimeout&&t._onTimeout()},e))},n(35),e.setImmediate="undefined"!=typeof self&&self.setImmediate||void 0!==t&&t.setImmediate||this&&this.setImmediate,e.clearImmediate="undefined"!=typeof self&&self.clearImmediate||void 0!==t&&t.clearImmediate||this&&this.clearImmediate}).call(this,n(1))},function(t,e,n){(function(t,e){!function(t,n){"use strict";if(!t.setImmediate){var r,i,o,s,a,h=1,u={},l=!1,f=t.document,c=Object.getPrototypeOf&&Object.getPrototypeOf(t);c=c&&c.setTimeout?c:t,"[object process]"==={}.toString.call(t.process)?r=function(t){e.nextTick(function(){p(t)})}:!function(){if(t.postMessage&&!t.importScripts){var e=!0,n=t.onmessage;return t.onmessage=function(){e=!1},t.postMessage("","*"),t.onmessage=n,e}}()?t.MessageChannel?((o=new MessageChannel).port1.onmessage=function(t){p(t.data)},r=function(t){o.port2.postMessage(t)}):f&&"onreadystatechange"in f.createElement("script")?(i=f.documentElement,r=function(t){var e=f.createElement("script");e.onreadystatechange=function(){p(t),e.onreadystatechange=null,i.removeChild(e),e=null},i.appendChild(e)}):r=function(t){setTimeout(p,0,t)}:(s="setImmediate$"+Math.random()+"$",a=function(e){e.source===t&&"string"==typeof e.data&&0===e.data.indexOf(s)&&p(+e.data.slice(s.length))},t.addEventListener?t.addEventListener("message",a,!1):t.attachEvent("onmessage",a),r=function(e){t.postMessage(s+e,"*")}),c.setImmediate=function(t){"function"!=typeof t&&(t=new Function(""+t));for(var e=new Array(arguments.length-1),n=0;n<e.length;n++)e[n]=arguments[n+1];var i={callback:t,args:e};return u[h]=i,r(h),h++},c.clearImmediate=d}function d(t){delete u[t]}function p(t){if(l)setTimeout(p,0,t);else{var e=u[t];if(e){l=!0;try{!function(t){var e=t.callback,r=t.args;switch(r.length){case 0:e();break;case 1:e(r[0]);break;case 2:e(r[0],r[1]);break;case 3:e(r[0],r[1],r[2]);break;default:e.apply(n,r)}}(e)}finally{d(t),l=!1}}}}}("undefined"==typeof self?void 0===t?this:t:self)}).call(this,n(1),n(0))},function(t,e,n){(function(e){function n(t){try{if(!e.localStorage)return!1}catch(t){return!1}var n=e.localStorage[t];return null!=n&&"true"===String(n).toLowerCase()}t.exports=function(t,e){if(n("noDeprecation"))return t;var r=!1;return function(){if(!r){if(n("throwDeprecation"))throw new Error(e);n("traceDeprecation")?console.trace(e):console.warn(e),r=!0}return t.apply(this,arguments)}}}).call(this,n(1))},function(t,e,n){"use strict";t.exports=o;var r=n(18),i=n(5);function o(t){if(!(this instanceof o))return new o(t);r.call(this,t)}i.inherits=n(2),i.inherits(o,r),o.prototype._transform=function(t,e,n){n(null,t)}},function(t,e,n){t.exports=n(11)},function(t,e,n){t.exports=n(3)},function(t,e,n){t.exports=n(10).Transform},function(t,e,n){t.exports=n(10).PassThrough},function(t,e,n){"use strict";(function(t,r){var i=n(19),o=n(44),s=n(45),a=n(48),h=n(51);for(var u in h)e[u]=h[u];e.NONE=0,e.DEFLATE=1,e.INFLATE=2,e.GZIP=3,e.GUNZIP=4,e.DEFLATERAW=5,e.INFLATERAW=6,e.UNZIP=7;function l(t){if("number"!=typeof t||t<e.DEFLATE||t>e.UNZIP)throw new TypeError("Bad argument");this.dictionary=null,this.err=0,this.flush=0,this.init_done=!1,this.level=0,this.memLevel=0,this.mode=t,this.strategy=0,this.windowBits=0,this.write_in_progress=!1,this.pending_close=!1,this.gzip_id_bytes_read=0}l.prototype.close=function(){this.write_in_progress?this.pending_close=!0:(this.pending_close=!1,i(this.init_done,"close before init"),i(this.mode<=e.UNZIP),this.mode===e.DEFLATE||this.mode===e.GZIP||this.mode===e.DEFLATERAW?s.deflateEnd(this.strm):this.mode!==e.INFLATE&&this.mode!==e.GUNZIP&&this.mode!==e.INFLATERAW&&this.mode!==e.UNZIP||a.inflateEnd(this.strm),this.mode=e.NONE,this.dictionary=null)},l.prototype.write=function(t,e,n,r,i,o,s){return this._write(!0,t,e,n,r,i,o,s)},l.prototype.writeSync=function(t,e,n,r,i,o,s){return this._write(!1,t,e,n,r,i,o,s)},l.prototype._write=function(n,o,s,a,h,u,l,f){if(i.equal(arguments.length,8),i(this.init_done,"write before init"),i(this.mode!==e.NONE,"already finalized"),i.equal(!1,this.write_in_progress,"write already in progress"),i.equal(!1,this.pending_close,"close is pending"),this.write_in_progress=!0,i.equal(!1,void 0===o,"must provide flush value"),this.write_in_progress=!0,o!==e.Z_NO_FLUSH&&o!==e.Z_PARTIAL_FLUSH&&o!==e.Z_SYNC_FLUSH&&o!==e.Z_FULL_FLUSH&&o!==e.Z_FINISH&&o!==e.Z_BLOCK)throw new Error("Invalid flush value");if(null==s&&(s=t.alloc(0),h=0,a=0),this.strm.avail_in=h,this.strm.input=s,this.strm.next_in=a,this.strm.avail_out=f,this.strm.output=u,this.strm.next_out=l,this.flush=o,!n)return this._process(),this._checkError()?this._afterSync():void 0;var c=this;return r.nextTick(function(){c._process(),c._after()}),this},l.prototype._afterSync=function(){var t=this.strm.avail_out,e=this.strm.avail_in;return this.write_in_progress=!1,[e,t]},l.prototype._process=function(){var t=null;switch(this.mode){case e.DEFLATE:case e.GZIP:case e.DEFLATERAW:this.err=s.deflate(this.strm,this.flush);break;case e.UNZIP:switch(this.strm.avail_in>0&&(t=this.strm.next_in),this.gzip_id_bytes_read){case 0:if(null===t)break;if(31!==this.strm.input[t]){this.mode=e.INFLATE;break}if(this.gzip_id_bytes_read=1,t++,1===this.strm.avail_in)break;case 1:if(null===t)break;139===this.strm.input[t]?(this.gzip_id_bytes_read=2,this.mode=e.GUNZIP):this.mode=e.INFLATE;break;default:throw new Error("invalid number of gzip magic number bytes read")}case e.INFLATE:case e.GUNZIP:case e.INFLATERAW:for(this.err=a.inflate(this.strm,this.flush),this.err===e.Z_NEED_DICT&&this.dictionary&&(this.err=a.inflateSetDictionary(this.strm,this.dictionary),this.err===e.Z_OK?this.err=a.inflate(this.strm,this.flush):this.err===e.Z_DATA_ERROR&&(this.err=e.Z_NEED_DICT));this.strm.avail_in>0&&this.mode===e.GUNZIP&&this.err===e.Z_STREAM_END&&0!==this.strm.next_in[0];)this.reset(),this.err=a.inflate(this.strm,this.flush);break;default:throw new Error("Unknown mode "+this.mode)}},l.prototype._checkError=function(){switch(this.err){case e.Z_OK:case e.Z_BUF_ERROR:if(0!==this.strm.avail_out&&this.flush===e.Z_FINISH)return this._error("unexpected end of file"),!1;break;case e.Z_STREAM_END:break;case e.Z_NEED_DICT:return null==this.dictionary?this._error("Missing dictionary"):this._error("Bad dictionary"),!1;default:return this._error("Zlib error"),!1}return!0},l.prototype._after=function(){if(this._checkError()){var t=this.strm.avail_out,e=this.strm.avail_in;this.write_in_progress=!1,this.callback(e,t),this.pending_close&&this.close()}},l.prototype._error=function(t){this.strm.msg&&(t=this.strm.msg),this.onerror(t,this.err),this.write_in_progress=!1,this.pending_close&&this.close()},l.prototype.init=function(t,n,r,o,s){i(4===arguments.length||5===arguments.length,"init(windowBits, level, memLevel, strategy, [dictionary])"),i(t>=8&&t<=15,"invalid windowBits"),i(n>=-1&&n<=9,"invalid compression level"),i(r>=1&&r<=9,"invalid memlevel"),i(o===e.Z_FILTERED||o===e.Z_HUFFMAN_ONLY||o===e.Z_RLE||o===e.Z_FIXED||o===e.Z_DEFAULT_STRATEGY,"invalid strategy"),this._init(n,t,r,o,s),this._setDictionary()},l.prototype.params=function(){throw new Error("deflateParams Not supported")},l.prototype.reset=function(){this._reset(),this._setDictionary()},l.prototype._init=function(t,n,r,i,h){switch(this.level=t,this.windowBits=n,this.memLevel=r,this.strategy=i,this.flush=e.Z_NO_FLUSH,this.err=e.Z_OK,this.mode!==e.GZIP&&this.mode!==e.GUNZIP||(this.windowBits+=16),this.mode===e.UNZIP&&(this.windowBits+=32),this.mode!==e.DEFLATERAW&&this.mode!==e.INFLATERAW||(this.windowBits=-1*this.windowBits),this.strm=new o,this.mode){case e.DEFLATE:case e.GZIP:case e.DEFLATERAW:this.err=s.deflateInit2(this.strm,this.level,e.Z_DEFLATED,this.windowBits,this.memLevel,this.strategy);break;case e.INFLATE:case e.GUNZIP:case e.INFLATERAW:case e.UNZIP:this.err=a.inflateInit2(this.strm,this.windowBits);break;default:throw new Error("Unknown mode "+this.mode)}this.err!==e.Z_OK&&this._error("Init error"),this.dictionary=h,this.write_in_progress=!1,this.init_done=!0},l.prototype._setDictionary=function(){if(null!=this.dictionary){switch(this.err=e.Z_OK,this.mode){case e.DEFLATE:case e.DEFLATERAW:this.err=s.deflateSetDictionary(this.strm,this.dictionary)}this.err!==e.Z_OK&&this._error("Failed to set dictionary")}},l.prototype._reset=function(){switch(this.err=e.Z_OK,this.mode){case e.DEFLATE:case e.DEFLATERAW:case e.GZIP:this.err=s.deflateReset(this.strm);break;case e.INFLATE:case e.INFLATERAW:case e.GUNZIP:this.err=a.inflateReset(this.strm)}this.err!==e.Z_OK&&this._error("Failed to reset stream")},e.Zlib=l}).call(this,n(4).Buffer,n(0))},function(t,e){t.exports=function(t){return t&&"object"==typeof t&&"function"==typeof t.copy&&"function"==typeof t.fill&&"function"==typeof t.readUInt8}},function(t,e,n){"use strict";t.exports=function(){this.input=null,this.next_in=0,this.avail_in=0,this.total_in=0,this.output=null,this.next_out=0,this.avail_out=0,this.total_out=0,this.msg="",this.state=null,this.data_type=2,this.adler=0}},function(t,e,n){"use strict";var r,i=n(8),o=n(46),s=n(21),a=n(22),h=n(47),u=0,l=1,f=3,c=4,d=5,p=0,g=1,_=-2,b=-3,y=-5,m=-1,w=1,v=2,E=3,k=4,x=0,S=2,T=8,A=9,R=15,I=8,L=286,O=30,z=19,N=2*L+1,B=15,D=3,F=258,P=F+D+1,U=32,M=42,C=69,Z=73,j=91,V=103,W=113,H=666,q=1,Y=2,G=3,K=4,X=3;function $(t,e){return t.msg=h[e],e}function J(t){return(t<<1)-(t>4?9:0)}function Q(t){for(var e=t.length;--e>=0;)t[e]=0}function tt(t){var e=t.state,n=e.pending;n>t.avail_out&&(n=t.avail_out),0!==n&&(i.arraySet(t.output,e.pending_buf,e.pending_out,n,t.next_out),t.next_out+=n,e.pending_out+=n,t.total_out+=n,t.avail_out-=n,e.pending-=n,0===e.pending&&(e.pending_out=0))}function et(t,e){o._tr_flush_block(t,t.block_start>=0?t.block_start:-1,t.strstart-t.block_start,e),t.block_start=t.strstart,tt(t.strm)}function nt(t,e){t.pending_buf[t.pending++]=e}function rt(t,e){t.pending_buf[t.pending++]=e>>>8&255,t.pending_buf[t.pending++]=255&e}function it(t,e){var n,r,i=t.max_chain_length,o=t.strstart,s=t.prev_length,a=t.nice_match,h=t.strstart>t.w_size-P?t.strstart-(t.w_size-P):0,u=t.window,l=t.w_mask,f=t.prev,c=t.strstart+F,d=u[o+s-1],p=u[o+s];t.prev_length>=t.good_match&&(i>>=2),a>t.lookahead&&(a=t.lookahead);do{if(u[(n=e)+s]===p&&u[n+s-1]===d&&u[n]===u[o]&&u[++n]===u[o+1]){o+=2,n++;do{}while(u[++o]===u[++n]&&u[++o]===u[++n]&&u[++o]===u[++n]&&u[++o]===u[++n]&&u[++o]===u[++n]&&u[++o]===u[++n]&&u[++o]===u[++n]&&u[++o]===u[++n]&&o<c);if(r=F-(c-o),o=c-F,r>s){if(t.match_start=e,s=r,r>=a)break;d=u[o+s-1],p=u[o+s]}}}while((e=f[e&l])>h&&0!=--i);return s<=t.lookahead?s:t.lookahead}function ot(t){var e,n,r,o,h,u,l,f,c,d,p=t.w_size;do{if(o=t.window_size-t.lookahead-t.strstart,t.strstart>=p+(p-P)){i.arraySet(t.window,t.window,p,p,0),t.match_start-=p,t.strstart-=p,t.block_start-=p,e=n=t.hash_size;do{r=t.head[--e],t.head[e]=r>=p?r-p:0}while(--n);e=n=p;do{r=t.prev[--e],t.prev[e]=r>=p?r-p:0}while(--n);o+=p}if(0===t.strm.avail_in)break;if(u=t.strm,l=t.window,f=t.strstart+t.lookahead,c=o,d=void 0,(d=u.avail_in)>c&&(d=c),n=0===d?0:(u.avail_in-=d,i.arraySet(l,u.input,u.next_in,d,f),1===u.state.wrap?u.adler=s(u.adler,l,d,f):2===u.state.wrap&&(u.adler=a(u.adler,l,d,f)),u.next_in+=d,u.total_in+=d,d),t.lookahead+=n,t.lookahead+t.insert>=D)for(h=t.strstart-t.insert,t.ins_h=t.window[h],t.ins_h=(t.ins_h<<t.hash_shift^t.window[h+1])&t.hash_mask;t.insert&&(t.ins_h=(t.ins_h<<t.hash_shift^t.window[h+D-1])&t.hash_mask,t.prev[h&t.w_mask]=t.head[t.ins_h],t.head[t.ins_h]=h,h++,t.insert--,!(t.lookahead+t.insert<D)););}while(t.lookahead<P&&0!==t.strm.avail_in)}function st(t,e){for(var n,r;;){if(t.lookahead<P){if(ot(t),t.lookahead<P&&e===u)return q;if(0===t.lookahead)break}if(n=0,t.lookahead>=D&&(t.ins_h=(t.ins_h<<t.hash_shift^t.window[t.strstart+D-1])&t.hash_mask,n=t.prev[t.strstart&t.w_mask]=t.head[t.ins_h],t.head[t.ins_h]=t.strstart),0!==n&&t.strstart-n<=t.w_size-P&&(t.match_length=it(t,n)),t.match_length>=D)if(r=o._tr_tally(t,t.strstart-t.match_start,t.match_length-D),t.lookahead-=t.match_length,t.match_length<=t.max_lazy_match&&t.lookahead>=D){t.match_length--;do{t.strstart++,t.ins_h=(t.ins_h<<t.hash_shift^t.window[t.strstart+D-1])&t.hash_mask,n=t.prev[t.strstart&t.w_mask]=t.head[t.ins_h],t.head[t.ins_h]=t.strstart}while(0!=--t.match_length);t.strstart++}else t.strstart+=t.match_length,t.match_length=0,t.ins_h=t.window[t.strstart],t.ins_h=(t.ins_h<<t.hash_shift^t.window[t.strstart+1])&t.hash_mask;else r=o._tr_tally(t,0,t.window[t.strstart]),t.lookahead--,t.strstart++;if(r&&(et(t,!1),0===t.strm.avail_out))return q}return t.insert=t.strstart<D-1?t.strstart:D-1,e===c?(et(t,!0),0===t.strm.avail_out?G:K):t.last_lit&&(et(t,!1),0===t.strm.avail_out)?q:Y}function at(t,e){for(var n,r,i;;){if(t.lookahead<P){if(ot(t),t.lookahead<P&&e===u)return q;if(0===t.lookahead)break}if(n=0,t.lookahead>=D&&(t.ins_h=(t.ins_h<<t.hash_shift^t.window[t.strstart+D-1])&t.hash_mask,n=t.prev[t.strstart&t.w_mask]=t.head[t.ins_h],t.head[t.ins_h]=t.strstart),t.prev_length=t.match_length,t.prev_match=t.match_start,t.match_length=D-1,0!==n&&t.prev_length<t.max_lazy_match&&t.strstart-n<=t.w_size-P&&(t.match_length=it(t,n),t.match_length<=5&&(t.strategy===w||t.match_length===D&&t.strstart-t.match_start>4096)&&(t.match_length=D-1)),t.prev_length>=D&&t.match_length<=t.prev_length){i=t.strstart+t.lookahead-D,r=o._tr_tally(t,t.strstart-1-t.prev_match,t.prev_length-D),t.lookahead-=t.prev_length-1,t.prev_length-=2;do{++t.strstart<=i&&(t.ins_h=(t.ins_h<<t.hash_shift^t.window[t.strstart+D-1])&t.hash_mask,n=t.prev[t.strstart&t.w_mask]=t.head[t.ins_h],t.head[t.ins_h]=t.strstart)}while(0!=--t.prev_length);if(t.match_available=0,t.match_length=D-1,t.strstart++,r&&(et(t,!1),0===t.strm.avail_out))return q}else if(t.match_available){if((r=o._tr_tally(t,0,t.window[t.strstart-1]))&&et(t,!1),t.strstart++,t.lookahead--,0===t.strm.avail_out)return q}else t.match_available=1,t.strstart++,t.lookahead--}return t.match_available&&(r=o._tr_tally(t,0,t.window[t.strstart-1]),t.match_available=0),t.insert=t.strstart<D-1?t.strstart:D-1,e===c?(et(t,!0),0===t.strm.avail_out?G:K):t.last_lit&&(et(t,!1),0===t.strm.avail_out)?q:Y}function ht(t,e,n,r,i){this.good_length=t,this.max_lazy=e,this.nice_length=n,this.max_chain=r,this.func=i}function ut(){this.strm=null,this.status=0,this.pending_buf=null,this.pending_buf_size=0,this.pending_out=0,this.pending=0,this.wrap=0,this.gzhead=null,this.gzindex=0,this.method=T,this.last_flush=-1,this.w_size=0,this.w_bits=0,this.w_mask=0,this.window=null,this.window_size=0,this.prev=null,this.head=null,this.ins_h=0,this.hash_size=0,this.hash_bits=0,this.hash_mask=0,this.hash_shift=0,this.block_start=0,this.match_length=0,this.prev_match=0,this.match_available=0,this.strstart=0,this.match_start=0,this.lookahead=0,this.prev_length=0,this.max_chain_length=0,this.max_lazy_match=0,this.level=0,this.strategy=0,this.good_match=0,this.nice_match=0,this.dyn_ltree=new i.Buf16(2*N),this.dyn_dtree=new i.Buf16(2*(2*O+1)),this.bl_tree=new i.Buf16(2*(2*z+1)),Q(this.dyn_ltree),Q(this.dyn_dtree),Q(this.bl_tree),this.l_desc=null,this.d_desc=null,this.bl_desc=null,this.bl_count=new i.Buf16(B+1),this.heap=new i.Buf16(2*L+1),Q(this.heap),this.heap_len=0,this.heap_max=0,this.depth=new i.Buf16(2*L+1),Q(this.depth),this.l_buf=0,this.lit_bufsize=0,this.last_lit=0,this.d_buf=0,this.opt_len=0,this.static_len=0,this.matches=0,this.insert=0,this.bi_buf=0,this.bi_valid=0}function lt(t){var e;return t&&t.state?(t.total_in=t.total_out=0,t.data_type=S,(e=t.state).pending=0,e.pending_out=0,e.wrap<0&&(e.wrap=-e.wrap),e.status=e.wrap?M:W,t.adler=2===e.wrap?0:1,e.last_flush=u,o._tr_init(e),p):$(t,_)}function ft(t){var e,n=lt(t);return n===p&&((e=t.state).window_size=2*e.w_size,Q(e.head),e.max_lazy_match=r[e.level].max_lazy,e.good_match=r[e.level].good_length,e.nice_match=r[e.level].nice_length,e.max_chain_length=r[e.level].max_chain,e.strstart=0,e.block_start=0,e.lookahead=0,e.insert=0,e.match_length=e.prev_length=D-1,e.match_available=0,e.ins_h=0),n}function ct(t,e,n,r,o,s){if(!t)return _;var a=1;if(e===m&&(e=6),r<0?(a=0,r=-r):r>15&&(a=2,r-=16),o<1||o>A||n!==T||r<8||r>15||e<0||e>9||s<0||s>k)return $(t,_);8===r&&(r=9);var h=new ut;return t.state=h,h.strm=t,h.wrap=a,h.gzhead=null,h.w_bits=r,h.w_size=1<<h.w_bits,h.w_mask=h.w_size-1,h.hash_bits=o+7,h.hash_size=1<<h.hash_bits,h.hash_mask=h.hash_size-1,h.hash_shift=~~((h.hash_bits+D-1)/D),h.window=new i.Buf8(2*h.w_size),h.head=new i.Buf16(h.hash_size),h.prev=new i.Buf16(h.w_size),h.lit_bufsize=1<<o+6,h.pending_buf_size=4*h.lit_bufsize,h.pending_buf=new i.Buf8(h.pending_buf_size),h.d_buf=1*h.lit_bufsize,h.l_buf=3*h.lit_bufsize,h.level=e,h.strategy=s,h.method=n,ft(t)}r=[new ht(0,0,0,0,function(t,e){var n=65535;for(n>t.pending_buf_size-5&&(n=t.pending_buf_size-5);;){if(t.lookahead<=1){if(ot(t),0===t.lookahead&&e===u)return q;if(0===t.lookahead)break}t.strstart+=t.lookahead,t.lookahead=0;var r=t.block_start+n;if((0===t.strstart||t.strstart>=r)&&(t.lookahead=t.strstart-r,t.strstart=r,et(t,!1),0===t.strm.avail_out))return q;if(t.strstart-t.block_start>=t.w_size-P&&(et(t,!1),0===t.strm.avail_out))return q}return t.insert=0,e===c?(et(t,!0),0===t.strm.avail_out?G:K):(t.strstart>t.block_start&&(et(t,!1),t.strm.avail_out),q)}),new ht(4,4,8,4,st),new ht(4,5,16,8,st),new ht(4,6,32,32,st),new ht(4,4,16,16,at),new ht(8,16,32,32,at),new ht(8,16,128,128,at),new ht(8,32,128,256,at),new ht(32,128,258,1024,at),new ht(32,258,258,4096,at)],e.deflateInit=function(t,e){return ct(t,e,T,R,I,x)},e.deflateInit2=ct,e.deflateReset=ft,e.deflateResetKeep=lt,e.deflateSetHeader=function(t,e){return t&&t.state?2!==t.state.wrap?_:(t.state.gzhead=e,p):_},e.deflate=function(t,e){var n,i,s,h;if(!t||!t.state||e>d||e<0)return t?$(t,_):_;if(i=t.state,!t.output||!t.input&&0!==t.avail_in||i.status===H&&e!==c)return $(t,0===t.avail_out?y:_);if(i.strm=t,n=i.last_flush,i.last_flush=e,i.status===M)if(2===i.wrap)t.adler=0,nt(i,31),nt(i,139),nt(i,8),i.gzhead?(nt(i,(i.gzhead.text?1:0)+(i.gzhead.hcrc?2:0)+(i.gzhead.extra?4:0)+(i.gzhead.name?8:0)+(i.gzhead.comment?16:0)),nt(i,255&i.gzhead.time),nt(i,i.gzhead.time>>8&255),nt(i,i.gzhead.time>>16&255),nt(i,i.gzhead.time>>24&255),nt(i,9===i.level?2:i.strategy>=v||i.level<2?4:0),nt(i,255&i.gzhead.os),i.gzhead.extra&&i.gzhead.extra.length&&(nt(i,255&i.gzhead.extra.length),nt(i,i.gzhead.extra.length>>8&255)),i.gzhead.hcrc&&(t.adler=a(t.adler,i.pending_buf,i.pending,0)),i.gzindex=0,i.status=C):(nt(i,0),nt(i,0),nt(i,0),nt(i,0),nt(i,0),nt(i,9===i.level?2:i.strategy>=v||i.level<2?4:0),nt(i,X),i.status=W);else{var b=T+(i.w_bits-8<<4)<<8;b|=(i.strategy>=v||i.level<2?0:i.level<6?1:6===i.level?2:3)<<6,0!==i.strstart&&(b|=U),b+=31-b%31,i.status=W,rt(i,b),0!==i.strstart&&(rt(i,t.adler>>>16),rt(i,65535&t.adler)),t.adler=1}if(i.status===C)if(i.gzhead.extra){for(s=i.pending;i.gzindex<(65535&i.gzhead.extra.length)&&(i.pending!==i.pending_buf_size||(i.gzhead.hcrc&&i.pending>s&&(t.adler=a(t.adler,i.pending_buf,i.pending-s,s)),tt(t),s=i.pending,i.pending!==i.pending_buf_size));)nt(i,255&i.gzhead.extra[i.gzindex]),i.gzindex++;i.gzhead.hcrc&&i.pending>s&&(t.adler=a(t.adler,i.pending_buf,i.pending-s,s)),i.gzindex===i.gzhead.extra.length&&(i.gzindex=0,i.status=Z)}else i.status=Z;if(i.status===Z)if(i.gzhead.name){s=i.pending;do{if(i.pending===i.pending_buf_size&&(i.gzhead.hcrc&&i.pending>s&&(t.adler=a(t.adler,i.pending_buf,i.pending-s,s)),tt(t),s=i.pending,i.pending===i.pending_buf_size)){h=1;break}h=i.gzindex<i.gzhead.name.length?255&i.gzhead.name.charCodeAt(i.gzindex++):0,nt(i,h)}while(0!==h);i.gzhead.hcrc&&i.pending>s&&(t.adler=a(t.adler,i.pending_buf,i.pending-s,s)),0===h&&(i.gzindex=0,i.status=j)}else i.status=j;if(i.status===j)if(i.gzhead.comment){s=i.pending;do{if(i.pending===i.pending_buf_size&&(i.gzhead.hcrc&&i.pending>s&&(t.adler=a(t.adler,i.pending_buf,i.pending-s,s)),tt(t),s=i.pending,i.pending===i.pending_buf_size)){h=1;break}h=i.gzindex<i.gzhead.comment.length?255&i.gzhead.comment.charCodeAt(i.gzindex++):0,nt(i,h)}while(0!==h);i.gzhead.hcrc&&i.pending>s&&(t.adler=a(t.adler,i.pending_buf,i.pending-s,s)),0===h&&(i.status=V)}else i.status=V;if(i.status===V&&(i.gzhead.hcrc?(i.pending+2>i.pending_buf_size&&tt(t),i.pending+2<=i.pending_buf_size&&(nt(i,255&t.adler),nt(i,t.adler>>8&255),t.adler=0,i.status=W)):i.status=W),0!==i.pending){if(tt(t),0===t.avail_out)return i.last_flush=-1,p}else if(0===t.avail_in&&J(e)<=J(n)&&e!==c)return $(t,y);if(i.status===H&&0!==t.avail_in)return $(t,y);if(0!==t.avail_in||0!==i.lookahead||e!==u&&i.status!==H){var m=i.strategy===v?function(t,e){for(var n;;){if(0===t.lookahead&&(ot(t),0===t.lookahead)){if(e===u)return q;break}if(t.match_length=0,n=o._tr_tally(t,0,t.window[t.strstart]),t.lookahead--,t.strstart++,n&&(et(t,!1),0===t.strm.avail_out))return q}return t.insert=0,e===c?(et(t,!0),0===t.strm.avail_out?G:K):t.last_lit&&(et(t,!1),0===t.strm.avail_out)?q:Y}(i,e):i.strategy===E?function(t,e){for(var n,r,i,s,a=t.window;;){if(t.lookahead<=F){if(ot(t),t.lookahead<=F&&e===u)return q;if(0===t.lookahead)break}if(t.match_length=0,t.lookahead>=D&&t.strstart>0&&(r=a[i=t.strstart-1])===a[++i]&&r===a[++i]&&r===a[++i]){s=t.strstart+F;do{}while(r===a[++i]&&r===a[++i]&&r===a[++i]&&r===a[++i]&&r===a[++i]&&r===a[++i]&&r===a[++i]&&r===a[++i]&&i<s);t.match_length=F-(s-i),t.match_length>t.lookahead&&(t.match_length=t.lookahead)}if(t.match_length>=D?(n=o._tr_tally(t,1,t.match_length-D),t.lookahead-=t.match_length,t.strstart+=t.match_length,t.match_length=0):(n=o._tr_tally(t,0,t.window[t.strstart]),t.lookahead--,t.strstart++),n&&(et(t,!1),0===t.strm.avail_out))return q}return t.insert=0,e===c?(et(t,!0),0===t.strm.avail_out?G:K):t.last_lit&&(et(t,!1),0===t.strm.avail_out)?q:Y}(i,e):r[i.level].func(i,e);if(m!==G&&m!==K||(i.status=H),m===q||m===G)return 0===t.avail_out&&(i.last_flush=-1),p;if(m===Y&&(e===l?o._tr_align(i):e!==d&&(o._tr_stored_block(i,0,0,!1),e===f&&(Q(i.head),0===i.lookahead&&(i.strstart=0,i.block_start=0,i.insert=0))),tt(t),0===t.avail_out))return i.last_flush=-1,p}return e!==c?p:i.wrap<=0?g:(2===i.wrap?(nt(i,255&t.adler),nt(i,t.adler>>8&255),nt(i,t.adler>>16&255),nt(i,t.adler>>24&255),nt(i,255&t.total_in),nt(i,t.total_in>>8&255),nt(i,t.total_in>>16&255),nt(i,t.total_in>>24&255)):(rt(i,t.adler>>>16),rt(i,65535&t.adler)),tt(t),i.wrap>0&&(i.wrap=-i.wrap),0!==i.pending?p:g)},e.deflateEnd=function(t){var e;return t&&t.state?(e=t.state.status)!==M&&e!==C&&e!==Z&&e!==j&&e!==V&&e!==W&&e!==H?$(t,_):(t.state=null,e===W?$(t,b):p):_},e.deflateSetDictionary=function(t,e){var n,r,o,a,h,u,l,f,c=e.length;if(!t||!t.state)return _;if(2===(a=(n=t.state).wrap)||1===a&&n.status!==M||n.lookahead)return _;for(1===a&&(t.adler=s(t.adler,e,c,0)),n.wrap=0,c>=n.w_size&&(0===a&&(Q(n.head),n.strstart=0,n.block_start=0,n.insert=0),f=new i.Buf8(n.w_size),i.arraySet(f,e,c-n.w_size,n.w_size,0),e=f,c=n.w_size),h=t.avail_in,u=t.next_in,l=t.input,t.avail_in=c,t.next_in=0,t.input=e,ot(n);n.lookahead>=D;){r=n.strstart,o=n.lookahead-(D-1);do{n.ins_h=(n.ins_h<<n.hash_shift^n.window[r+D-1])&n.hash_mask,n.prev[r&n.w_mask]=n.head[n.ins_h],n.head[n.ins_h]=r,r++}while(--o);n.strstart=r,n.lookahead=D-1,ot(n)}return n.strstart+=n.lookahead,n.block_start=n.strstart,n.insert=n.lookahead,n.lookahead=0,n.match_length=n.prev_length=D-1,n.match_available=0,t.next_in=u,t.input=l,t.avail_in=h,n.wrap=a,p},e.deflateInfo="pako deflate (from Nodeca project)"},function(t,e,n){"use strict";var r=n(8),i=4,o=0,s=1,a=2;function h(t){for(var e=t.length;--e>=0;)t[e]=0}var u=0,l=1,f=2,c=29,d=256,p=d+1+c,g=30,_=19,b=2*p+1,y=15,m=16,w=7,v=256,E=16,k=17,x=18,S=[0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0],T=[0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13],A=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,3,7],R=[16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15],I=new Array(2*(p+2));h(I);var L=new Array(2*g);h(L);var O=new Array(512);h(O);var z=new Array(256);h(z);var N=new Array(c);h(N);var B,D,F,P=new Array(g);function U(t,e,n,r,i){this.static_tree=t,this.extra_bits=e,this.extra_base=n,this.elems=r,this.max_length=i,this.has_stree=t&&t.length}function M(t,e){this.dyn_tree=t,this.max_code=0,this.stat_desc=e}function C(t){return t<256?O[t]:O[256+(t>>>7)]}function Z(t,e){t.pending_buf[t.pending++]=255&e,t.pending_buf[t.pending++]=e>>>8&255}function j(t,e,n){t.bi_valid>m-n?(t.bi_buf|=e<<t.bi_valid&65535,Z(t,t.bi_buf),t.bi_buf=e>>m-t.bi_valid,t.bi_valid+=n-m):(t.bi_buf|=e<<t.bi_valid&65535,t.bi_valid+=n)}function V(t,e,n){j(t,n[2*e],n[2*e+1])}function W(t,e){var n=0;do{n|=1&t,t>>>=1,n<<=1}while(--e>0);return n>>>1}function H(t,e,n){var r,i,o=new Array(y+1),s=0;for(r=1;r<=y;r++)o[r]=s=s+n[r-1]<<1;for(i=0;i<=e;i++){var a=t[2*i+1];0!==a&&(t[2*i]=W(o[a]++,a))}}function q(t){var e;for(e=0;e<p;e++)t.dyn_ltree[2*e]=0;for(e=0;e<g;e++)t.dyn_dtree[2*e]=0;for(e=0;e<_;e++)t.bl_tree[2*e]=0;t.dyn_ltree[2*v]=1,t.opt_len=t.static_len=0,t.last_lit=t.matches=0}function Y(t){t.bi_valid>8?Z(t,t.bi_buf):t.bi_valid>0&&(t.pending_buf[t.pending++]=t.bi_buf),t.bi_buf=0,t.bi_valid=0}function G(t,e,n,r){var i=2*e,o=2*n;return t[i]<t[o]||t[i]===t[o]&&r[e]<=r[n]}function K(t,e,n){for(var r=t.heap[n],i=n<<1;i<=t.heap_len&&(i<t.heap_len&&G(e,t.heap[i+1],t.heap[i],t.depth)&&i++,!G(e,r,t.heap[i],t.depth));)t.heap[n]=t.heap[i],n=i,i<<=1;t.heap[n]=r}function X(t,e,n){var r,i,o,s,a=0;if(0!==t.last_lit)do{r=t.pending_buf[t.d_buf+2*a]<<8|t.pending_buf[t.d_buf+2*a+1],i=t.pending_buf[t.l_buf+a],a++,0===r?V(t,i,e):(V(t,(o=z[i])+d+1,e),0!==(s=S[o])&&j(t,i-=N[o],s),V(t,o=C(--r),n),0!==(s=T[o])&&j(t,r-=P[o],s))}while(a<t.last_lit);V(t,v,e)}function $(t,e){var n,r,i,o=e.dyn_tree,s=e.stat_desc.static_tree,a=e.stat_desc.has_stree,h=e.stat_desc.elems,u=-1;for(t.heap_len=0,t.heap_max=b,n=0;n<h;n++)0!==o[2*n]?(t.heap[++t.heap_len]=u=n,t.depth[n]=0):o[2*n+1]=0;for(;t.heap_len<2;)o[2*(i=t.heap[++t.heap_len]=u<2?++u:0)]=1,t.depth[i]=0,t.opt_len--,a&&(t.static_len-=s[2*i+1]);for(e.max_code=u,n=t.heap_len>>1;n>=1;n--)K(t,o,n);i=h;do{n=t.heap[1],t.heap[1]=t.heap[t.heap_len--],K(t,o,1),r=t.heap[1],t.heap[--t.heap_max]=n,t.heap[--t.heap_max]=r,o[2*i]=o[2*n]+o[2*r],t.depth[i]=(t.depth[n]>=t.depth[r]?t.depth[n]:t.depth[r])+1,o[2*n+1]=o[2*r+1]=i,t.heap[1]=i++,K(t,o,1)}while(t.heap_len>=2);t.heap[--t.heap_max]=t.heap[1],function(t,e){var n,r,i,o,s,a,h=e.dyn_tree,u=e.max_code,l=e.stat_desc.static_tree,f=e.stat_desc.has_stree,c=e.stat_desc.extra_bits,d=e.stat_desc.extra_base,p=e.stat_desc.max_length,g=0;for(o=0;o<=y;o++)t.bl_count[o]=0;for(h[2*t.heap[t.heap_max]+1]=0,n=t.heap_max+1;n<b;n++)(o=h[2*h[2*(r=t.heap[n])+1]+1]+1)>p&&(o=p,g++),h[2*r+1]=o,r>u||(t.bl_count[o]++,s=0,r>=d&&(s=c[r-d]),a=h[2*r],t.opt_len+=a*(o+s),f&&(t.static_len+=a*(l[2*r+1]+s)));if(0!==g){do{for(o=p-1;0===t.bl_count[o];)o--;t.bl_count[o]--,t.bl_count[o+1]+=2,t.bl_count[p]--,g-=2}while(g>0);for(o=p;0!==o;o--)for(r=t.bl_count[o];0!==r;)(i=t.heap[--n])>u||(h[2*i+1]!==o&&(t.opt_len+=(o-h[2*i+1])*h[2*i],h[2*i+1]=o),r--)}}(t,e),H(o,u,t.bl_count)}function J(t,e,n){var r,i,o=-1,s=e[1],a=0,h=7,u=4;for(0===s&&(h=138,u=3),e[2*(n+1)+1]=65535,r=0;r<=n;r++)i=s,s=e[2*(r+1)+1],++a<h&&i===s||(a<u?t.bl_tree[2*i]+=a:0!==i?(i!==o&&t.bl_tree[2*i]++,t.bl_tree[2*E]++):a<=10?t.bl_tree[2*k]++:t.bl_tree[2*x]++,a=0,o=i,0===s?(h=138,u=3):i===s?(h=6,u=3):(h=7,u=4))}function Q(t,e,n){var r,i,o=-1,s=e[1],a=0,h=7,u=4;for(0===s&&(h=138,u=3),r=0;r<=n;r++)if(i=s,s=e[2*(r+1)+1],!(++a<h&&i===s)){if(a<u)do{V(t,i,t.bl_tree)}while(0!=--a);else 0!==i?(i!==o&&(V(t,i,t.bl_tree),a--),V(t,E,t.bl_tree),j(t,a-3,2)):a<=10?(V(t,k,t.bl_tree),j(t,a-3,3)):(V(t,x,t.bl_tree),j(t,a-11,7));a=0,o=i,0===s?(h=138,u=3):i===s?(h=6,u=3):(h=7,u=4)}}h(P);var tt=!1;function et(t,e,n,i){j(t,(u<<1)+(i?1:0),3),function(t,e,n,i){Y(t),i&&(Z(t,n),Z(t,~n)),r.arraySet(t.pending_buf,t.window,e,n,t.pending),t.pending+=n}(t,e,n,!0)}e._tr_init=function(t){tt||(function(){var t,e,n,r,i,o=new Array(y+1);for(n=0,r=0;r<c-1;r++)for(N[r]=n,t=0;t<1<<S[r];t++)z[n++]=r;for(z[n-1]=r,i=0,r=0;r<16;r++)for(P[r]=i,t=0;t<1<<T[r];t++)O[i++]=r;for(i>>=7;r<g;r++)for(P[r]=i<<7,t=0;t<1<<T[r]-7;t++)O[256+i++]=r;for(e=0;e<=y;e++)o[e]=0;for(t=0;t<=143;)I[2*t+1]=8,t++,o[8]++;for(;t<=255;)I[2*t+1]=9,t++,o[9]++;for(;t<=279;)I[2*t+1]=7,t++,o[7]++;for(;t<=287;)I[2*t+1]=8,t++,o[8]++;for(H(I,p+1,o),t=0;t<g;t++)L[2*t+1]=5,L[2*t]=W(t,5);B=new U(I,S,d+1,p,y),D=new U(L,T,0,g,y),F=new U(new Array(0),A,0,_,w)}(),tt=!0),t.l_desc=new M(t.dyn_ltree,B),t.d_desc=new M(t.dyn_dtree,D),t.bl_desc=new M(t.bl_tree,F),t.bi_buf=0,t.bi_valid=0,q(t)},e._tr_stored_block=et,e._tr_flush_block=function(t,e,n,r){var h,u,c=0;t.level>0?(t.strm.data_type===a&&(t.strm.data_type=function(t){var e,n=4093624447;for(e=0;e<=31;e++,n>>>=1)if(1&n&&0!==t.dyn_ltree[2*e])return o;if(0!==t.dyn_ltree[18]||0!==t.dyn_ltree[20]||0!==t.dyn_ltree[26])return s;for(e=32;e<d;e++)if(0!==t.dyn_ltree[2*e])return s;return o}(t)),$(t,t.l_desc),$(t,t.d_desc),c=function(t){var e;for(J(t,t.dyn_ltree,t.l_desc.max_code),J(t,t.dyn_dtree,t.d_desc.max_code),$(t,t.bl_desc),e=_-1;e>=3&&0===t.bl_tree[2*R[e]+1];e--);return t.opt_len+=3*(e+1)+5+5+4,e}(t),h=t.opt_len+3+7>>>3,(u=t.static_len+3+7>>>3)<=h&&(h=u)):h=u=n+5,n+4<=h&&-1!==e?et(t,e,n,r):t.strategy===i||u===h?(j(t,(l<<1)+(r?1:0),3),X(t,I,L)):(j(t,(f<<1)+(r?1:0),3),function(t,e,n,r){var i;for(j(t,e-257,5),j(t,n-1,5),j(t,r-4,4),i=0;i<r;i++)j(t,t.bl_tree[2*R[i]+1],3);Q(t,t.dyn_ltree,e-1),Q(t,t.dyn_dtree,n-1)}(t,t.l_desc.max_code+1,t.d_desc.max_code+1,c+1),X(t,t.dyn_ltree,t.dyn_dtree)),q(t),r&&Y(t)},e._tr_tally=function(t,e,n){return t.pending_buf[t.d_buf+2*t.last_lit]=e>>>8&255,t.pending_buf[t.d_buf+2*t.last_lit+1]=255&e,t.pending_buf[t.l_buf+t.last_lit]=255&n,t.last_lit++,0===e?t.dyn_ltree[2*n]++:(t.matches++,e--,t.dyn_ltree[2*(z[n]+d+1)]++,t.dyn_dtree[2*C(e)]++),t.last_lit===t.lit_bufsize-1},e._tr_align=function(t){j(t,l<<1,3),V(t,v,I),function(t){16===t.bi_valid?(Z(t,t.bi_buf),t.bi_buf=0,t.bi_valid=0):t.bi_valid>=8&&(t.pending_buf[t.pending++]=255&t.bi_buf,t.bi_buf>>=8,t.bi_valid-=8)}(t)}},function(t,e,n){"use strict";t.exports={2:"need dictionary",1:"stream end",0:"","-1":"file error","-2":"stream error","-3":"data error","-4":"insufficient memory","-5":"buffer error","-6":"incompatible version"}},function(t,e,n){"use strict";var r=n(8),i=n(21),o=n(22),s=n(49),a=n(50),h=0,u=1,l=2,f=4,c=5,d=6,p=0,g=1,_=2,b=-2,y=-3,m=-4,w=-5,v=8,E=1,k=2,x=3,S=4,T=5,A=6,R=7,I=8,L=9,O=10,z=11,N=12,B=13,D=14,F=15,P=16,U=17,M=18,C=19,Z=20,j=21,V=22,W=23,H=24,q=25,Y=26,G=27,K=28,X=29,$=30,J=31,Q=32,tt=852,et=592,nt=15;function rt(t){return(t>>>24&255)+(t>>>8&65280)+((65280&t)<<8)+((255&t)<<24)}function it(){this.mode=0,this.last=!1,this.wrap=0,this.havedict=!1,this.flags=0,this.dmax=0,this.check=0,this.total=0,this.head=null,this.wbits=0,this.wsize=0,this.whave=0,this.wnext=0,this.window=null,this.hold=0,this.bits=0,this.length=0,this.offset=0,this.extra=0,this.lencode=null,this.distcode=null,this.lenbits=0,this.distbits=0,this.ncode=0,this.nlen=0,this.ndist=0,this.have=0,this.next=null,this.lens=new r.Buf16(320),this.work=new r.Buf16(288),this.lendyn=null,this.distdyn=null,this.sane=0,this.back=0,this.was=0}function ot(t){var e;return t&&t.state?(e=t.state,t.total_in=t.total_out=e.total=0,t.msg="",e.wrap&&(t.adler=1&e.wrap),e.mode=E,e.last=0,e.havedict=0,e.dmax=32768,e.head=null,e.hold=0,e.bits=0,e.lencode=e.lendyn=new r.Buf32(tt),e.distcode=e.distdyn=new r.Buf32(et),e.sane=1,e.back=-1,p):b}function st(t){var e;return t&&t.state?((e=t.state).wsize=0,e.whave=0,e.wnext=0,ot(t)):b}function at(t,e){var n,r;return t&&t.state?(r=t.state,e<0?(n=0,e=-e):(n=1+(e>>4),e<48&&(e&=15)),e&&(e<8||e>15)?b:(null!==r.window&&r.wbits!==e&&(r.window=null),r.wrap=n,r.wbits=e,st(t))):b}function ht(t,e){var n,r;return t?(r=new it,t.state=r,r.window=null,(n=at(t,e))!==p&&(t.state=null),n):b}var ut,lt,ft=!0;function ct(t){if(ft){var e;for(ut=new r.Buf32(512),lt=new r.Buf32(32),e=0;e<144;)t.lens[e++]=8;for(;e<256;)t.lens[e++]=9;for(;e<280;)t.lens[e++]=7;for(;e<288;)t.lens[e++]=8;for(a(u,t.lens,0,288,ut,0,t.work,{bits:9}),e=0;e<32;)t.lens[e++]=5;a(l,t.lens,0,32,lt,0,t.work,{bits:5}),ft=!1}t.lencode=ut,t.lenbits=9,t.distcode=lt,t.distbits=5}function dt(t,e,n,i){var o,s=t.state;return null===s.window&&(s.wsize=1<<s.wbits,s.wnext=0,s.whave=0,s.window=new r.Buf8(s.wsize)),i>=s.wsize?(r.arraySet(s.window,e,n-s.wsize,s.wsize,0),s.wnext=0,s.whave=s.wsize):((o=s.wsize-s.wnext)>i&&(o=i),r.arraySet(s.window,e,n-i,o,s.wnext),(i-=o)?(r.arraySet(s.window,e,n-i,i,0),s.wnext=i,s.whave=s.wsize):(s.wnext+=o,s.wnext===s.wsize&&(s.wnext=0),s.whave<s.wsize&&(s.whave+=o))),0}e.inflateReset=st,e.inflateReset2=at,e.inflateResetKeep=ot,e.inflateInit=function(t){return ht(t,nt)},e.inflateInit2=ht,e.inflate=function(t,e){var n,tt,et,nt,it,ot,st,at,ht,ut,lt,ft,pt,gt,_t,bt,yt,mt,wt,vt,Et,kt,xt,St,Tt=0,At=new r.Buf8(4),Rt=[16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15];if(!t||!t.state||!t.output||!t.input&&0!==t.avail_in)return b;(n=t.state).mode===N&&(n.mode=B),it=t.next_out,et=t.output,st=t.avail_out,nt=t.next_in,tt=t.input,ot=t.avail_in,at=n.hold,ht=n.bits,ut=ot,lt=st,kt=p;t:for(;;)switch(n.mode){case E:if(0===n.wrap){n.mode=B;break}for(;ht<16;){if(0===ot)break t;ot--,at+=tt[nt++]<<ht,ht+=8}if(2&n.wrap&&35615===at){n.check=0,At[0]=255&at,At[1]=at>>>8&255,n.check=o(n.check,At,2,0),at=0,ht=0,n.mode=k;break}if(n.flags=0,n.head&&(n.head.done=!1),!(1&n.wrap)||(((255&at)<<8)+(at>>8))%31){t.msg="incorrect header check",n.mode=$;break}if((15&at)!==v){t.msg="unknown compression method",n.mode=$;break}if(ht-=4,Et=8+(15&(at>>>=4)),0===n.wbits)n.wbits=Et;else if(Et>n.wbits){t.msg="invalid window size",n.mode=$;break}n.dmax=1<<Et,t.adler=n.check=1,n.mode=512&at?O:N,at=0,ht=0;break;case k:for(;ht<16;){if(0===ot)break t;ot--,at+=tt[nt++]<<ht,ht+=8}if(n.flags=at,(255&n.flags)!==v){t.msg="unknown compression method",n.mode=$;break}if(57344&n.flags){t.msg="unknown header flags set",n.mode=$;break}n.head&&(n.head.text=at>>8&1),512&n.flags&&(At[0]=255&at,At[1]=at>>>8&255,n.check=o(n.check,At,2,0)),at=0,ht=0,n.mode=x;case x:for(;ht<32;){if(0===ot)break t;ot--,at+=tt[nt++]<<ht,ht+=8}n.head&&(n.head.time=at),512&n.flags&&(At[0]=255&at,At[1]=at>>>8&255,At[2]=at>>>16&255,At[3]=at>>>24&255,n.check=o(n.check,At,4,0)),at=0,ht=0,n.mode=S;case S:for(;ht<16;){if(0===ot)break t;ot--,at+=tt[nt++]<<ht,ht+=8}n.head&&(n.head.xflags=255&at,n.head.os=at>>8),512&n.flags&&(At[0]=255&at,At[1]=at>>>8&255,n.check=o(n.check,At,2,0)),at=0,ht=0,n.mode=T;case T:if(1024&n.flags){for(;ht<16;){if(0===ot)break t;ot--,at+=tt[nt++]<<ht,ht+=8}n.length=at,n.head&&(n.head.extra_len=at),512&n.flags&&(At[0]=255&at,At[1]=at>>>8&255,n.check=o(n.check,At,2,0)),at=0,ht=0}else n.head&&(n.head.extra=null);n.mode=A;case A:if(1024&n.flags&&((ft=n.length)>ot&&(ft=ot),ft&&(n.head&&(Et=n.head.extra_len-n.length,n.head.extra||(n.head.extra=new Array(n.head.extra_len)),r.arraySet(n.head.extra,tt,nt,ft,Et)),512&n.flags&&(n.check=o(n.check,tt,ft,nt)),ot-=ft,nt+=ft,n.length-=ft),n.length))break t;n.length=0,n.mode=R;case R:if(2048&n.flags){if(0===ot)break t;ft=0;do{Et=tt[nt+ft++],n.head&&Et&&n.length<65536&&(n.head.name+=String.fromCharCode(Et))}while(Et&&ft<ot);if(512&n.flags&&(n.check=o(n.check,tt,ft,nt)),ot-=ft,nt+=ft,Et)break t}else n.head&&(n.head.name=null);n.length=0,n.mode=I;case I:if(4096&n.flags){if(0===ot)break t;ft=0;do{Et=tt[nt+ft++],n.head&&Et&&n.length<65536&&(n.head.comment+=String.fromCharCode(Et))}while(Et&&ft<ot);if(512&n.flags&&(n.check=o(n.check,tt,ft,nt)),ot-=ft,nt+=ft,Et)break t}else n.head&&(n.head.comment=null);n.mode=L;case L:if(512&n.flags){for(;ht<16;){if(0===ot)break t;ot--,at+=tt[nt++]<<ht,ht+=8}if(at!==(65535&n.check)){t.msg="header crc mismatch",n.mode=$;break}at=0,ht=0}n.head&&(n.head.hcrc=n.flags>>9&1,n.head.done=!0),t.adler=n.check=0,n.mode=N;break;case O:for(;ht<32;){if(0===ot)break t;ot--,at+=tt[nt++]<<ht,ht+=8}t.adler=n.check=rt(at),at=0,ht=0,n.mode=z;case z:if(0===n.havedict)return t.next_out=it,t.avail_out=st,t.next_in=nt,t.avail_in=ot,n.hold=at,n.bits=ht,_;t.adler=n.check=1,n.mode=N;case N:if(e===c||e===d)break t;case B:if(n.last){at>>>=7&ht,ht-=7&ht,n.mode=G;break}for(;ht<3;){if(0===ot)break t;ot--,at+=tt[nt++]<<ht,ht+=8}switch(n.last=1&at,ht-=1,3&(at>>>=1)){case 0:n.mode=D;break;case 1:if(ct(n),n.mode=Z,e===d){at>>>=2,ht-=2;break t}break;case 2:n.mode=U;break;case 3:t.msg="invalid block type",n.mode=$}at>>>=2,ht-=2;break;case D:for(at>>>=7&ht,ht-=7&ht;ht<32;){if(0===ot)break t;ot--,at+=tt[nt++]<<ht,ht+=8}if((65535&at)!=(at>>>16^65535)){t.msg="invalid stored block lengths",n.mode=$;break}if(n.length=65535&at,at=0,ht=0,n.mode=F,e===d)break t;case F:n.mode=P;case P:if(ft=n.length){if(ft>ot&&(ft=ot),ft>st&&(ft=st),0===ft)break t;r.arraySet(et,tt,nt,ft,it),ot-=ft,nt+=ft,st-=ft,it+=ft,n.length-=ft;break}n.mode=N;break;case U:for(;ht<14;){if(0===ot)break t;ot--,at+=tt[nt++]<<ht,ht+=8}if(n.nlen=257+(31&at),at>>>=5,ht-=5,n.ndist=1+(31&at),at>>>=5,ht-=5,n.ncode=4+(15&at),at>>>=4,ht-=4,n.nlen>286||n.ndist>30){t.msg="too many length or distance symbols",n.mode=$;break}n.have=0,n.mode=M;case M:for(;n.have<n.ncode;){for(;ht<3;){if(0===ot)break t;ot--,at+=tt[nt++]<<ht,ht+=8}n.lens[Rt[n.have++]]=7&at,at>>>=3,ht-=3}for(;n.have<19;)n.lens[Rt[n.have++]]=0;if(n.lencode=n.lendyn,n.lenbits=7,xt={bits:n.lenbits},kt=a(h,n.lens,0,19,n.lencode,0,n.work,xt),n.lenbits=xt.bits,kt){t.msg="invalid code lengths set",n.mode=$;break}n.have=0,n.mode=C;case C:for(;n.have<n.nlen+n.ndist;){for(;bt=(Tt=n.lencode[at&(1<<n.lenbits)-1])>>>16&255,yt=65535&Tt,!((_t=Tt>>>24)<=ht);){if(0===ot)break t;ot--,at+=tt[nt++]<<ht,ht+=8}if(yt<16)at>>>=_t,ht-=_t,n.lens[n.have++]=yt;else{if(16===yt){for(St=_t+2;ht<St;){if(0===ot)break t;ot--,at+=tt[nt++]<<ht,ht+=8}if(at>>>=_t,ht-=_t,0===n.have){t.msg="invalid bit length repeat",n.mode=$;break}Et=n.lens[n.have-1],ft=3+(3&at),at>>>=2,ht-=2}else if(17===yt){for(St=_t+3;ht<St;){if(0===ot)break t;ot--,at+=tt[nt++]<<ht,ht+=8}ht-=_t,Et=0,ft=3+(7&(at>>>=_t)),at>>>=3,ht-=3}else{for(St=_t+7;ht<St;){if(0===ot)break t;ot--,at+=tt[nt++]<<ht,ht+=8}ht-=_t,Et=0,ft=11+(127&(at>>>=_t)),at>>>=7,ht-=7}if(n.have+ft>n.nlen+n.ndist){t.msg="invalid bit length repeat",n.mode=$;break}for(;ft--;)n.lens[n.have++]=Et}}if(n.mode===$)break;if(0===n.lens[256]){t.msg="invalid code -- missing end-of-block",n.mode=$;break}if(n.lenbits=9,xt={bits:n.lenbits},kt=a(u,n.lens,0,n.nlen,n.lencode,0,n.work,xt),n.lenbits=xt.bits,kt){t.msg="invalid literal/lengths set",n.mode=$;break}if(n.distbits=6,n.distcode=n.distdyn,xt={bits:n.distbits},kt=a(l,n.lens,n.nlen,n.ndist,n.distcode,0,n.work,xt),n.distbits=xt.bits,kt){t.msg="invalid distances set",n.mode=$;break}if(n.mode=Z,e===d)break t;case Z:n.mode=j;case j:if(ot>=6&&st>=258){t.next_out=it,t.avail_out=st,t.next_in=nt,t.avail_in=ot,n.hold=at,n.bits=ht,s(t,lt),it=t.next_out,et=t.output,st=t.avail_out,nt=t.next_in,tt=t.input,ot=t.avail_in,at=n.hold,ht=n.bits,n.mode===N&&(n.back=-1);break}for(n.back=0;bt=(Tt=n.lencode[at&(1<<n.lenbits)-1])>>>16&255,yt=65535&Tt,!((_t=Tt>>>24)<=ht);){if(0===ot)break t;ot--,at+=tt[nt++]<<ht,ht+=8}if(bt&&0==(240&bt)){for(mt=_t,wt=bt,vt=yt;bt=(Tt=n.lencode[vt+((at&(1<<mt+wt)-1)>>mt)])>>>16&255,yt=65535&Tt,!(mt+(_t=Tt>>>24)<=ht);){if(0===ot)break t;ot--,at+=tt[nt++]<<ht,ht+=8}at>>>=mt,ht-=mt,n.back+=mt}if(at>>>=_t,ht-=_t,n.back+=_t,n.length=yt,0===bt){n.mode=Y;break}if(32&bt){n.back=-1,n.mode=N;break}if(64&bt){t.msg="invalid literal/length code",n.mode=$;break}n.extra=15&bt,n.mode=V;case V:if(n.extra){for(St=n.extra;ht<St;){if(0===ot)break t;ot--,at+=tt[nt++]<<ht,ht+=8}n.length+=at&(1<<n.extra)-1,at>>>=n.extra,ht-=n.extra,n.back+=n.extra}n.was=n.length,n.mode=W;case W:for(;bt=(Tt=n.distcode[at&(1<<n.distbits)-1])>>>16&255,yt=65535&Tt,!((_t=Tt>>>24)<=ht);){if(0===ot)break t;ot--,at+=tt[nt++]<<ht,ht+=8}if(0==(240&bt)){for(mt=_t,wt=bt,vt=yt;bt=(Tt=n.distcode[vt+((at&(1<<mt+wt)-1)>>mt)])>>>16&255,yt=65535&Tt,!(mt+(_t=Tt>>>24)<=ht);){if(0===ot)break t;ot--,at+=tt[nt++]<<ht,ht+=8}at>>>=mt,ht-=mt,n.back+=mt}if(at>>>=_t,ht-=_t,n.back+=_t,64&bt){t.msg="invalid distance code",n.mode=$;break}n.offset=yt,n.extra=15&bt,n.mode=H;case H:if(n.extra){for(St=n.extra;ht<St;){if(0===ot)break t;ot--,at+=tt[nt++]<<ht,ht+=8}n.offset+=at&(1<<n.extra)-1,at>>>=n.extra,ht-=n.extra,n.back+=n.extra}if(n.offset>n.dmax){t.msg="invalid distance too far back",n.mode=$;break}n.mode=q;case q:if(0===st)break t;if(ft=lt-st,n.offset>ft){if((ft=n.offset-ft)>n.whave&&n.sane){t.msg="invalid distance too far back",n.mode=$;break}ft>n.wnext?(ft-=n.wnext,pt=n.wsize-ft):pt=n.wnext-ft,ft>n.length&&(ft=n.length),gt=n.window}else gt=et,pt=it-n.offset,ft=n.length;ft>st&&(ft=st),st-=ft,n.length-=ft;do{et[it++]=gt[pt++]}while(--ft);0===n.length&&(n.mode=j);break;case Y:if(0===st)break t;et[it++]=n.length,st--,n.mode=j;break;case G:if(n.wrap){for(;ht<32;){if(0===ot)break t;ot--,at|=tt[nt++]<<ht,ht+=8}if(lt-=st,t.total_out+=lt,n.total+=lt,lt&&(t.adler=n.check=n.flags?o(n.check,et,lt,it-lt):i(n.check,et,lt,it-lt)),lt=st,(n.flags?at:rt(at))!==n.check){t.msg="incorrect data check",n.mode=$;break}at=0,ht=0}n.mode=K;case K:if(n.wrap&&n.flags){for(;ht<32;){if(0===ot)break t;ot--,at+=tt[nt++]<<ht,ht+=8}if(at!==(4294967295&n.total)){t.msg="incorrect length check",n.mode=$;break}at=0,ht=0}n.mode=X;case X:kt=g;break t;case $:kt=y;break t;case J:return m;case Q:default:return b}return t.next_out=it,t.avail_out=st,t.next_in=nt,t.avail_in=ot,n.hold=at,n.bits=ht,(n.wsize||lt!==t.avail_out&&n.mode<$&&(n.mode<G||e!==f))&&dt(t,t.output,t.next_out,lt-t.avail_out)?(n.mode=J,m):(ut-=t.avail_in,lt-=t.avail_out,t.total_in+=ut,t.total_out+=lt,n.total+=lt,n.wrap&&lt&&(t.adler=n.check=n.flags?o(n.check,et,lt,t.next_out-lt):i(n.check,et,lt,t.next_out-lt)),t.data_type=n.bits+(n.last?64:0)+(n.mode===N?128:0)+(n.mode===Z||n.mode===F?256:0),(0===ut&&0===lt||e===f)&&kt===p&&(kt=w),kt)},e.inflateEnd=function(t){if(!t||!t.state)return b;var e=t.state;return e.window&&(e.window=null),t.state=null,p},e.inflateGetHeader=function(t,e){var n;return t&&t.state?0==(2&(n=t.state).wrap)?b:(n.head=e,e.done=!1,p):b},e.inflateSetDictionary=function(t,e){var n,r=e.length;return t&&t.state?0!==(n=t.state).wrap&&n.mode!==z?b:n.mode===z&&i(1,e,r,0)!==n.check?y:dt(t,e,r,r)?(n.mode=J,m):(n.havedict=1,p):b},e.inflateInfo="pako inflate (from Nodeca project)"},function(t,e,n){"use strict";t.exports=function(t,e){var n,r,i,o,s,a,h,u,l,f,c,d,p,g,_,b,y,m,w,v,E,k,x,S,T;n=t.state,r=t.next_in,S=t.input,i=r+(t.avail_in-5),o=t.next_out,T=t.output,s=o-(e-t.avail_out),a=o+(t.avail_out-257),h=n.dmax,u=n.wsize,l=n.whave,f=n.wnext,c=n.window,d=n.hold,p=n.bits,g=n.lencode,_=n.distcode,b=(1<<n.lenbits)-1,y=(1<<n.distbits)-1;t:do{p<15&&(d+=S[r++]<<p,p+=8,d+=S[r++]<<p,p+=8),m=g[d&b];e:for(;;){if(d>>>=w=m>>>24,p-=w,0===(w=m>>>16&255))T[o++]=65535&m;else{if(!(16&w)){if(0==(64&w)){m=g[(65535&m)+(d&(1<<w)-1)];continue e}if(32&w){n.mode=12;break t}t.msg="invalid literal/length code",n.mode=30;break t}v=65535&m,(w&=15)&&(p<w&&(d+=S[r++]<<p,p+=8),v+=d&(1<<w)-1,d>>>=w,p-=w),p<15&&(d+=S[r++]<<p,p+=8,d+=S[r++]<<p,p+=8),m=_[d&y];n:for(;;){if(d>>>=w=m>>>24,p-=w,!(16&(w=m>>>16&255))){if(0==(64&w)){m=_[(65535&m)+(d&(1<<w)-1)];continue n}t.msg="invalid distance code",n.mode=30;break t}if(E=65535&m,p<(w&=15)&&(d+=S[r++]<<p,(p+=8)<w&&(d+=S[r++]<<p,p+=8)),(E+=d&(1<<w)-1)>h){t.msg="invalid distance too far back",n.mode=30;break t}if(d>>>=w,p-=w,E>(w=o-s)){if((w=E-w)>l&&n.sane){t.msg="invalid distance too far back",n.mode=30;break t}if(k=0,x=c,0===f){if(k+=u-w,w<v){v-=w;do{T[o++]=c[k++]}while(--w);k=o-E,x=T}}else if(f<w){if(k+=u+f-w,(w-=f)<v){v-=w;do{T[o++]=c[k++]}while(--w);if(k=0,f<v){v-=w=f;do{T[o++]=c[k++]}while(--w);k=o-E,x=T}}}else if(k+=f-w,w<v){v-=w;do{T[o++]=c[k++]}while(--w);k=o-E,x=T}for(;v>2;)T[o++]=x[k++],T[o++]=x[k++],T[o++]=x[k++],v-=3;v&&(T[o++]=x[k++],v>1&&(T[o++]=x[k++]))}else{k=o-E;do{T[o++]=T[k++],T[o++]=T[k++],T[o++]=T[k++],v-=3}while(v>2);v&&(T[o++]=T[k++],v>1&&(T[o++]=T[k++]))}break}}break}}while(r<i&&o<a);r-=v=p>>3,d&=(1<<(p-=v<<3))-1,t.next_in=r,t.next_out=o,t.avail_in=r<i?i-r+5:5-(r-i),t.avail_out=o<a?a-o+257:257-(o-a),n.hold=d,n.bits=p}},function(t,e,n){"use strict";var r=n(8),i=[3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258,0,0],o=[16,16,16,16,16,16,16,16,17,17,17,17,18,18,18,18,19,19,19,19,20,20,20,20,21,21,21,21,16,72,78],s=[1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577,0,0],a=[16,16,16,16,17,17,18,18,19,19,20,20,21,21,22,22,23,23,24,24,25,25,26,26,27,27,28,28,29,29,64,64];t.exports=function(t,e,n,h,u,l,f,c){var d,p,g,_,b,y,m,w,v,E=c.bits,k=0,x=0,S=0,T=0,A=0,R=0,I=0,L=0,O=0,z=0,N=null,B=0,D=new r.Buf16(16),F=new r.Buf16(16),P=null,U=0;for(k=0;k<=15;k++)D[k]=0;for(x=0;x<h;x++)D[e[n+x]]++;for(A=E,T=15;T>=1&&0===D[T];T--);if(A>T&&(A=T),0===T)return u[l++]=20971520,u[l++]=20971520,c.bits=1,0;for(S=1;S<T&&0===D[S];S++);for(A<S&&(A=S),L=1,k=1;k<=15;k++)if(L<<=1,(L-=D[k])<0)return-1;if(L>0&&(0===t||1!==T))return-1;for(F[1]=0,k=1;k<15;k++)F[k+1]=F[k]+D[k];for(x=0;x<h;x++)0!==e[n+x]&&(f[F[e[n+x]]++]=x);if(0===t?(N=P=f,y=19):1===t?(N=i,B-=257,P=o,U-=257,y=256):(N=s,P=a,y=-1),z=0,x=0,k=S,b=l,R=A,I=0,g=-1,_=(O=1<<A)-1,1===t&&O>852||2===t&&O>592)return 1;for(;;){m=k-I,f[x]<y?(w=0,v=f[x]):f[x]>y?(w=P[U+f[x]],v=N[B+f[x]]):(w=96,v=0),d=1<<k-I,S=p=1<<R;do{u[b+(z>>I)+(p-=d)]=m<<24|w<<16|v|0}while(0!==p);for(d=1<<k-1;z&d;)d>>=1;if(0!==d?(z&=d-1,z+=d):z=0,x++,0==--D[k]){if(k===T)break;k=e[n+f[x]]}if(k>A&&(z&_)!==g){for(0===I&&(I=A),b+=S,L=1<<(R=k-I);R+I<T&&!((L-=D[R+I])<=0);)R++,L<<=1;if(O+=1<<R,1===t&&O>852||2===t&&O>592)return 1;u[g=z&_]=A<<24|R<<16|b-l|0}}return 0!==z&&(u[b+z]=k-I<<24|64<<16|0),c.bits=A,0}},function(t,e,n){"use strict";t.exports={Z_NO_FLUSH:0,Z_PARTIAL_FLUSH:1,Z_SYNC_FLUSH:2,Z_FULL_FLUSH:3,Z_FINISH:4,Z_BLOCK:5,Z_TREES:6,Z_OK:0,Z_STREAM_END:1,Z_NEED_DICT:2,Z_ERRNO:-1,Z_STREAM_ERROR:-2,Z_DATA_ERROR:-3,Z_BUF_ERROR:-5,Z_NO_COMPRESSION:0,Z_BEST_SPEED:1,Z_BEST_COMPRESSION:9,Z_DEFAULT_COMPRESSION:-1,Z_FILTERED:1,Z_HUFFMAN_ONLY:2,Z_RLE:3,Z_FIXED:4,Z_DEFAULT_STRATEGY:0,Z_BINARY:0,Z_TEXT:1,Z_UNKNOWN:2,Z_DEFLATED:8}},function(t,e){t.exports=class{constructor(t){this.file=t}async read(t,e){const n=this.file;return new Promise(function(r,i){const o=new FileReader;if(o.onload=function(t){r(o.result)},o.onerror=function(t){console.err("Error reading local file "+n.name),i(null,o)},void 0!==t){const r=n.slice(t,t+e);o.readAsArrayBuffer(r)}else o.readAsArrayBuffer(n)})}}},function(t,e,n){const r=n(23),i=n(54);function o(t,e,n){const r=t.includes("?")?"&":"?";return t+r+e+"="+n}t.exports=class{constructor(t){var e;this.config=t,this.url=(e=t.path||t.url).includes("//www.dropbox.com")?e.replace("//www.dropbox.com","//dl.dropboxusercontent.com"):e.startsWith("ftp://ftp.ncbi.nlm.nih.gov")?e.replace("ftp://","https://"):e}async read(t,e){const n=this.config.headers||{},s="bytes="+t+"-"+(t+e-1);n.Range=s;let a=this.url.slice();if(i.isNode)n["User-Agent"]="straw";else{if(this.config.oauthToken){const t=async function(t){return"function"==typeof t?await Promise.resolve(t()):t}(this.config.oauthToken);n.Authorization=`Bearer ${t}`}0==navigator.vendor.indexOf("Apple")&&/\sSafari\//.test(navigator.userAgent);const t=navigator.userAgent.indexOf("Chrome")>-1,e=this.url.indexOf("X-Amz-Signature")>-1;t&&!e&&(a=o(a,"randomSeed",Math.random().toString(36)))}this.config.apiKey&&(a=o(a,"key",this.config.apiKey));const h=await r(a,{method:"GET",headers:n,redirect:"follow",mode:"cors"}),u=h.status;if(u>=400){const t=Error(h.statusText);throw t.code=u,t}return h.arrayBuffer()}}},function(t,e,n){"use strict";(function(t){Object.defineProperty(e,"__esModule",{value:!0});var n="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t},r="undefined"!=typeof window&&void 0!==window.document,i="object"===("undefined"==typeof self?"undefined":n(self))&&self.constructor&&"DedicatedWorkerGlobalScope"===self.constructor.name,o=void 0!==t&&null!=t.versions&&null!=t.versions.node;e.isBrowser=r,e.isWebWorker=i,e.isNode=o}).call(this,n(0))},function(t,e){t.exports=class{constructor(t,e){this.file=t,this.rateLimiter=e}async read(t,e){const n=this.file,r=this.rateLimiter;return new Promise(function(i,o){r.limiter(async function(n){try{const r=await n.read(t,e);i(r)}catch(t){o(t)}})(n)})}}},function(t,e){t.exports=class{constructor(t){this.wait=void 0===t?100:t,this.isCalled=!1,this.calls=[]}limiter(t){const e=this;let n=function(){e.calls.length&&!e.isCalled&&(e.isCalled=!0,e.calls.shift().call(),setTimeout(function(){e.isCalled=!1,n()},e.wait))};return function(){e.calls.push(t.bind(this,...arguments)),n()}}}},function(t,e){var n=function(t,e){var n=new Uint8Array(t.byteLength+e.byteLength);return n.set(new Uint8Array(t),0),n.set(new Uint8Array(e),t.byteLength),n.buffer};t.exports=class{constructor(t){this.file=t.file,this.size=t.size||64e3,this.position=0,this.bufferStart=0,this.bufferLength=0,this.buffer=void 0}async read(t,e){const r=t,i=t+e,o=this.bufferStart,s=this.bufferStart+this.bufferLength;if(e>this.size)return this.buffer=void 0,this.bufferStart=0,this.bufferLength=0,this.file.read(t,e);if(r>=o&&i<=s){const t=r-o,n=t+e;return this.buffer.slice(t,n)}if(r<o&&i>o){const i=o-r,s=await this.file.read(t,i),a=e-i;if(a>0){const t=this.buffer.slice(0,a);return n(s,t)}return s}if(!(r<s&&i>s))return this.buffer=await this.file.read(t,this.size),this.bufferStart=t,this.bufferLength=this.buffer.byteLength,this.buffer.slice(0,e);{const t=s-r,i=this.bufferLength-t,o=this.buffer.slice(i,this.bufferLength),a=e-t;if(!(a>0))return o;try{this.buffer=await this.file.read(s,this.size),this.bufferStart=s,this.bufferLength=this.buffer.byteLength;const t=this.buffer.slice(0,a);return n(o,t)}catch(t){if(t.code&&416===t.code)return o;throw t}}}}},function(t,e){const n=function(t,e){this.littleEndian=void 0===e||e,this.position=0,this.view=t,this.length=t.byteLength};function r(t,e){this.block=t,this.offset=e}n.prototype.available=function(){return this.length-this.position},n.prototype.remLength=function(){return this.length-this.position},n.prototype.hasNext=function(){return this.position<this.length-1},n.prototype.getByte=function(){var t=this.view.getUint8(this.position,this.littleEndian);return this.position++,t},n.prototype.getShort=function(){var t=this.view.getInt16(this.position,this.littleEndian);return this.position+=2,t},n.prototype.getUShort=function(){var t=this.view.getUint16(this.position,this.littleEndian);return this.position+=2,t},n.prototype.getInt=function(){var t=this.view.getInt32(this.position,this.littleEndian);return this.position+=4,t},n.prototype.getUInt=function(){var t=this.view.getUint32(this.position,this.littleEndian);return this.position+=4,t},n.prototype.getLong=function(){var t=[];t[0]=this.view.getUint8(this.position),t[1]=this.view.getUint8(this.position+1),t[2]=this.view.getUint8(this.position+2),t[3]=this.view.getUint8(this.position+3),t[4]=this.view.getUint8(this.position+4),t[5]=this.view.getUint8(this.position+5),t[6]=this.view.getUint8(this.position+6),t[7]=this.view.getUint8(this.position+7);var e=0;if(this.littleEndian)for(var n=t.length-1;n>=0;n--)e=256*e+t[n];else for(n=0;n<t.length;n++)e=256*e+t[n];return this.position+=8,e},n.prototype.getString=function(t){for(var e,n="";0!=(e=this.view.getUint8(this.position++))&&(n+=String.fromCharCode(e),!t||n.length!=t););return n},n.prototype.getFixedLengthString=function(t){var e,n,r="";for(e=0;e<t;e++)(n=this.view.getUint8(this.position++))>0&&(r+=String.fromCharCode(n));return r},n.prototype.getFixedLengthTrimmedString=function(t){var e,n,r="";for(e=0;e<t;e++)(n=this.view.getUint8(this.position++))>32&&(r+=String.fromCharCode(n));return r},n.prototype.getFloat=function(){var t=this.view.getFloat32(this.position,this.littleEndian);return this.position+=4,t},n.prototype.getDouble=function(){var t=this.view.getFloat64(this.position,this.littleEndian);return this.position+=8,t},n.prototype.skip=function(t){return this.position+=t,this.position},n.prototype.getVPointer=function(){var t=this.position,e=this.view.getUint8(t+1)<<8|this.view.getUint8(t),n=4294967296*(255&this.view.getUint8(t+6))+16777216*(255&this.view.getUint8(t+5))+65536*(255&this.view.getUint8(t+4))+256*(255&this.view.getUint8(t+3))+(255&this.view.getUint8(t+2));return this.position+=8,new r(n,e)},r.prototype.isLessThan=function(t){return this.block<t.block||this.block===t.block&&this.offset<t.offset},r.prototype.isGreaterThan=function(t){return this.block>t.block||this.block===t.block&&this.offset>t.offset},r.prototype.print=function(){return this.block+":"+this.offset},t.exports=n},function(t,e){t.exports=class{constructor(t,e,n){const r=this;this.chr1=t,this.chr2=e,this.bpZoomData=[],this.fragZoomData=[],n.forEach(function(t){"BP"===t.zoom.unit?r.bpZoomData.push(t):r.fragZoomData.push(t)})}getZoomDataByIndex(t,e){return("FRAG"===e?this.fragZoomData:this.bpZoomData)[t]}findZoomForResolution(t,e){const n="FRAG"===e?this.fragZoomData:this.bpZoomData;for(let e=1;e<n.length;e++)if(n[e].zoom.binSize<t)return e-1;return n.length-1}getZoomData(t){const e="BP"===t.unit?this.bpZoomData:this.fragZoomData;for(let r=0;r<e.length;r++){var n=e[r];if(t.binSize===n.zoom.binSize)return n}}}},function(t,e){t.exports=class{constructor(t,e,n,r,i,o,s){this.chr1=t,this.chr2=e,this.zoom=n,this.blockBinCount=r,this.blockColumnCount=i,this.chr1Sites=o,this.chr2Sites=s}getKey(){return this.chr1.name+"_"+this.chr2.name+"_"+this.zoom.unit+"_"+this.zoom.binSize}}},function(t,e){class n{constructor(t,e,n,r,i){var o,s=function(t){var e,n=0,r=0;for(e=0;e<t.length;e++)isNaN(t[e])||(n+=t[e],r++);return r>0?n/r:0}(i);if(s>0)for(o=0;o<i.length;o++)i[o]/=s;this.type=t,this.chrIdx=e,this.unit=n,this.resolution=r,this.data=i}getKey(){return n.getKey(this.type,this.chrIdx,this.unit,this.resolution)}static getNormalizationVectorKey(t,e,n,r){return t+"_"+e+"_"+n+"_"+r}}t.exports=n}])});
+
+var regeneratorRuntime  = {}
+var Op = Object.prototype;
+var hasOwn = Op.hasOwnProperty;
+var undefined; // More compressible than void 0.
+var $Symbol = typeof Symbol === "function" ? Symbol : {};
+var iteratorSymbol = $Symbol.iterator || "@@iterator";
+var asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator";
+var toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag";
+
+function wrap(innerFn, outerFn, self, tryLocsList) {
+    // If outerFn provided and outerFn.prototype is a Generator, then outerFn.prototype instanceof Generator.
+    var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator;
+    var generator = Object.create(protoGenerator.prototype);
+    var context = new Context(tryLocsList || []);
+
+    // The ._invoke method unifies the implementations of the .next,
+    // .throw, and .return methods.
+    generator._invoke = makeInvokeMethod(innerFn, self, context);
+
+    return generator;
+}
+regeneratorRuntime.wrap = wrap;
+
+// Try/catch helper to minimize deoptimizations. Returns a completion
+// record like context.tryEntries[i].completion. This interface could
+// have been (and was previously) designed to take a closure to be
+// invoked without arguments, but in all the cases we care about we
+// already have an existing method we want to call, so there's no need
+// to create a new function object. We can even get away with assuming
+// the method takes exactly one argument, since that happens to be true
+// in every case, so we don't have to touch the arguments object. The
+// only additional allocation required is the completion record, which
+// has a stable shape and so hopefully should be cheap to allocate.
+function tryCatch(fn, obj, arg) {
+    try {
+        return { type: "normal", arg: fn.call(obj, arg) };
+    } catch (err) {
+        return { type: "throw", arg: err };
+    }
+}
+
+var GenStateSuspendedStart = "suspendedStart";
+var GenStateSuspendedYield = "suspendedYield";
+var GenStateExecuting = "executing";
+var GenStateCompleted = "completed";
+
+// Returning this object from the innerFn has the same effect as
+// breaking out of the dispatch switch statement.
+var ContinueSentinel = {};
+
+// Dummy constructor functions that we use as the .constructor and
+// .constructor.prototype properties for functions that return Generator
+// objects. For full spec compliance, you may wish to configure your
+// minifier not to mangle the names of these two functions.
+function Generator() {}
+function GeneratorFunction() {}
+function GeneratorFunctionPrototype() {}
+
+// This is a polyfill for %IteratorPrototype% for environments that
+// don't natively support it.
+var IteratorPrototype = {};
+IteratorPrototype[iteratorSymbol] = function () {
+    return this;
+};
+
+var getProto = Object.getPrototypeOf;
+var NativeIteratorPrototype = getProto && getProto(getProto(values([])));
+if (NativeIteratorPrototype &&
+    NativeIteratorPrototype !== Op &&
+    hasOwn.call(NativeIteratorPrototype, iteratorSymbol)) {
+    // This environment has a native %IteratorPrototype%; use it instead
+    // of the polyfill.
+    IteratorPrototype = NativeIteratorPrototype;
+}
+
+var Gp = GeneratorFunctionPrototype.prototype =
+    Generator.prototype = Object.create(IteratorPrototype);
+GeneratorFunction.prototype = Gp.constructor = GeneratorFunctionPrototype;
+GeneratorFunctionPrototype.constructor = GeneratorFunction;
+GeneratorFunctionPrototype[toStringTagSymbol] =
+    GeneratorFunction.displayName = "GeneratorFunction";
+
+// Helper for defining the .next, .throw, and .return methods of the
+// Iterator interface in terms of a single ._invoke method.
+function defineIteratorMethods(prototype) {
+    ["next", "throw", "return"].forEach(function(method) {
+        prototype[method] = function(arg) {
+            return this._invoke(method, arg);
+        };
+    });
+}
+
+regeneratorRuntime.isGeneratorFunction = function(genFun) {
+    var ctor = typeof genFun === "function" && genFun.constructor;
+    return ctor
+        ? ctor === GeneratorFunction ||
+        // For the native GeneratorFunction constructor, the best we can
+        // do is to check its .name property.
+        (ctor.displayName || ctor.name) === "GeneratorFunction"
+        : false;
+};
+
+regeneratorRuntime.mark = function(genFun) {
+    if (Object.setPrototypeOf) {
+        Object.setPrototypeOf(genFun, GeneratorFunctionPrototype);
+    } else {
+        genFun.__proto__ = GeneratorFunctionPrototype;
+        if (!(toStringTagSymbol in genFun)) {
+            genFun[toStringTagSymbol] = "GeneratorFunction";
+        }
+    }
+    genFun.prototype = Object.create(Gp);
+    return genFun;
+};
+
+// Within the body of any async function, `await x` is transformed to
+// `yield regeneratorRuntime.awrap(x)`, so that the runtime can test
+// `hasOwn.call(value, "__await")` to determine if the yielded value is
+// meant to be awaited.
+regeneratorRuntime.awrap = function(arg) {
+    return { __await: arg };
+};
+
+function AsyncIterator(generator) {
+    function invoke(method, arg, resolve, reject) {
+        var record = tryCatch(generator[method], generator, arg);
+        if (record.type === "throw") {
+            reject(record.arg);
+        } else {
+            var result = record.arg;
+            var value = result.value;
+            if (value &&
+                typeof value === "object" &&
+                hasOwn.call(value, "__await")) {
+                return Promise.resolve(value.__await).then(function(value) {
+                    invoke("next", value, resolve, reject);
+                }, function(err) {
+                    invoke("throw", err, resolve, reject);
+                });
+            }
+
+            return Promise.resolve(value).then(function(unwrapped) {
+                // When a yielded Promise is resolved, its final value becomes
+                // the .value of the Promise<{value,done}> result for the
+                // current iteration.
+                result.value = unwrapped;
+                resolve(result);
+            }, function(error) {
+                // If a rejected Promise was yielded, throw the rejection back
+                // into the async generator function so it can be handled there.
+                return invoke("throw", error, resolve, reject);
+            });
+        }
+    }
+
+    var previousPromise;
+
+    function enqueue(method, arg) {
+        function callInvokeWithMethodAndArg() {
+            return new Promise(function(resolve, reject) {
+                invoke(method, arg, resolve, reject);
+            });
+        }
+
+        return previousPromise =
+            // If enqueue has been called before, then we want to wait until
+            // all previous Promises have been resolved before calling invoke,
+            // so that results are always delivered in the correct order. If
+            // enqueue has not been called before, then it is important to
+            // call invoke immediately, without waiting on a callback to fire,
+            // so that the async generator function has the opportunity to do
+            // any necessary setup in a predictable way. This predictability
+            // is why the Promise constructor synchronously invokes its
+            // executor callback, and why async functions synchronously
+            // execute code before the first await. Since we implement simple
+            // async functions in terms of async generators, it is especially
+            // important to get this right, even though it requires care.
+            previousPromise ? previousPromise.then(
+                callInvokeWithMethodAndArg,
+                // Avoid propagating failures to Promises returned by later
+                // invocations of the iterator.
+                callInvokeWithMethodAndArg
+            ) : callInvokeWithMethodAndArg();
+    }
+
+    // Define the unified helper method that is used to implement .next,
+    // .throw, and .return (see defineIteratorMethods).
+    this._invoke = enqueue;
+}
+
+defineIteratorMethods(AsyncIterator.prototype);
+AsyncIterator.prototype[asyncIteratorSymbol] = function () {
+    return this;
+};
+regeneratorRuntime.AsyncIterator = AsyncIterator;
+
+// Note that simple async functions are implemented on top of
+// AsyncIterator objects; they just return a Promise for the value of
+// the final result produced by the iterator.
+regeneratorRuntime.async = function(innerFn, outerFn, self, tryLocsList) {
+    var iter = new AsyncIterator(
+        wrap(innerFn, outerFn, self, tryLocsList)
+    );
+
+    return regeneratorRuntime.isGeneratorFunction(outerFn)
+        ? iter // If outerFn is a generator, return the full iterator.
+        : iter.next().then(function(result) {
+            return result.done ? result.value : iter.next();
+        });
+};
+
+function makeInvokeMethod(innerFn, self, context) {
+    var state = GenStateSuspendedStart;
+
+    return function invoke(method, arg) {
+        if (state === GenStateExecuting) {
+            throw new Error("Generator is already running");
+        }
+
+        if (state === GenStateCompleted) {
+            if (method === "throw") {
+                throw arg;
+            }
+
+            // Be forgiving, per 25.3.3.3.3 of the spec:
+            // https://people.mozilla.org/~jorendorff/es6-draft.html#sec-generatorresume
+            return doneResult();
+        }
+
+        context.method = method;
+        context.arg = arg;
+
+        while (true) {
+            var delegate = context.delegate;
+            if (delegate) {
+                var delegateResult = maybeInvokeDelegate(delegate, context);
+                if (delegateResult) {
+                    if (delegateResult === ContinueSentinel) continue;
+                    return delegateResult;
+                }
+            }
+
+            if (context.method === "next") {
+                // Setting context._sent for legacy support of Babel's
+                // function.sent implementation.
+                context.sent = context._sent = context.arg;
+
+            } else if (context.method === "throw") {
+                if (state === GenStateSuspendedStart) {
+                    state = GenStateCompleted;
+                    throw context.arg;
+                }
+
+                context.dispatchException(context.arg);
+
+            } else if (context.method === "return") {
+                context.abrupt("return", context.arg);
+            }
+
+            state = GenStateExecuting;
+
+            var record = tryCatch(innerFn, self, context);
+            if (record.type === "normal") {
+                // If an exception is thrown from innerFn, we leave state ===
+                // GenStateExecuting and loop back for another invocation.
+                state = context.done
+                    ? GenStateCompleted
+                    : GenStateSuspendedYield;
+
+                if (record.arg === ContinueSentinel) {
+                    continue;
+                }
+
+                return {
+                    value: record.arg,
+                    done: context.done
+                };
+
+            } else if (record.type === "throw") {
+                state = GenStateCompleted;
+                // Dispatch the exception by looping back around to the
+                // context.dispatchException(context.arg) call above.
+                context.method = "throw";
+                context.arg = record.arg;
+            }
+        }
+    };
+}
+
+// Call delegate.iterator[context.method](context.arg) and handle the
+// result, either by returning a { value, done } result from the
+// delegate iterator, or by modifying context.method and context.arg,
+// setting context.delegate to null, and returning the ContinueSentinel.
+function maybeInvokeDelegate(delegate, context) {
+    var method = delegate.iterator[context.method];
+    if (method === undefined) {
+        // A .throw or .return when the delegate iterator has no .throw
+        // method always terminates the yield* loop.
+        context.delegate = null;
+
+        if (context.method === "throw") {
+            // Note: ["return"] must be used for ES3 parsing compatibility.
+            if (delegate.iterator["return"]) {
+                // If the delegate iterator has a return method, give it a
+                // chance to clean up.
+                context.method = "return";
+                context.arg = undefined;
+                maybeInvokeDelegate(delegate, context);
+
+                if (context.method === "throw") {
+                    // If maybeInvokeDelegate(context) changed context.method from
+                    // "return" to "throw", let that override the TypeError below.
+                    return ContinueSentinel;
+                }
+            }
+
+            context.method = "throw";
+            context.arg = new TypeError(
+                "The iterator does not provide a 'throw' method");
+        }
+
+        return ContinueSentinel;
+    }
+
+    var record = tryCatch(method, delegate.iterator, context.arg);
+
+    if (record.type === "throw") {
+        context.method = "throw";
+        context.arg = record.arg;
+        context.delegate = null;
+        return ContinueSentinel;
+    }
+
+    var info = record.arg;
+
+    if (! info) {
+        context.method = "throw";
+        context.arg = new TypeError("iterator result is not an object");
+        context.delegate = null;
+        return ContinueSentinel;
+    }
+
+    if (info.done) {
+        // Assign the result of the finished delegate to the temporary
+        // variable specified by delegate.resultName (see delegateYield).
+        context[delegate.resultName] = info.value;
+
+        // Resume execution at the desired location (see delegateYield).
+        context.next = delegate.nextLoc;
+
+        // If context.method was "throw" but the delegate handled the
+        // exception, let the outer generator proceed normally. If
+        // context.method was "next", forget context.arg since it has been
+        // "consumed" by the delegate iterator. If context.method was
+        // "return", allow the original .return call to continue in the
+        // outer generator.
+        if (context.method !== "return") {
+            context.method = "next";
+            context.arg = undefined;
+        }
+
+    } else {
+        // Re-yield the result returned by the delegate method.
+        return info;
+    }
+
+    // The delegate iterator is finished, so forget it and continue with
+    // the outer generator.
+    context.delegate = null;
+    return ContinueSentinel;
+}
+
+// Define Generator.prototype.{next,throw,return} in terms of the
+// unified ._invoke helper method.
+defineIteratorMethods(Gp);
+
+Gp[toStringTagSymbol] = "Generator";
+
+// A Generator should always return itself as the iterator object when the
+// @@iterator function is called on it. Some browsers' implementations of the
+// iterator prototype chain incorrectly implement this, causing the Generator
+// object to not be returned from this call. This ensures that doesn't happen.
+// See https://github.com/facebook/regenerator/issues/274 for more details.
+Gp[iteratorSymbol] = function() {
+    return this;
+};
+
+Gp.toString = function() {
+    return "[object Generator]";
+};
+
+function pushTryEntry(locs) {
+    var entry = { tryLoc: locs[0] };
+
+    if (1 in locs) {
+        entry.catchLoc = locs[1];
+    }
+
+    if (2 in locs) {
+        entry.finallyLoc = locs[2];
+        entry.afterLoc = locs[3];
+    }
+
+    this.tryEntries.push(entry);
+}
+
+function resetTryEntry(entry) {
+    var record = entry.completion || {};
+    record.type = "normal";
+    delete record.arg;
+    entry.completion = record;
+}
+
+function Context(tryLocsList) {
+    // The root entry object (effectively a try statement without a catch
+    // or a finally block) gives us a place to store values thrown from
+    // locations where there is no enclosing try statement.
+    this.tryEntries = [{ tryLoc: "root" }];
+    tryLocsList.forEach(pushTryEntry, this);
+    this.reset(true);
+}
+
+regeneratorRuntime.keys = function(object) {
+    var keys = [];
+    for (var key in object) {
+        keys.push(key);
+    }
+    keys.reverse();
+
+    // Rather than returning an object with a next method, we keep
+    // things simple and return the next function itself.
+    return function next() {
+        while (keys.length) {
+            var key = keys.pop();
+            if (key in object) {
+                next.value = key;
+                next.done = false;
+                return next;
+            }
+        }
+
+        // To avoid creating an additional object, we just hang the .value
+        // and .done properties off the next function object itself. This
+        // also ensures that the minifier will not anonymize the function.
+        next.done = true;
+        return next;
+    };
+};
+
+function values(iterable) {
+    if (iterable) {
+        var iteratorMethod = iterable[iteratorSymbol];
+        if (iteratorMethod) {
+            return iteratorMethod.call(iterable);
+        }
+
+        if (typeof iterable.next === "function") {
+            return iterable;
+        }
+
+        if (!isNaN(iterable.length)) {
+            var i = -1, next = function next() {
+                while (++i < iterable.length) {
+                    if (hasOwn.call(iterable, i)) {
+                        next.value = iterable[i];
+                        next.done = false;
+                        return next;
+                    }
+                }
+
+                next.value = undefined;
+                next.done = true;
+
+                return next;
+            };
+
+            return next.next = next;
+        }
+    }
+
+    // Return an iterator with no values.
+    return { next: doneResult };
+}
+regeneratorRuntime.values = values;
+
+function doneResult() {
+    return { value: undefined, done: true };
+}
+
+Context.prototype = {
+    constructor: Context,
+
+    reset: function(skipTempReset) {
+        this.prev = 0;
+        this.next = 0;
+        // Resetting context._sent for legacy support of Babel's
+        // function.sent implementation.
+        this.sent = this._sent = undefined;
+        this.done = false;
+        this.delegate = null;
+
+        this.method = "next";
+        this.arg = undefined;
+
+        this.tryEntries.forEach(resetTryEntry);
+
+        if (!skipTempReset) {
+            for (var name in this) {
+                // Not sure about the optimal order of these conditions:
+                if (name.charAt(0) === "t" &&
+                    hasOwn.call(this, name) &&
+                    !isNaN(+name.slice(1))) {
+                    this[name] = undefined;
+                }
+            }
+        }
+    },
+
+    stop: function() {
+        this.done = true;
+
+        var rootEntry = this.tryEntries[0];
+        var rootRecord = rootEntry.completion;
+        if (rootRecord.type === "throw") {
+            throw rootRecord.arg;
+        }
+
+        return this.rval;
+    },
+
+    dispatchException: function(exception) {
+        if (this.done) {
+            throw exception;
+        }
+
+        var context = this;
+        function handle(loc, caught) {
+            record.type = "throw";
+            record.arg = exception;
+            context.next = loc;
+
+            if (caught) {
+                // If the dispatched exception was caught by a catch block,
+                // then let that catch block handle the exception normally.
+                context.method = "next";
+                context.arg = undefined;
+            }
+
+            return !! caught;
+        }
+
+        for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+            var entry = this.tryEntries[i];
+            var record = entry.completion;
+
+            if (entry.tryLoc === "root") {
+                // Exception thrown outside of any try block that could handle
+                // it, so set the completion value of the entire function to
+                // throw the exception.
+                return handle("end");
+            }
+
+            if (entry.tryLoc <= this.prev) {
+                var hasCatch = hasOwn.call(entry, "catchLoc");
+                var hasFinally = hasOwn.call(entry, "finallyLoc");
+
+                if (hasCatch && hasFinally) {
+                    if (this.prev < entry.catchLoc) {
+                        return handle(entry.catchLoc, true);
+                    } else if (this.prev < entry.finallyLoc) {
+                        return handle(entry.finallyLoc);
+                    }
+
+                } else if (hasCatch) {
+                    if (this.prev < entry.catchLoc) {
+                        return handle(entry.catchLoc, true);
+                    }
+
+                } else if (hasFinally) {
+                    if (this.prev < entry.finallyLoc) {
+                        return handle(entry.finallyLoc);
+                    }
+
+                } else {
+                    throw new Error("try statement without catch or finally");
+                }
+            }
+        }
+    },
+
+    abrupt: function(type, arg) {
+        for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+            var entry = this.tryEntries[i];
+            if (entry.tryLoc <= this.prev &&
+                hasOwn.call(entry, "finallyLoc") &&
+                this.prev < entry.finallyLoc) {
+                var finallyEntry = entry;
+                break;
+            }
+        }
+
+        if (finallyEntry &&
+            (type === "break" ||
+                type === "continue") &&
+            finallyEntry.tryLoc <= arg &&
+            arg <= finallyEntry.finallyLoc) {
+            // Ignore the finally entry if control is not jumping to a
+            // location outside the try/catch block.
+            finallyEntry = null;
+        }
+
+        var record = finallyEntry ? finallyEntry.completion : {};
+        record.type = type;
+        record.arg = arg;
+
+        if (finallyEntry) {
+            this.method = "next";
+            this.next = finallyEntry.finallyLoc;
+            return ContinueSentinel;
+        }
+
+        return this.complete(record);
+    },
+
+    complete: function(record, afterLoc) {
+        if (record.type === "throw") {
+            throw record.arg;
+        }
+
+        if (record.type === "break" ||
+            record.type === "continue") {
+            this.next = record.arg;
+        } else if (record.type === "return") {
+            this.rval = this.arg = record.arg;
+            this.method = "return";
+            this.next = "end";
+        } else if (record.type === "normal" && afterLoc) {
+            this.next = afterLoc;
+        }
+
+        return ContinueSentinel;
+    },
+
+    finish: function(finallyLoc) {
+        for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+            var entry = this.tryEntries[i];
+            if (entry.finallyLoc === finallyLoc) {
+                this.complete(entry.completion, entry.afterLoc);
+                resetTryEntry(entry);
+                return ContinueSentinel;
+            }
+        }
+    },
+
+    "catch": function(tryLoc) {
+        for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+            var entry = this.tryEntries[i];
+            if (entry.tryLoc === tryLoc) {
+                var record = entry.completion;
+                if (record.type === "throw") {
+                    var thrown = record.arg;
+                    resetTryEntry(entry);
+                }
+                return thrown;
+            }
+        }
+
+        // The context.catch method must only be called with a location
+        // argument that corresponds to a known catch block.
+        throw new Error("illegal catch attempt");
+    },
+
+    delegateYield: function(iterable, resultName, nextLoc) {
+        this.delegate = {
+            iterator: values(iterable),
+            resultName: resultName,
+            nextLoc: nextLoc
+        };
+
+        if (this.method === "next") {
+            // Deliberately forget the last sent value so that we don't
+            // accidentally pass it on to the delegate.
+            this.arg = undefined;
+        }
+
+        return ContinueSentinel;
+    }
+};
+
+  function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+    try {
+      var info = gen[key](arg);
+      var value = info.value;
+    } catch (error) {
+      reject(error);
+      return;
+    }
+
+    if (info.done) {
+      resolve(value);
+    } else {
+      Promise.resolve(value).then(_next, _throw);
+    }
+  }
+
+  function _asyncToGenerator(fn) {
+    return function () {
+      var self = this,
+          args = arguments;
+      return new Promise(function (resolve, reject) {
+        var gen = fn.apply(self, args);
+
+        function _next(value) {
+          asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+        }
+
+        function _throw(err) {
+          asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+        }
+
+        _next(undefined);
+      });
+    };
+  }
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  function _defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  function _createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) _defineProperties(Constructor, staticProps);
+    return Constructor;
+  }
+
+  // from https://github.com/imaya/zlib.js
+  var Zlib = {
+    Huffman: {},
+    Util: {},
+    CRC32: {}
+  };
+  /**
+   * Compression Method
+   * @enum {number}
+   */
+
+  Zlib.CompressionMethod = {
+    DEFLATE: 8,
+    RESERVED: 15
+  };
+  /**
+   * @param {Object=} opt_params options.
+   * @constructor
+   */
+
+  Zlib.Zip = function (opt_params) {
+    opt_params = opt_params || {};
+    /** @type {Array.<{
+     *   buffer: !(Array.<number>|Uint8Array),
+     *   option: Object,
+     *   compressed: boolean,
+     *   encrypted: boolean,
+     *   size: number,
+     *   crc32: number
+     * }>} */
+
+    this.files = [];
+    /** @type {(Array.<number>|Uint8Array)} */
+
+    this.comment = opt_params['comment'];
+    /** @type {(Array.<number>|Uint8Array)} */
+
+    this.password;
+  };
+  /**
+   * @enum {number}
+   */
+
+
+  Zlib.Zip.CompressionMethod = {
+    STORE: 0,
+    DEFLATE: 8
+  };
+  /**
+   * @enum {number}
+   */
+
+  Zlib.Zip.OperatingSystem = {
+    MSDOS: 0,
+    UNIX: 3,
+    MACINTOSH: 7
+  };
+  /**
+   * @enum {number}
+   */
+
+  Zlib.Zip.Flags = {
+    ENCRYPT: 0x0001,
+    DESCRIPTOR: 0x0008,
+    UTF8: 0x0800
+  };
+  /**
+   * @type {Array.<number>}
+   * @const
+   */
+
+  Zlib.Zip.FileHeaderSignature = [0x50, 0x4b, 0x01, 0x02];
+  /**
+   * @type {Array.<number>}
+   * @const
+   */
+
+  Zlib.Zip.LocalFileHeaderSignature = [0x50, 0x4b, 0x03, 0x04];
+  /**
+   * @type {Array.<number>}
+   * @const
+   */
+
+  Zlib.Zip.CentralDirectorySignature = [0x50, 0x4b, 0x05, 0x06];
+  /**
+   * @param {Array.<number>|Uint8Array} input
+   * @param {Object=} opt_params options.
+   */
+
+  Zlib.Zip.prototype.addFile = function (input, opt_params) {
+    opt_params = opt_params || {};
+    /** @type {string} */
+
+    var filename =  opt_params['filename'];
+    /** @type {boolean} */
+
+    var compressed;
+    /** @type {number} */
+
+    var size = input.length;
+    /** @type {number} */
+
+    var crc32 = 0;
+
+    if ( input instanceof Array) {
+      input = new Uint8Array(input);
+    } // default
+
+
+    if (typeof opt_params['compressionMethod'] !== 'number') {
+      opt_params['compressionMethod'] = Zlib.Zip.CompressionMethod.DEFLATE;
+    } // その場で圧縮する場合
+
+
+    if (opt_params['compress']) {
+      switch (opt_params['compressionMethod']) {
+        case Zlib.Zip.CompressionMethod.STORE:
+          break;
+
+        case Zlib.Zip.CompressionMethod.DEFLATE:
+          crc32 = Zlib.CRC32.calc(input);
+          input = this.deflateWithOption(input, opt_params);
+          compressed = true;
+          break;
+
+        default:
+          throw new Error('unknown compression method:' + opt_params['compressionMethod']);
+      }
+    }
+
+    this.files.push({
+      buffer: input,
+      option: opt_params,
+      compressed: compressed,
+      encrypted: false,
+      size: size,
+      crc32: crc32
+    });
+  };
+  /**
+   * @param {(Array.<number>|Uint8Array)} password
+   */
+
+
+  Zlib.Zip.prototype.setPassword = function (password) {
+    this.password = password;
+  };
+
+  Zlib.Zip.prototype.compress = function () {
+    /** @type {Array.<{
+     *   buffer: !(Array.<number>|Uint8Array),
+     *   option: Object,
+     *   compressed: boolean,
+     *   encrypted: boolean,
+     *   size: number,
+     *   crc32: number
+     * }>} */
+    var files = this.files;
+    /** @type {{
+     *   buffer: !(Array.<number>|Uint8Array),
+     *   option: Object,
+     *   compressed: boolean,
+     *   encrypted: boolean,
+     *   size: number,
+     *   crc32: number
+     * }} */
+
+    var file;
+    /** @type {!(Array.<number>|Uint8Array)} */
+
+    var output;
+    /** @type {number} */
+
+    var op1;
+    /** @type {number} */
+
+    var op2;
+    /** @type {number} */
+
+    var op3;
+    /** @type {number} */
+
+    var localFileSize = 0;
+    /** @type {number} */
+
+    var centralDirectorySize = 0;
+    /** @type {number} */
+
+    var endOfCentralDirectorySize;
+    /** @type {number} */
+
+    var offset;
+    /** @type {number} */
+
+    var needVersion;
+    /** @type {number} */
+
+    var flags;
+    /** @type {Zlib.Zip.CompressionMethod} */
+
+    var compressionMethod;
+    /** @type {Date} */
+
+    var date;
+    /** @type {number} */
+
+    var crc32;
+    /** @type {number} */
+
+    var size;
+    /** @type {number} */
+
+    var plainSize;
+    /** @type {number} */
+
+    var filenameLength;
+    /** @type {number} */
+
+    var extraFieldLength;
+    /** @type {number} */
+
+    var commentLength;
+    /** @type {(Array.<number>|Uint8Array)} */
+
+    var filename;
+    /** @type {(Array.<number>|Uint8Array)} */
+
+    var extraField;
+    /** @type {(Array.<number>|Uint8Array)} */
+
+    var comment;
+    /** @type {(Array.<number>|Uint8Array)} */
+
+    var buffer;
+    /** @type {*} */
+
+    var tmp;
+    /** @type {Array.<number>|Uint32Array|Object} */
+
+    var key;
+    /** @type {number} */
+
+    var i;
+    /** @type {number} */
+
+    var il;
+    /** @type {number} */
+
+    var j;
+    /** @type {number} */
+
+    var jl; // ファイルの圧縮
+
+    for (i = 0, il = files.length; i < il; ++i) {
+      file = files[i];
+      filenameLength = file.option['filename'] ? file.option['filename'].length : 0;
+      extraFieldLength = file.option['extraField'] ? file.option['extraField'].length : 0;
+      commentLength = file.option['comment'] ? file.option['comment'].length : 0; // 圧縮されていなかったら圧縮
+
+      if (!file.compressed) {
+        // 圧縮前に CRC32 の計算をしておく
+        file.crc32 = Zlib.CRC32.calc(file.buffer);
+
+        switch (file.option['compressionMethod']) {
+          case Zlib.Zip.CompressionMethod.STORE:
+            break;
+
+          case Zlib.Zip.CompressionMethod.DEFLATE:
+            file.buffer = this.deflateWithOption(file.buffer, file.option);
+            file.compressed = true;
+            break;
+
+          default:
+            throw new Error('unknown compression method:' + file.option['compressionMethod']);
+        }
+      } // encryption
+
+
+      if (file.option['password'] !== void 0 || this.password !== void 0) {
+        // init encryption
+        key = this.createEncryptionKey(file.option['password'] || this.password); // add header
+
+        buffer = file.buffer;
+
+        {
+          tmp = new Uint8Array(buffer.length + 12);
+          tmp.set(buffer, 12);
+          buffer = tmp;
+        }
+
+        for (j = 0; j < 12; ++j) {
+          buffer[j] = this.encode(key, i === 11 ? file.crc32 & 0xff : Math.random() * 256 | 0);
+        } // data encryption
+
+
+        for (jl = buffer.length; j < jl; ++j) {
+          buffer[j] = this.encode(key, buffer[j]);
+        }
+
+        file.buffer = buffer;
+      } // 必要バッファサイズの計算
+
+
+      localFileSize += // local file header
+      30 + filenameLength + // file data
+      file.buffer.length;
+      centralDirectorySize += // file header
+      46 + filenameLength + commentLength;
+    } // end of central directory
+
+
+    endOfCentralDirectorySize = 22 + (this.comment ? this.comment.length : 0);
+    output = new ( Uint8Array )(localFileSize + centralDirectorySize + endOfCentralDirectorySize);
+    op1 = 0;
+    op2 = localFileSize;
+    op3 = op2 + centralDirectorySize; // ファイルの圧縮
+
+    for (i = 0, il = files.length; i < il; ++i) {
+      file = files[i];
+      filenameLength = file.option['filename'] ? file.option['filename'].length : 0;
+      extraFieldLength = 0; // TODO
+
+      commentLength = file.option['comment'] ? file.option['comment'].length : 0; //-------------------------------------------------------------------------
+      // local file header & file header
+      //-------------------------------------------------------------------------
+
+      offset = op1; // signature
+      // local file header
+
+      output[op1++] = Zlib.Zip.LocalFileHeaderSignature[0];
+      output[op1++] = Zlib.Zip.LocalFileHeaderSignature[1];
+      output[op1++] = Zlib.Zip.LocalFileHeaderSignature[2];
+      output[op1++] = Zlib.Zip.LocalFileHeaderSignature[3]; // file header
+
+      output[op2++] = Zlib.Zip.FileHeaderSignature[0];
+      output[op2++] = Zlib.Zip.FileHeaderSignature[1];
+      output[op2++] = Zlib.Zip.FileHeaderSignature[2];
+      output[op2++] = Zlib.Zip.FileHeaderSignature[3]; // compressor info
+
+      needVersion = 20;
+      output[op2++] = needVersion & 0xff;
+      output[op2++] =
+      /** @type {Zlib.Zip.OperatingSystem} */
+      file.option['os'] || Zlib.Zip.OperatingSystem.MSDOS; // need version
+
+      output[op1++] = output[op2++] = needVersion & 0xff;
+      output[op1++] = output[op2++] = needVersion >> 8 & 0xff; // general purpose bit flag
+
+      flags = 0;
+
+      if (file.option['password'] || this.password) {
+        flags |= Zlib.Zip.Flags.ENCRYPT;
+      }
+
+      output[op1++] = output[op2++] = flags & 0xff;
+      output[op1++] = output[op2++] = flags >> 8 & 0xff; // compression method
+
+      compressionMethod =
+      /** @type {Zlib.Zip.CompressionMethod} */
+      file.option['compressionMethod'];
+      output[op1++] = output[op2++] = compressionMethod & 0xff;
+      output[op1++] = output[op2++] = compressionMethod >> 8 & 0xff; // date
+
+      date =
+      /** @type {(Date|undefined)} */
+      file.option['date'] || new Date();
+      output[op1++] = output[op2++] = (date.getMinutes() & 0x7) << 5 | (date.getSeconds() / 2 | 0);
+      output[op1++] = output[op2++] = date.getHours() << 3 | date.getMinutes() >> 3; //
+
+      output[op1++] = output[op2++] = (date.getMonth() + 1 & 0x7) << 5 | date.getDate();
+      output[op1++] = output[op2++] = (date.getFullYear() - 1980 & 0x7f) << 1 | date.getMonth() + 1 >> 3; // CRC-32
+
+      crc32 = file.crc32;
+      output[op1++] = output[op2++] = crc32 & 0xff;
+      output[op1++] = output[op2++] = crc32 >> 8 & 0xff;
+      output[op1++] = output[op2++] = crc32 >> 16 & 0xff;
+      output[op1++] = output[op2++] = crc32 >> 24 & 0xff; // compressed size
+
+      size = file.buffer.length;
+      output[op1++] = output[op2++] = size & 0xff;
+      output[op1++] = output[op2++] = size >> 8 & 0xff;
+      output[op1++] = output[op2++] = size >> 16 & 0xff;
+      output[op1++] = output[op2++] = size >> 24 & 0xff; // uncompressed size
+
+      plainSize = file.size;
+      output[op1++] = output[op2++] = plainSize & 0xff;
+      output[op1++] = output[op2++] = plainSize >> 8 & 0xff;
+      output[op1++] = output[op2++] = plainSize >> 16 & 0xff;
+      output[op1++] = output[op2++] = plainSize >> 24 & 0xff; // filename length
+
+      output[op1++] = output[op2++] = filenameLength & 0xff;
+      output[op1++] = output[op2++] = filenameLength >> 8 & 0xff; // extra field length
+
+      output[op1++] = output[op2++] = extraFieldLength & 0xff;
+      output[op1++] = output[op2++] = extraFieldLength >> 8 & 0xff; // file comment length
+
+      output[op2++] = commentLength & 0xff;
+      output[op2++] = commentLength >> 8 & 0xff; // disk number start
+
+      output[op2++] = 0;
+      output[op2++] = 0; // internal file attributes
+
+      output[op2++] = 0;
+      output[op2++] = 0; // external file attributes
+
+      output[op2++] = 0;
+      output[op2++] = 0;
+      output[op2++] = 0;
+      output[op2++] = 0; // relative offset of local header
+
+      output[op2++] = offset & 0xff;
+      output[op2++] = offset >> 8 & 0xff;
+      output[op2++] = offset >> 16 & 0xff;
+      output[op2++] = offset >> 24 & 0xff; // filename
+
+      filename = file.option['filename'];
+
+      if (filename) {
+        {
+          output.set(filename, op1);
+          output.set(filename, op2);
+          op1 += filenameLength;
+          op2 += filenameLength;
+        }
+      } // extra field
+
+
+      extraField = file.option['extraField'];
+
+      if (extraField) {
+        {
+          output.set(extraField, op1);
+          output.set(extraField, op2);
+          op1 += extraFieldLength;
+          op2 += extraFieldLength;
+        }
+      } // comment
+
+
+      comment = file.option['comment'];
+
+      if (comment) {
+        {
+          output.set(comment, op2);
+          op2 += commentLength;
+        }
+      } //-------------------------------------------------------------------------
+      // file data
+      //-------------------------------------------------------------------------
+
+
+      {
+        output.set(file.buffer, op1);
+        op1 += file.buffer.length;
+      }
+    } //-------------------------------------------------------------------------
+    // end of central directory
+    //-------------------------------------------------------------------------
+    // signature
+
+
+    output[op3++] = Zlib.Zip.CentralDirectorySignature[0];
+    output[op3++] = Zlib.Zip.CentralDirectorySignature[1];
+    output[op3++] = Zlib.Zip.CentralDirectorySignature[2];
+    output[op3++] = Zlib.Zip.CentralDirectorySignature[3]; // number of this disk
+
+    output[op3++] = 0;
+    output[op3++] = 0; // number of the disk with the start of the central directory
+
+    output[op3++] = 0;
+    output[op3++] = 0; // total number of entries in the central directory on this disk
+
+    output[op3++] = il & 0xff;
+    output[op3++] = il >> 8 & 0xff; // total number of entries in the central directory
+
+    output[op3++] = il & 0xff;
+    output[op3++] = il >> 8 & 0xff; // size of the central directory
+
+    output[op3++] = centralDirectorySize & 0xff;
+    output[op3++] = centralDirectorySize >> 8 & 0xff;
+    output[op3++] = centralDirectorySize >> 16 & 0xff;
+    output[op3++] = centralDirectorySize >> 24 & 0xff; // offset of start of central directory with respect to the starting disk number
+
+    output[op3++] = localFileSize & 0xff;
+    output[op3++] = localFileSize >> 8 & 0xff;
+    output[op3++] = localFileSize >> 16 & 0xff;
+    output[op3++] = localFileSize >> 24 & 0xff; // .ZIP file comment length
+
+    commentLength = this.comment ? this.comment.length : 0;
+    output[op3++] = commentLength & 0xff;
+    output[op3++] = commentLength >> 8 & 0xff; // .ZIP file comment
+
+    if (this.comment) {
+      {
+        output.set(this.comment, op3);
+        op3 += commentLength;
+      }
+    }
+
+    return output;
+  };
+  /**
+   * @param {!(Array.<number>|Uint8Array)} input
+   * @param {Object=} opt_params options.
+   * @return {!(Array.<number>|Uint8Array)}
+   */
+
+
+  Zlib.Zip.prototype.deflateWithOption = function (input, opt_params) {
+    /** @type {Zlib.RawDeflate} */
+    var deflator = new Zlib.RawDeflate(input, opt_params['deflateOption']);
+    return deflator.compress();
+  };
+  /**
+   * @param {(Array.<number>|Uint32Array)} key
+   * @return {number}
+   */
+
+
+  Zlib.Zip.prototype.getByte = function (key) {
+    /** @type {number} */
+    var tmp = key[2] & 0xffff | 2;
+    return tmp * (tmp ^ 1) >> 8 & 0xff;
+  };
+  /**
+   * @param {(Array.<number>|Uint32Array|Object)} key
+   * @param {number} n
+   * @return {number}
+   */
+
+
+  Zlib.Zip.prototype.encode = function (key, n) {
+    /** @type {number} */
+    var tmp = this.getByte(
+    /** @type {(Array.<number>|Uint32Array)} */
+    key);
+    this.updateKeys(
+    /** @type {(Array.<number>|Uint32Array)} */
+    key, n);
+    return tmp ^ n;
+  };
+  /**
+   * @param {(Array.<number>|Uint32Array)} key
+   * @param {number} n
+   */
+
+
+  Zlib.Zip.prototype.updateKeys = function (key, n) {
+    key[0] = Zlib.CRC32.single(key[0], n);
+    key[1] = (((key[1] + (key[0] & 0xff)) * 20173 >>> 0) * 6681 >>> 0) + 1 >>> 0;
+    key[2] = Zlib.CRC32.single(key[2], key[1] >>> 24);
+  };
+  /**
+   * @param {(Array.<number>|Uint8Array)} password
+   * @return {!(Array.<number>|Uint32Array|Object)}
+   */
+
+
+  Zlib.Zip.prototype.createEncryptionKey = function (password) {
+    /** @type {!(Array.<number>|Uint32Array)} */
+    var key = [305419896, 591751049, 878082192];
+    /** @type {number} */
+
+    var i;
+    /** @type {number} */
+
+    var il;
+
+    {
+      key = new Uint32Array(key);
+    }
+
+    for (i = 0, il = password.length; i < il; ++i) {
+      this.updateKeys(key, password[i] & 0xff);
+    }
+
+    return key;
+  };
+  /**
+   * build huffman table from length list.
+   * @param {!(Array.<number>|Uint8Array)} lengths length list.
+   * @return {!Array} huffman table.
+   */
+
+
+  Zlib.Huffman.buildHuffmanTable = function (lengths) {
+    /** @type {number} length list size. */
+    var listSize = lengths.length;
+    /** @type {number} max code length for table size. */
+
+    var maxCodeLength = 0;
+    /** @type {number} min code length for table size. */
+
+    var minCodeLength = Number.POSITIVE_INFINITY;
+    /** @type {number} table size. */
+
+    var size;
+    /** @type {!(Array|Uint8Array)} huffman code table. */
+
+    var table;
+    /** @type {number} bit length. */
+
+    var bitLength;
+    /** @type {number} huffman code. */
+
+    var code;
+    /**
+     * サイズが 2^maxlength 個のテーブルを埋めるためのスキップ長.
+     * @type {number} skip length for table filling.
+     */
+
+    var skip;
+    /** @type {number} reversed code. */
+
+    var reversed;
+    /** @type {number} reverse temp. */
+
+    var rtemp;
+    /** @type {number} loop counter. */
+
+    var i;
+    /** @type {number} loop limit. */
+
+    var il;
+    /** @type {number} loop counter. */
+
+    var j;
+    /** @type {number} table value. */
+
+    var value; // Math.max は遅いので最長の値は for-loop で取得する
+
+    for (i = 0, il = listSize; i < il; ++i) {
+      if (lengths[i] > maxCodeLength) {
+        maxCodeLength = lengths[i];
+      }
+
+      if (lengths[i] < minCodeLength) {
+        minCodeLength = lengths[i];
+      }
+    }
+
+    size = 1 << maxCodeLength;
+    table = new ( Uint32Array )(size); // ビット長の短い順からハフマン符号を割り当てる
+
+    for (bitLength = 1, code = 0, skip = 2; bitLength <= maxCodeLength;) {
+      for (i = 0; i < listSize; ++i) {
+        if (lengths[i] === bitLength) {
+          // ビットオーダーが逆になるためビット長分並びを反転する
+          for (reversed = 0, rtemp = code, j = 0; j < bitLength; ++j) {
+            reversed = reversed << 1 | rtemp & 1;
+            rtemp >>= 1;
+          } // 最大ビット長をもとにテーブルを作るため、
+          // 最大ビット長以外では 0 / 1 どちらでも良い箇所ができる
+          // そのどちらでも良い場所は同じ値で埋めることで
+          // 本来のビット長以上のビット数取得しても問題が起こらないようにする
+
+
+          value = bitLength << 16 | i;
+
+          for (j = reversed; j < size; j += skip) {
+            table[j] = value;
+          }
+
+          ++code;
+        }
+      } // 次のビット長へ
+
+
+      ++bitLength;
+      code <<= 1;
+      skip <<= 1;
+    }
+
+    return [table, maxCodeLength, minCodeLength];
+  }; //-----------------------------------------------------------------------------
+
+  /** @define {number} buffer block size. */
+
+
+  var ZLIB_RAW_INFLATE_BUFFER_SIZE = 0x8000; // [ 0x8000 >= ZLIB_BUFFER_BLOCK_SIZE ]
+  //-----------------------------------------------------------------------------
+
+  var buildHuffmanTable = Zlib.Huffman.buildHuffmanTable;
+  /**
+   * @constructor
+   * @param {!(Uint8Array|Array.<number>)} input input buffer.
+   * @param {Object} opt_params option parameter.
+   *
+   * opt_params は以下のプロパティを指定する事ができます。
+   *   - index: input buffer の deflate コンテナの開始位置.
+   *   - blockSize: バッファのブロックサイズ.
+   *   - bufferType: Zlib.RawInflate.BufferType の値によってバッファの管理方法を指定する.
+   *   - resize: 確保したバッファが実際の大きさより大きかった場合に切り詰める.
+   */
+
+  Zlib.RawInflate = function (input, opt_params) {
+    /** @type {!(Array.<number>|Uint8Array)} inflated buffer */
+    this.buffer;
+    /** @type {!Array.<(Array.<number>|Uint8Array)>} */
+
+    this.blocks = [];
+    /** @type {number} block size. */
+
+    this.bufferSize = ZLIB_RAW_INFLATE_BUFFER_SIZE;
+    /** @type {!number} total output buffer pointer. */
+
+    this.totalpos = 0;
+    /** @type {!number} input buffer pointer. */
+
+    this.ip = 0;
+    /** @type {!number} bit stream reader buffer. */
+
+    this.bitsbuf = 0;
+    /** @type {!number} bit stream reader buffer size. */
+
+    this.bitsbuflen = 0;
+    /** @type {!(Array.<number>|Uint8Array)} input buffer. */
+
+    this.input =  new Uint8Array(input) ;
+    /** @type {!(Uint8Array|Array.<number>)} output buffer. */
+
+    this.output;
+    /** @type {!number} output buffer pointer. */
+
+    this.op;
+    /** @type {boolean} is final block flag. */
+
+    this.bfinal = false;
+    /** @type {Zlib.RawInflate.BufferType} buffer management. */
+
+    this.bufferType = Zlib.RawInflate.BufferType.ADAPTIVE;
+    /** @type {boolean} resize flag for memory size optimization. */
+
+    this.resize = false; // option parameters
+
+    if (opt_params || !(opt_params = {})) {
+      if (opt_params['index']) {
+        this.ip = opt_params['index'];
+      }
+
+      if (opt_params['bufferSize']) {
+        this.bufferSize = opt_params['bufferSize'];
+      }
+
+      if (opt_params['bufferType']) {
+        this.bufferType = opt_params['bufferType'];
+      }
+
+      if (opt_params['resize']) {
+        this.resize = opt_params['resize'];
+      }
+    } // initialize
+
+
+    switch (this.bufferType) {
+      case Zlib.RawInflate.BufferType.BLOCK:
+        this.op = Zlib.RawInflate.MaxBackwardLength;
+        this.output = new ( Uint8Array )(Zlib.RawInflate.MaxBackwardLength + this.bufferSize + Zlib.RawInflate.MaxCopyLength);
+        break;
+
+      case Zlib.RawInflate.BufferType.ADAPTIVE:
+        this.op = 0;
+        this.output = new ( Uint8Array )(this.bufferSize);
+        break;
+
+      default:
+        throw new Error('invalid inflate mode');
+    }
+  };
+  /**
+   * @enum {number}
+   */
+
+
+  Zlib.RawInflate.BufferType = {
+    BLOCK: 0,
+    ADAPTIVE: 1
+  };
+  /**
+   * decompress.
+   * @return {!(Uint8Array|Array.<number>)} inflated buffer.
+   */
+
+  Zlib.RawInflate.prototype.decompress = function () {
+    while (!this.bfinal) {
+      this.parseBlock();
+    }
+
+    switch (this.bufferType) {
+      case Zlib.RawInflate.BufferType.BLOCK:
+        return this.concatBufferBlock();
+
+      case Zlib.RawInflate.BufferType.ADAPTIVE:
+        return this.concatBufferDynamic();
+
+      default:
+        throw new Error('invalid inflate mode');
+    }
+  };
+  /**
+   * @const
+   * @type {number} max backward length for LZ77.
+   */
+
+
+  Zlib.RawInflate.MaxBackwardLength = 32768;
+  /**
+   * @const
+   * @type {number} max copy length for LZ77.
+   */
+
+  Zlib.RawInflate.MaxCopyLength = 258;
+  /**
+   * huffman order
+   * @const
+   * @type {!(Array.<number>|Uint8Array)}
+   */
+
+  Zlib.RawInflate.Order = function (table) {
+    return  new Uint16Array(table) ;
+  }([16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15]);
+  /**
+   * huffman length code table.
+   * @const
+   * @type {!(Array.<number>|Uint16Array)}
+   */
+
+
+  Zlib.RawInflate.LengthCodeTable = function (table) {
+    return  new Uint16Array(table) ;
+  }([0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x000a, 0x000b, 0x000d, 0x000f, 0x0011, 0x0013, 0x0017, 0x001b, 0x001f, 0x0023, 0x002b, 0x0033, 0x003b, 0x0043, 0x0053, 0x0063, 0x0073, 0x0083, 0x00a3, 0x00c3, 0x00e3, 0x0102, 0x0102, 0x0102]);
+  /**
+   * huffman length extra-bits table.
+   * @const
+   * @type {!(Array.<number>|Uint8Array)}
+   */
+
+
+  Zlib.RawInflate.LengthExtraTable = function (table) {
+    return  new Uint8Array(table) ;
+  }([0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0, 0, 0]);
+  /**
+   * huffman dist code table.
+   * @const
+   * @type {!(Array.<number>|Uint16Array)}
+   */
+
+
+  Zlib.RawInflate.DistCodeTable = function (table) {
+    return  new Uint16Array(table) ;
+  }([0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0007, 0x0009, 0x000d, 0x0011, 0x0019, 0x0021, 0x0031, 0x0041, 0x0061, 0x0081, 0x00c1, 0x0101, 0x0181, 0x0201, 0x0301, 0x0401, 0x0601, 0x0801, 0x0c01, 0x1001, 0x1801, 0x2001, 0x3001, 0x4001, 0x6001]);
+  /**
+   * huffman dist extra-bits table.
+   * @const
+   * @type {!(Array.<number>|Uint8Array)}
+   */
+
+
+  Zlib.RawInflate.DistExtraTable = function (table) {
+    return  new Uint8Array(table) ;
+  }([0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13]);
+  /**
+   * fixed huffman length code table
+   * @const
+   * @type {!Array}
+   */
+
+
+  Zlib.RawInflate.FixedLiteralLengthTable = function (table) {
+    return table;
+  }(function () {
+    var lengths = new ( Uint8Array )(288);
+    var i, il;
+
+    for (i = 0, il = lengths.length; i < il; ++i) {
+      lengths[i] = i <= 143 ? 8 : i <= 255 ? 9 : i <= 279 ? 7 : 8;
+    }
+
+    return buildHuffmanTable(lengths);
+  }());
+  /**
+   * fixed huffman distance code table
+   * @const
+   * @type {!Array}
+   */
+
+
+  Zlib.RawInflate.FixedDistanceTable = function (table) {
+    return table;
+  }(function () {
+    var lengths = new ( Uint8Array )(30);
+    var i, il;
+
+    for (i = 0, il = lengths.length; i < il; ++i) {
+      lengths[i] = 5;
+    }
+
+    return buildHuffmanTable(lengths);
+  }());
+  /**
+   * parse deflated block.
+   */
+
+
+  Zlib.RawInflate.prototype.parseBlock = function () {
+    /** @type {number} header */
+    var hdr = this.readBits(3); // BFINAL
+
+    if (hdr & 0x1) {
+      this.bfinal = true;
+    } // BTYPE
+
+
+    hdr >>>= 1;
+
+    switch (hdr) {
+      // uncompressed
+      case 0:
+        this.parseUncompressedBlock();
+        break;
+      // fixed huffman
+
+      case 1:
+        this.parseFixedHuffmanBlock();
+        break;
+      // dynamic huffman
+
+      case 2:
+        this.parseDynamicHuffmanBlock();
+        break;
+      // reserved or other
+
+      default:
+        throw new Error('unknown BTYPE: ' + hdr);
+    }
+  };
+  /**
+   * read inflate bits
+   * @param {number} length bits length.
+   * @return {number} read bits.
+   */
+
+
+  Zlib.RawInflate.prototype.readBits = function (length) {
+    var bitsbuf = this.bitsbuf;
+    var bitsbuflen = this.bitsbuflen;
+    var input = this.input;
+    var ip = this.ip;
+    /** @type {number} */
+
+    var inputLength = input.length;
+    /** @type {number} input and output byte. */
+
+    var octet; // input byte
+
+    if (ip + (length - bitsbuflen + 7 >> 3) >= inputLength) {
+      throw new Error('input buffer is broken');
+    } // not enough buffer
+
+
+    while (bitsbuflen < length) {
+      bitsbuf |= input[ip++] << bitsbuflen;
+      bitsbuflen += 8;
+    } // output byte
+
+
+    octet = bitsbuf &
+    /* MASK */
+    (1 << length) - 1;
+    bitsbuf >>>= length;
+    bitsbuflen -= length;
+    this.bitsbuf = bitsbuf;
+    this.bitsbuflen = bitsbuflen;
+    this.ip = ip;
+    return octet;
+  };
+  /**
+   * read huffman code using table
+   * @param {!(Array.<number>|Uint8Array|Uint16Array)} table huffman code table.
+   * @return {number} huffman code.
+   */
+
+
+  Zlib.RawInflate.prototype.readCodeByTable = function (table) {
+    var bitsbuf = this.bitsbuf;
+    var bitsbuflen = this.bitsbuflen;
+    var input = this.input;
+    var ip = this.ip;
+    /** @type {number} */
+
+    var inputLength = input.length;
+    /** @type {!(Array.<number>|Uint8Array)} huffman code table */
+
+    var codeTable = table[0];
+    /** @type {number} */
+
+    var maxCodeLength = table[1];
+    /** @type {number} code length & code (16bit, 16bit) */
+
+    var codeWithLength;
+    /** @type {number} code bits length */
+
+    var codeLength; // not enough buffer
+
+    while (bitsbuflen < maxCodeLength) {
+      if (ip >= inputLength) {
+        break;
+      }
+
+      bitsbuf |= input[ip++] << bitsbuflen;
+      bitsbuflen += 8;
+    } // read max length
+
+
+    codeWithLength = codeTable[bitsbuf & (1 << maxCodeLength) - 1];
+    codeLength = codeWithLength >>> 16;
+
+    if (codeLength > bitsbuflen) {
+      throw new Error('invalid code length: ' + codeLength);
+    }
+
+    this.bitsbuf = bitsbuf >> codeLength;
+    this.bitsbuflen = bitsbuflen - codeLength;
+    this.ip = ip;
+    return codeWithLength & 0xffff;
+  };
+  /**
+   * parse uncompressed block.
+   */
+
+
+  Zlib.RawInflate.prototype.parseUncompressedBlock = function () {
+    var input = this.input;
+    var ip = this.ip;
+    var output = this.output;
+    var op = this.op;
+    /** @type {number} */
+
+    var inputLength = input.length;
+    /** @type {number} block length */
+
+    var len;
+    /** @type {number} number for check block length */
+
+    var nlen;
+    /** @type {number} output buffer length */
+
+    var olength = output.length;
+    /** @type {number} copy counter */
+
+    var preCopy; // skip buffered header bits
+
+    this.bitsbuf = 0;
+    this.bitsbuflen = 0; // len
+
+    if (ip + 1 >= inputLength) {
+      throw new Error('invalid uncompressed block header: LEN');
+    }
+
+    len = input[ip++] | input[ip++] << 8; // nlen
+
+    if (ip + 1 >= inputLength) {
+      throw new Error('invalid uncompressed block header: NLEN');
+    }
+
+    nlen = input[ip++] | input[ip++] << 8; // check len & nlen
+
+    if (len === ~nlen) {
+      throw new Error('invalid uncompressed block header: length verify');
+    } // check size
+
+
+    if (ip + len > input.length) {
+      throw new Error('input buffer is broken');
+    } // expand buffer
+
+
+    switch (this.bufferType) {
+      case Zlib.RawInflate.BufferType.BLOCK:
+        // pre copy
+        while (op + len > output.length) {
+          preCopy = olength - op;
+          len -= preCopy;
+
+          {
+            output.set(input.subarray(ip, ip + preCopy), op);
+            op += preCopy;
+            ip += preCopy;
+          }
+
+          this.op = op;
+          output = this.expandBufferBlock();
+          op = this.op;
+        }
+
+        break;
+
+      case Zlib.RawInflate.BufferType.ADAPTIVE:
+        while (op + len > output.length) {
+          output = this.expandBufferAdaptive({
+            fixRatio: 2
+          });
+        }
+
+        break;
+
+      default:
+        throw new Error('invalid inflate mode');
+    } // copy
+
+
+    {
+      output.set(input.subarray(ip, ip + len), op);
+      op += len;
+      ip += len;
+    }
+
+    this.ip = ip;
+    this.op = op;
+    this.output = output;
+  };
+  /**
+   * parse fixed huffman block.
+   */
+
+
+  Zlib.RawInflate.prototype.parseFixedHuffmanBlock = function () {
+    switch (this.bufferType) {
+      case Zlib.RawInflate.BufferType.ADAPTIVE:
+        this.decodeHuffmanAdaptive(Zlib.RawInflate.FixedLiteralLengthTable, Zlib.RawInflate.FixedDistanceTable);
+        break;
+
+      case Zlib.RawInflate.BufferType.BLOCK:
+        this.decodeHuffmanBlock(Zlib.RawInflate.FixedLiteralLengthTable, Zlib.RawInflate.FixedDistanceTable);
+        break;
+
+      default:
+        throw new Error('invalid inflate mode');
+    }
+  };
+  /**
+   * parse dynamic huffman block.
+   */
+
+
+  Zlib.RawInflate.prototype.parseDynamicHuffmanBlock = function () {
+    /** @type {number} number of literal and length codes. */
+    var hlit = this.readBits(5) + 257;
+    /** @type {number} number of distance codes. */
+
+    var hdist = this.readBits(5) + 1;
+    /** @type {number} number of code lengths. */
+
+    var hclen = this.readBits(4) + 4;
+    /** @type {!(Uint8Array|Array.<number>)} code lengths. */
+
+    var codeLengths = new ( Uint8Array )(Zlib.RawInflate.Order.length);
+    /** @type {!Array} code lengths table. */
+
+    var codeLengthsTable;
+    /** @type {!(Uint8Array|Array.<number>)} literal and length code table. */
+
+    var litlenTable;
+    /** @type {!(Uint8Array|Array.<number>)} distance code table. */
+
+    var distTable;
+    /** @type {!(Uint8Array|Array.<number>)} code length table. */
+
+    var lengthTable;
+    /** @type {number} */
+
+    var code;
+    /** @type {number} */
+
+    var prev;
+    /** @type {number} */
+
+    var repeat;
+    /** @type {number} loop counter. */
+
+    var i;
+    /** @type {number} loop limit. */
+
+    var il; // decode code lengths
+
+    for (i = 0; i < hclen; ++i) {
+      codeLengths[Zlib.RawInflate.Order[i]] = this.readBits(3);
+    }
+
+
+    codeLengthsTable = buildHuffmanTable(codeLengths);
+    lengthTable = new ( Uint8Array )(hlit + hdist);
+
+    for (i = 0, il = hlit + hdist; i < il;) {
+      code = this.readCodeByTable(codeLengthsTable);
+
+      switch (code) {
+        case 16:
+          repeat = 3 + this.readBits(2);
+
+          while (repeat--) {
+            lengthTable[i++] = prev;
+          }
+
+          break;
+
+        case 17:
+          repeat = 3 + this.readBits(3);
+
+          while (repeat--) {
+            lengthTable[i++] = 0;
+          }
+
+          prev = 0;
+          break;
+
+        case 18:
+          repeat = 11 + this.readBits(7);
+
+          while (repeat--) {
+            lengthTable[i++] = 0;
+          }
+
+          prev = 0;
+          break;
+
+        default:
+          lengthTable[i++] = code;
+          prev = code;
+          break;
+      }
+    }
+
+    litlenTable =  buildHuffmanTable(lengthTable.subarray(0, hlit)) ;
+    distTable =  buildHuffmanTable(lengthTable.subarray(hlit)) ;
+
+    switch (this.bufferType) {
+      case Zlib.RawInflate.BufferType.ADAPTIVE:
+        this.decodeHuffmanAdaptive(litlenTable, distTable);
+        break;
+
+      case Zlib.RawInflate.BufferType.BLOCK:
+        this.decodeHuffmanBlock(litlenTable, distTable);
+        break;
+
+      default:
+        throw new Error('invalid inflate mode');
+    }
+  };
+  /**
+   * decode huffman code
+   * @param {!(Array.<number>|Uint16Array)} litlen literal and length code table.
+   * @param {!(Array.<number>|Uint8Array)} dist distination code table.
+   */
+
+
+  Zlib.RawInflate.prototype.decodeHuffmanBlock = function (litlen, dist) {
+    var output = this.output;
+    var op = this.op;
+    this.currentLitlenTable = litlen;
+    /** @type {number} output position limit. */
+
+    var olength = output.length - Zlib.RawInflate.MaxCopyLength;
+    /** @type {number} huffman code. */
+
+    var code;
+    /** @type {number} table index. */
+
+    var ti;
+    /** @type {number} huffman code distination. */
+
+    var codeDist;
+    /** @type {number} huffman code length. */
+
+    var codeLength;
+    var lengthCodeTable = Zlib.RawInflate.LengthCodeTable;
+    var lengthExtraTable = Zlib.RawInflate.LengthExtraTable;
+    var distCodeTable = Zlib.RawInflate.DistCodeTable;
+    var distExtraTable = Zlib.RawInflate.DistExtraTable;
+
+    while ((code = this.readCodeByTable(litlen)) !== 256) {
+      // literal
+      if (code < 256) {
+        if (op >= olength) {
+          this.op = op;
+          output = this.expandBufferBlock();
+          op = this.op;
+        }
+
+        output[op++] = code;
+        continue;
+      } // length code
+
+
+      ti = code - 257;
+      codeLength = lengthCodeTable[ti];
+
+      if (lengthExtraTable[ti] > 0) {
+        codeLength += this.readBits(lengthExtraTable[ti]);
+      } // dist code
+
+
+      code = this.readCodeByTable(dist);
+      codeDist = distCodeTable[code];
+
+      if (distExtraTable[code] > 0) {
+        codeDist += this.readBits(distExtraTable[code]);
+      } // lz77 decode
+
+
+      if (op >= olength) {
+        this.op = op;
+        output = this.expandBufferBlock();
+        op = this.op;
+      }
+
+      while (codeLength--) {
+        output[op] = output[op++ - codeDist];
+      }
+    }
+
+    while (this.bitsbuflen >= 8) {
+      this.bitsbuflen -= 8;
+      this.ip--;
+    }
+
+    this.op = op;
+  };
+  /**
+   * decode huffman code (adaptive)
+   * @param {!(Array.<number>|Uint16Array)} litlen literal and length code table.
+   * @param {!(Array.<number>|Uint8Array)} dist distination code table.
+   */
+
+
+  Zlib.RawInflate.prototype.decodeHuffmanAdaptive = function (litlen, dist) {
+    var output = this.output;
+    var op = this.op;
+    this.currentLitlenTable = litlen;
+    /** @type {number} output position limit. */
+
+    var olength = output.length;
+    /** @type {number} huffman code. */
+
+    var code;
+    /** @type {number} table index. */
+
+    var ti;
+    /** @type {number} huffman code distination. */
+
+    var codeDist;
+    /** @type {number} huffman code length. */
+
+    var codeLength;
+    var lengthCodeTable = Zlib.RawInflate.LengthCodeTable;
+    var lengthExtraTable = Zlib.RawInflate.LengthExtraTable;
+    var distCodeTable = Zlib.RawInflate.DistCodeTable;
+    var distExtraTable = Zlib.RawInflate.DistExtraTable;
+
+    while ((code = this.readCodeByTable(litlen)) !== 256) {
+      // literal
+      if (code < 256) {
+        if (op >= olength) {
+          output = this.expandBufferAdaptive();
+          olength = output.length;
+        }
+
+        output[op++] = code;
+        continue;
+      } // length code
+
+
+      ti = code - 257;
+      codeLength = lengthCodeTable[ti];
+
+      if (lengthExtraTable[ti] > 0) {
+        codeLength += this.readBits(lengthExtraTable[ti]);
+      } // dist code
+
+
+      code = this.readCodeByTable(dist);
+      codeDist = distCodeTable[code];
+
+      if (distExtraTable[code] > 0) {
+        codeDist += this.readBits(distExtraTable[code]);
+      } // lz77 decode
+
+
+      if (op + codeLength > olength) {
+        output = this.expandBufferAdaptive();
+        olength = output.length;
+      }
+
+      while (codeLength--) {
+        output[op] = output[op++ - codeDist];
+      }
+    }
+
+    while (this.bitsbuflen >= 8) {
+      this.bitsbuflen -= 8;
+      this.ip--;
+    }
+
+    this.op = op;
+  };
+  /**
+   * expand output buffer.
+   * @param {Object=} opt_param option parameters.
+   * @return {!(Array.<number>|Uint8Array)} output buffer.
+   */
+
+
+  Zlib.RawInflate.prototype.expandBufferBlock = function (opt_param) {
+    /** @type {!(Array.<number>|Uint8Array)} store buffer. */
+    var buffer = new ( Uint8Array )(this.op - Zlib.RawInflate.MaxBackwardLength);
+    /** @type {number} backward base point */
+
+    var backward = this.op - Zlib.RawInflate.MaxBackwardLength;
+    var output = this.output; // copy to output buffer
+
+    {
+      buffer.set(output.subarray(Zlib.RawInflate.MaxBackwardLength, buffer.length));
+    }
+
+    this.blocks.push(buffer);
+    this.totalpos += buffer.length; // copy to backward buffer
+
+    {
+      output.set(output.subarray(backward, backward + Zlib.RawInflate.MaxBackwardLength));
+    }
+
+    this.op = Zlib.RawInflate.MaxBackwardLength;
+    return output;
+  };
+  /**
+   * expand output buffer. (adaptive)
+   * @param {Object=} opt_param option parameters.
+   * @return {!(Array.<number>|Uint8Array)} output buffer pointer.
+   */
+
+
+  Zlib.RawInflate.prototype.expandBufferAdaptive = function (opt_param) {
+    /** @type {!(Array.<number>|Uint8Array)} store buffer. */
+    var buffer;
+    /** @type {number} expantion ratio. */
+
+    var ratio = this.input.length / this.ip + 1 | 0;
+    /** @type {number} maximum number of huffman code. */
+
+    var maxHuffCode;
+    /** @type {number} new output buffer size. */
+
+    var newSize;
+    /** @type {number} max inflate size. */
+
+    var maxInflateSize;
+    var input = this.input;
+    var output = this.output;
+
+    if (opt_param) {
+      if (typeof opt_param.fixRatio === 'number') {
+        ratio = opt_param.fixRatio;
+      }
+
+      if (typeof opt_param.addRatio === 'number') {
+        ratio += opt_param.addRatio;
+      }
+    } // calculate new buffer size
+
+
+    if (ratio < 2) {
+      maxHuffCode = (input.length - this.ip) / this.currentLitlenTable[2];
+      maxInflateSize = maxHuffCode / 2 * 258 | 0;
+      newSize = maxInflateSize < output.length ? output.length + maxInflateSize : output.length << 1;
+    } else {
+      newSize = output.length * ratio;
+    } // buffer expantion
+
+
+    {
+      buffer = new Uint8Array(newSize);
+      buffer.set(output);
+    }
+
+    this.output = buffer;
+    return this.output;
+  };
+  /**
+   * concat output buffer.
+   * @return {!(Array.<number>|Uint8Array)} output buffer.
+   */
+
+
+  Zlib.RawInflate.prototype.concatBufferBlock = function () {
+    /** @type {number} buffer pointer. */
+    var pos = 0;
+    /** @type {number} buffer pointer. */
+
+    var limit = this.totalpos + (this.op - Zlib.RawInflate.MaxBackwardLength);
+    /** @type {!(Array.<number>|Uint8Array)} output block array. */
+
+    var output = this.output;
+    /** @type {!Array} blocks array. */
+
+    var blocks = this.blocks;
+    /** @type {!(Array.<number>|Uint8Array)} output block array. */
+
+    var block;
+    /** @type {!(Array.<number>|Uint8Array)} output buffer. */
+
+    var buffer = new ( Uint8Array )(limit);
+    /** @type {number} loop counter. */
+
+    var i;
+    /** @type {number} loop limiter. */
+
+    var il;
+    /** @type {number} loop counter. */
+
+    var j;
+    /** @type {number} loop limiter. */
+
+    var jl; // single buffer
+
+    if (blocks.length === 0) {
+      return  this.output.subarray(Zlib.RawInflate.MaxBackwardLength, this.op) ;
+    } // copy to buffer
+
+
+    for (i = 0, il = blocks.length; i < il; ++i) {
+      block = blocks[i];
+
+      for (j = 0, jl = block.length; j < jl; ++j) {
+        buffer[pos++] = block[j];
+      }
+    } // current buffer
+
+
+    for (i = Zlib.RawInflate.MaxBackwardLength, il = this.op; i < il; ++i) {
+      buffer[pos++] = output[i];
+    }
+
+    this.blocks = [];
+    this.buffer = buffer;
+    return this.buffer;
+  };
+  /**
+   * concat output buffer. (dynamic)
+   * @return {!(Array.<number>|Uint8Array)} output buffer.
+   */
+
+
+  Zlib.RawInflate.prototype.concatBufferDynamic = function () {
+    /** @type {Array.<number>|Uint8Array} output buffer. */
+    var buffer;
+    var op = this.op;
+
+    {
+      if (this.resize) {
+        buffer = new Uint8Array(op);
+        buffer.set(this.output.subarray(0, op));
+      } else {
+        buffer = this.output.subarray(0, op);
+      }
+    }
+
+    this.buffer = buffer;
+    return this.buffer;
+  };
+
+  var buildHuffmanTable = Zlib.Huffman.buildHuffmanTable;
+  /**
+   * @param {!(Uint8Array|Array.<number>)} input input buffer.
+   * @param {number} ip input buffer pointer.
+   * @param {number=} opt_buffersize buffer block size.
+   * @constructor
+   */
+
+  Zlib.RawInflateStream = function (input, ip, opt_buffersize) {
+    /** @type {!Array.<(Array|Uint8Array)>} */
+    this.blocks = [];
+    /** @type {number} block size. */
+
+    this.bufferSize = opt_buffersize ? opt_buffersize : ZLIB_STREAM_RAW_INFLATE_BUFFER_SIZE;
+    /** @type {!number} total output buffer pointer. */
+
+    this.totalpos = 0;
+    /** @type {!number} input buffer pointer. */
+
+    this.ip = ip === void 0 ? 0 : ip;
+    /** @type {!number} bit stream reader buffer. */
+
+    this.bitsbuf = 0;
+    /** @type {!number} bit stream reader buffer size. */
+
+    this.bitsbuflen = 0;
+    /** @type {!(Array|Uint8Array)} input buffer. */
+
+    this.input =  new Uint8Array(input) ;
+    /** @type {!(Uint8Array|Array)} output buffer. */
+
+    this.output = new ( Uint8Array )(this.bufferSize);
+    /** @type {!number} output buffer pointer. */
+
+    this.op = 0;
+    /** @type {boolean} is final block flag. */
+
+    this.bfinal = false;
+    /** @type {number} uncompressed block length. */
+
+    this.blockLength;
+    /** @type {boolean} resize flag for memory size optimization. */
+
+    this.resize = false;
+    /** @type {Array} */
+
+    this.litlenTable;
+    /** @type {Array} */
+
+    this.distTable;
+    /** @type {number} */
+
+    this.sp = 0; // stream pointer
+
+    /** @type {Zlib.RawInflateStream.Status} */
+
+    this.status = Zlib.RawInflateStream.Status.INITIALIZED; //
+    // backup
+    //
+
+    /** @type {!number} */
+
+    this.ip_;
+    /** @type {!number} */
+
+    this.bitsbuflen_;
+    /** @type {!number} */
+
+    this.bitsbuf_;
+  };
+  /**
+   * @enum {number}
+   */
+
+
+  Zlib.RawInflateStream.BlockType = {
+    UNCOMPRESSED: 0,
+    FIXED: 1,
+    DYNAMIC: 2
+  };
+  /**
+   * @enum {number}
+   */
+
+  Zlib.RawInflateStream.Status = {
+    INITIALIZED: 0,
+    BLOCK_HEADER_START: 1,
+    BLOCK_HEADER_END: 2,
+    BLOCK_BODY_START: 3,
+    BLOCK_BODY_END: 4,
+    DECODE_BLOCK_START: 5,
+    DECODE_BLOCK_END: 6
+  };
+  /**
+   * decompress.
+   * @return {!(Uint8Array|Array)} inflated buffer.
+   */
+
+  Zlib.RawInflateStream.prototype.decompress = function (newInput, ip) {
+    /** @type {boolean} */
+    var stop = false;
+
+    if (newInput !== void 0) {
+      this.input = newInput;
+    }
+
+    if (ip !== void 0) {
+      this.ip = ip;
+    } // decompress
+
+
+    while (!stop) {
+      switch (this.status) {
+        // block header
+        case Zlib.RawInflateStream.Status.INITIALIZED:
+        case Zlib.RawInflateStream.Status.BLOCK_HEADER_START:
+          if (this.readBlockHeader() < 0) {
+            stop = true;
+          }
+
+          break;
+        // block body
+
+        case Zlib.RawInflateStream.Status.BLOCK_HEADER_END:
+        /* FALLTHROUGH */
+
+        case Zlib.RawInflateStream.Status.BLOCK_BODY_START:
+          switch (this.currentBlockType) {
+            case Zlib.RawInflateStream.BlockType.UNCOMPRESSED:
+              if (this.readUncompressedBlockHeader() < 0) {
+                stop = true;
+              }
+
+              break;
+
+            case Zlib.RawInflateStream.BlockType.FIXED:
+              if (this.parseFixedHuffmanBlock() < 0) {
+                stop = true;
+              }
+
+              break;
+
+            case Zlib.RawInflateStream.BlockType.DYNAMIC:
+              if (this.parseDynamicHuffmanBlock() < 0) {
+                stop = true;
+              }
+
+              break;
+          }
+
+          break;
+        // decode data
+
+        case Zlib.RawInflateStream.Status.BLOCK_BODY_END:
+        case Zlib.RawInflateStream.Status.DECODE_BLOCK_START:
+          switch (this.currentBlockType) {
+            case Zlib.RawInflateStream.BlockType.UNCOMPRESSED:
+              if (this.parseUncompressedBlock() < 0) {
+                stop = true;
+              }
+
+              break;
+
+            case Zlib.RawInflateStream.BlockType.FIXED:
+            /* FALLTHROUGH */
+
+            case Zlib.RawInflateStream.BlockType.DYNAMIC:
+              if (this.decodeHuffman() < 0) {
+                stop = true;
+              }
+
+              break;
+          }
+
+          break;
+
+        case Zlib.RawInflateStream.Status.DECODE_BLOCK_END:
+          if (this.bfinal) {
+            stop = true;
+          } else {
+            this.status = Zlib.RawInflateStream.Status.INITIALIZED;
+          }
+
+          break;
+      }
+    }
+
+    return this.concatBuffer();
+  };
+  /**
+   * @const
+   * @type {number} max backward length for LZ77.
+   */
+
+
+  Zlib.RawInflateStream.MaxBackwardLength = 32768;
+  /**
+   * @const
+   * @type {number} max copy length for LZ77.
+   */
+
+  Zlib.RawInflateStream.MaxCopyLength = 258;
+  /**
+   * huffman order
+   * @const
+   * @type {!(Array.<number>|Uint8Array)}
+   */
+
+  Zlib.RawInflateStream.Order = function (table) {
+    return  new Uint16Array(table) ;
+  }([16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15]);
+  /**
+   * huffman length code table.
+   * @const
+   * @type {!(Array.<number>|Uint16Array)}
+   */
+
+
+  Zlib.RawInflateStream.LengthCodeTable = function (table) {
+    return  new Uint16Array(table) ;
+  }([0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x000a, 0x000b, 0x000d, 0x000f, 0x0011, 0x0013, 0x0017, 0x001b, 0x001f, 0x0023, 0x002b, 0x0033, 0x003b, 0x0043, 0x0053, 0x0063, 0x0073, 0x0083, 0x00a3, 0x00c3, 0x00e3, 0x0102, 0x0102, 0x0102]);
+  /**
+   * huffman length extra-bits table.
+   * @const
+   * @type {!(Array.<number>|Uint8Array)}
+   */
+
+
+  Zlib.RawInflateStream.LengthExtraTable = function (table) {
+    return  new Uint8Array(table) ;
+  }([0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0, 0, 0]);
+  /**
+   * huffman dist code table.
+   * @const
+   * @type {!(Array.<number>|Uint16Array)}
+   */
+
+
+  Zlib.RawInflateStream.DistCodeTable = function (table) {
+    return  new Uint16Array(table) ;
+  }([0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0007, 0x0009, 0x000d, 0x0011, 0x0019, 0x0021, 0x0031, 0x0041, 0x0061, 0x0081, 0x00c1, 0x0101, 0x0181, 0x0201, 0x0301, 0x0401, 0x0601, 0x0801, 0x0c01, 0x1001, 0x1801, 0x2001, 0x3001, 0x4001, 0x6001]);
+  /**
+   * huffman dist extra-bits table.
+   * @const
+   * @type {!(Array.<number>|Uint8Array)}
+   */
+
+
+  Zlib.RawInflateStream.DistExtraTable = function (table) {
+    return  new Uint8Array(table) ;
+  }([0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13]);
+  /**
+   * fixed huffman length code table
+   * @const
+   * @type {!Array}
+   */
+
+
+  Zlib.RawInflateStream.FixedLiteralLengthTable = function (table) {
+    return table;
+  }(function () {
+    var lengths = new ( Uint8Array )(288);
+    var i, il;
+
+    for (i = 0, il = lengths.length; i < il; ++i) {
+      lengths[i] = i <= 143 ? 8 : i <= 255 ? 9 : i <= 279 ? 7 : 8;
+    }
+
+    return buildHuffmanTable(lengths);
+  }());
+  /**
+   * fixed huffman distance code table
+   * @const
+   * @type {!Array}
+   */
+
+
+  Zlib.RawInflateStream.FixedDistanceTable = function (table) {
+    return table;
+  }(function () {
+    var lengths = new ( Uint8Array )(30);
+    var i, il;
+
+    for (i = 0, il = lengths.length; i < il; ++i) {
+      lengths[i] = 5;
+    }
+
+    return buildHuffmanTable(lengths);
+  }());
+  /**
+   * parse deflated block.
+   */
+
+
+  Zlib.RawInflateStream.prototype.readBlockHeader = function () {
+    /** @type {number} header */
+    var hdr;
+    this.status = Zlib.RawInflateStream.Status.BLOCK_HEADER_START;
+    this.save_();
+
+    if ((hdr = this.readBits(3)) < 0) {
+      this.restore_();
+      return -1;
+    } // BFINAL
+
+
+    if (hdr & 0x1) {
+      this.bfinal = true;
+    } // BTYPE
+
+
+    hdr >>>= 1;
+
+    switch (hdr) {
+      case 0:
+        // uncompressed
+        this.currentBlockType = Zlib.RawInflateStream.BlockType.UNCOMPRESSED;
+        break;
+
+      case 1:
+        // fixed huffman
+        this.currentBlockType = Zlib.RawInflateStream.BlockType.FIXED;
+        break;
+
+      case 2:
+        // dynamic huffman
+        this.currentBlockType = Zlib.RawInflateStream.BlockType.DYNAMIC;
+        break;
+
+      default:
+        // reserved or other
+        throw new Error('unknown BTYPE: ' + hdr);
+    }
+
+    this.status = Zlib.RawInflateStream.Status.BLOCK_HEADER_END;
+  };
+  /**
+   * read inflate bits
+   * @param {number} length bits length.
+   * @return {number} read bits.
+   */
+
+
+  Zlib.RawInflateStream.prototype.readBits = function (length) {
+    var bitsbuf = this.bitsbuf;
+    var bitsbuflen = this.bitsbuflen;
+    var input = this.input;
+    var ip = this.ip;
+    /** @type {number} input and output byte. */
+
+    var octet; // not enough buffer
+
+    while (bitsbuflen < length) {
+      // input byte
+      if (input.length <= ip) {
+        return -1;
+      }
+
+      octet = input[ip++]; // concat octet
+
+      bitsbuf |= octet << bitsbuflen;
+      bitsbuflen += 8;
+    } // output byte
+
+
+    octet = bitsbuf &
+    /* MASK */
+    (1 << length) - 1;
+    bitsbuf >>>= length;
+    bitsbuflen -= length;
+    this.bitsbuf = bitsbuf;
+    this.bitsbuflen = bitsbuflen;
+    this.ip = ip;
+    return octet;
+  };
+  /**
+   * read huffman code using table
+   * @param {Array} table huffman code table.
+   * @return {number} huffman code.
+   */
+
+
+  Zlib.RawInflateStream.prototype.readCodeByTable = function (table) {
+    var bitsbuf = this.bitsbuf;
+    var bitsbuflen = this.bitsbuflen;
+    var input = this.input;
+    var ip = this.ip;
+    /** @type {!(Array|Uint8Array)} huffman code table */
+
+    var codeTable = table[0];
+    /** @type {number} */
+
+    var maxCodeLength = table[1];
+    /** @type {number} input byte */
+
+    var octet;
+    /** @type {number} code length & code (16bit, 16bit) */
+
+    var codeWithLength;
+    /** @type {number} code bits length */
+
+    var codeLength; // not enough buffer
+
+    while (bitsbuflen < maxCodeLength) {
+      if (input.length <= ip) {
+        return -1;
+      }
+
+      octet = input[ip++];
+      bitsbuf |= octet << bitsbuflen;
+      bitsbuflen += 8;
+    } // read max length
+
+
+    codeWithLength = codeTable[bitsbuf & (1 << maxCodeLength) - 1];
+    codeLength = codeWithLength >>> 16;
+
+    if (codeLength > bitsbuflen) {
+      throw new Error('invalid code length: ' + codeLength);
+    }
+
+    this.bitsbuf = bitsbuf >> codeLength;
+    this.bitsbuflen = bitsbuflen - codeLength;
+    this.ip = ip;
+    return codeWithLength & 0xffff;
+  };
+  /**
+   * read uncompressed block header
+   */
+
+
+  Zlib.RawInflateStream.prototype.readUncompressedBlockHeader = function () {
+    /** @type {number} block length */
+    var len;
+    /** @type {number} number for check block length */
+
+    var nlen;
+    var input = this.input;
+    var ip = this.ip;
+    this.status = Zlib.RawInflateStream.Status.BLOCK_BODY_START;
+
+    if (ip + 4 >= input.length) {
+      return -1;
+    }
+
+    len = input[ip++] | input[ip++] << 8;
+    nlen = input[ip++] | input[ip++] << 8; // check len & nlen
+
+    if (len === ~nlen) {
+      throw new Error('invalid uncompressed block header: length verify');
+    } // skip buffered header bits
+
+
+    this.bitsbuf = 0;
+    this.bitsbuflen = 0;
+    this.ip = ip;
+    this.blockLength = len;
+    this.status = Zlib.RawInflateStream.Status.BLOCK_BODY_END;
+  };
+  /**
+   * parse uncompressed block.
+   */
+
+
+  Zlib.RawInflateStream.prototype.parseUncompressedBlock = function () {
+    var input = this.input;
+    var ip = this.ip;
+    var output = this.output;
+    var op = this.op;
+    var len = this.blockLength;
+    this.status = Zlib.RawInflateStream.Status.DECODE_BLOCK_START; // copy
+    // XXX: とりあえず素直にコピー
+
+    while (len--) {
+      if (op === output.length) {
+        output = this.expandBuffer({
+          fixRatio: 2
+        });
+      } // not enough input buffer
+
+
+      if (ip >= input.length) {
+        this.ip = ip;
+        this.op = op;
+        this.blockLength = len + 1; // コピーしてないので戻す
+
+        return -1;
+      }
+
+      output[op++] = input[ip++];
+    }
+
+    if (len < 0) {
+      this.status = Zlib.RawInflateStream.Status.DECODE_BLOCK_END;
+    }
+
+    this.ip = ip;
+    this.op = op;
+    return 0;
+  };
+  /**
+   * parse fixed huffman block.
+   */
+
+
+  Zlib.RawInflateStream.prototype.parseFixedHuffmanBlock = function () {
+    this.status = Zlib.RawInflateStream.Status.BLOCK_BODY_START;
+    this.litlenTable = Zlib.RawInflateStream.FixedLiteralLengthTable;
+    this.distTable = Zlib.RawInflateStream.FixedDistanceTable;
+    this.status = Zlib.RawInflateStream.Status.BLOCK_BODY_END;
+    return 0;
+  };
+  /**
+   * オブジェクトのコンテキストを別のプロパティに退避する.
+   * @private
+   */
+
+
+  Zlib.RawInflateStream.prototype.save_ = function () {
+    this.ip_ = this.ip;
+    this.bitsbuflen_ = this.bitsbuflen;
+    this.bitsbuf_ = this.bitsbuf;
+  };
+  /**
+   * 別のプロパティに退避したコンテキストを復元する.
+   * @private
+   */
+
+
+  Zlib.RawInflateStream.prototype.restore_ = function () {
+    this.ip = this.ip_;
+    this.bitsbuflen = this.bitsbuflen_;
+    this.bitsbuf = this.bitsbuf_;
+  };
+  /**
+   * parse dynamic huffman block.
+   */
+
+
+  Zlib.RawInflateStream.prototype.parseDynamicHuffmanBlock = function () {
+    /** @type {number} number of literal and length codes. */
+    var hlit;
+    /** @type {number} number of distance codes. */
+
+    var hdist;
+    /** @type {number} number of code lengths. */
+
+    var hclen;
+    /** @type {!(Uint8Array|Array)} code lengths. */
+
+    var codeLengths = new ( Uint8Array )(Zlib.RawInflateStream.Order.length);
+    /** @type {!Array} code lengths table. */
+
+    var codeLengthsTable;
+    this.status = Zlib.RawInflateStream.Status.BLOCK_BODY_START;
+    this.save_();
+    hlit = this.readBits(5) + 257;
+    hdist = this.readBits(5) + 1;
+    hclen = this.readBits(4) + 4;
+
+    if (hlit < 0 || hdist < 0 || hclen < 0) {
+      this.restore_();
+      return -1;
+    }
+
+    try {
+      parseDynamicHuffmanBlockImpl.call(this);
+    } catch (e) {
+      this.restore_();
+      return -1;
+    }
+
+    function parseDynamicHuffmanBlockImpl() {
+      /** @type {number} */
+      var bits;
+      var code;
+      var prev = 0;
+      var repeat;
+      /** @type {!(Uint8Array|Array.<number>)} code length table. */
+
+      var lengthTable;
+      /** @type {number} loop counter. */
+
+      var i;
+      /** @type {number} loop limit. */
+
+      var il; // decode code lengths
+
+      for (i = 0; i < hclen; ++i) {
+        if ((bits = this.readBits(3)) < 0) {
+          throw new Error('not enough input');
+        }
+
+        codeLengths[Zlib.RawInflateStream.Order[i]] = bits;
+      } // decode length table
+
+
+      codeLengthsTable = buildHuffmanTable(codeLengths);
+      lengthTable = new ( Uint8Array )(hlit + hdist);
+
+      for (i = 0, il = hlit + hdist; i < il;) {
+        code = this.readCodeByTable(codeLengthsTable);
+
+        if (code < 0) {
+          throw new Error('not enough input');
+        }
+
+        switch (code) {
+          case 16:
+            if ((bits = this.readBits(2)) < 0) {
+              throw new Error('not enough input');
+            }
+
+            repeat = 3 + bits;
+
+            while (repeat--) {
+              lengthTable[i++] = prev;
+            }
+
+            break;
+
+          case 17:
+            if ((bits = this.readBits(3)) < 0) {
+              throw new Error('not enough input');
+            }
+
+            repeat = 3 + bits;
+
+            while (repeat--) {
+              lengthTable[i++] = 0;
+            }
+
+            prev = 0;
+            break;
+
+          case 18:
+            if ((bits = this.readBits(7)) < 0) {
+              throw new Error('not enough input');
+            }
+
+            repeat = 11 + bits;
+
+            while (repeat--) {
+              lengthTable[i++] = 0;
+            }
+
+            prev = 0;
+            break;
+
+          default:
+            lengthTable[i++] = code;
+            prev = code;
+            break;
+        }
+      } // literal and length code
+      this.litlenTable =  buildHuffmanTable(lengthTable.subarray(0, hlit)) ;
+      this.distTable =  buildHuffmanTable(lengthTable.subarray(hlit)) ;
+    }
+
+    this.status = Zlib.RawInflateStream.Status.BLOCK_BODY_END;
+    return 0;
+  };
+  /**
+   * decode huffman code (dynamic)
+   * @return {(number|undefined)} -1 is error.
+   */
+
+
+  Zlib.RawInflateStream.prototype.decodeHuffman = function () {
+    var output = this.output;
+    var op = this.op;
+    /** @type {number} huffman code. */
+
+    var code;
+    /** @type {number} table index. */
+
+    var ti;
+    /** @type {number} huffman code distination. */
+
+    var codeDist;
+    /** @type {number} huffman code length. */
+
+    var codeLength;
+    var litlen = this.litlenTable;
+    var dist = this.distTable;
+    var olength = output.length;
+    var bits;
+    this.status = Zlib.RawInflateStream.Status.DECODE_BLOCK_START;
+
+    while (true) {
+      this.save_();
+      code = this.readCodeByTable(litlen);
+
+      if (code < 0) {
+        this.op = op;
+        this.restore_();
+        return -1;
+      }
+
+      if (code === 256) {
+        break;
+      } // literal
+
+
+      if (code < 256) {
+        if (op === olength) {
+          output = this.expandBuffer();
+          olength = output.length;
+        }
+
+        output[op++] = code;
+        continue;
+      } // length code
+
+
+      ti = code - 257;
+      codeLength = Zlib.RawInflateStream.LengthCodeTable[ti];
+
+      if (Zlib.RawInflateStream.LengthExtraTable[ti] > 0) {
+        bits = this.readBits(Zlib.RawInflateStream.LengthExtraTable[ti]);
+
+        if (bits < 0) {
+          this.op = op;
+          this.restore_();
+          return -1;
+        }
+
+        codeLength += bits;
+      } // dist code
+
+
+      code = this.readCodeByTable(dist);
+
+      if (code < 0) {
+        this.op = op;
+        this.restore_();
+        return -1;
+      }
+
+      codeDist = Zlib.RawInflateStream.DistCodeTable[code];
+
+      if (Zlib.RawInflateStream.DistExtraTable[code] > 0) {
+        bits = this.readBits(Zlib.RawInflateStream.DistExtraTable[code]);
+
+        if (bits < 0) {
+          this.op = op;
+          this.restore_();
+          return -1;
+        }
+
+        codeDist += bits;
+      } // lz77 decode
+
+
+      if (op + codeLength >= olength) {
+        output = this.expandBuffer();
+        olength = output.length;
+      }
+
+      while (codeLength--) {
+        output[op] = output[op++ - codeDist];
+      } // break
+
+
+      if (this.ip === this.input.length) {
+        this.op = op;
+        return -1;
+      }
+    }
+
+    while (this.bitsbuflen >= 8) {
+      this.bitsbuflen -= 8;
+      this.ip--;
+    }
+
+    this.op = op;
+    this.status = Zlib.RawInflateStream.Status.DECODE_BLOCK_END;
+  };
+  /**
+   * expand output buffer. (dynamic)
+   * @param {Object=} opt_param option parameters.
+   * @return {!(Array|Uint8Array)} output buffer pointer.
+   */
+
+
+  Zlib.RawInflateStream.prototype.expandBuffer = function (opt_param) {
+    /** @type {!(Array|Uint8Array)} store buffer. */
+    var buffer;
+    /** @type {number} expantion ratio. */
+
+    var ratio = this.input.length / this.ip + 1 | 0;
+    /** @type {number} maximum number of huffman code. */
+
+    var maxHuffCode;
+    /** @type {number} new output buffer size. */
+
+    var newSize;
+    /** @type {number} max inflate size. */
+
+    var maxInflateSize;
+    var input = this.input;
+    var output = this.output;
+
+    if (opt_param) {
+      if (typeof opt_param.fixRatio === 'number') {
+        ratio = opt_param.fixRatio;
+      }
+
+      if (typeof opt_param.addRatio === 'number') {
+        ratio += opt_param.addRatio;
+      }
+    } // calculate new buffer size
+
+
+    if (ratio < 2) {
+      maxHuffCode = (input.length - this.ip) / this.litlenTable[2];
+      maxInflateSize = maxHuffCode / 2 * 258 | 0;
+      newSize = maxInflateSize < output.length ? output.length + maxInflateSize : output.length << 1;
+    } else {
+      newSize = output.length * ratio;
+    } // buffer expantion
+
+
+    {
+      buffer = new Uint8Array(newSize);
+      buffer.set(output);
+    }
+
+    this.output = buffer;
+    return this.output;
+  };
+  /**
+   * concat output buffer. (dynamic)
+   * @return {!(Array|Uint8Array)} output buffer.
+   */
+
+
+  Zlib.RawInflateStream.prototype.concatBuffer = function () {
+    /** @type {!(Array|Uint8Array)} output buffer. */
+    var buffer;
+    /** @type {number} */
+
+    var op = this.op;
+    /** @type {Uint8Array} */
+
+    var tmp;
+
+    if (this.resize) {
+      {
+        buffer = new Uint8Array(this.output.subarray(this.sp, op));
+      }
+    } else {
+      buffer =  this.output.subarray(this.sp, op) ;
+    }
+
+    this.sp = op; // compaction
+
+    if (op > Zlib.RawInflateStream.MaxBackwardLength + this.bufferSize) {
+      this.op = this.sp = Zlib.RawInflateStream.MaxBackwardLength;
+
+      {
+        tmp =
+        /** @type {Uint8Array} */
+        this.output;
+        this.output = new Uint8Array(this.bufferSize + Zlib.RawInflateStream.MaxBackwardLength);
+        this.output.set(tmp.subarray(op - Zlib.RawInflateStream.MaxBackwardLength, op));
+      }
+    }
+
+    return buffer;
+  };
+  /**
+   * @constructor
+   * @param {!(Uint8Array|Array)} input deflated buffer.
+   * @param {Object=} opt_params option parameters.
+   *
+   * opt_params は以下のプロパティを指定する事ができます。
+   *   - index: input buffer の deflate コンテナの開始位置.
+   *   - blockSize: バッファのブロックサイズ.
+   *   - verify: 伸張が終わった後 adler-32 checksum の検証を行うか.
+   *   - bufferType: Zlib.Inflate.BufferType の値によってバッファの管理方法を指定する.
+   *       Zlib.Inflate.BufferType は Zlib.RawInflate.BufferType のエイリアス.
+   */
+
+
+  Zlib.Inflate = function (input, opt_params) {
+    /** @type {number} */
+
+    var cmf;
+    /** @type {number} */
+
+    var flg;
+    /** @type {!(Uint8Array|Array)} */
+
+    this.input = input;
+    /** @type {number} */
+
+    this.ip = 0;
+    /** @type {Zlib.RawInflate} */
+
+    this.rawinflate;
+    /** @type {(boolean|undefined)} verify flag. */
+
+    this.verify; // option parameters
+
+    if (opt_params || !(opt_params = {})) {
+      if (opt_params['index']) {
+        this.ip = opt_params['index'];
+      }
+
+      if (opt_params['verify']) {
+        this.verify = opt_params['verify'];
+      }
+    } // Compression Method and Flags
+
+
+    cmf = input[this.ip++];
+    flg = input[this.ip++]; // compression method
+
+    switch (cmf & 0x0f) {
+      case Zlib.CompressionMethod.DEFLATE:
+        this.method = Zlib.CompressionMethod.DEFLATE;
+        break;
+
+      default:
+        throw new Error('unsupported compression method');
+    } // fcheck
+
+
+    if (((cmf << 8) + flg) % 31 !== 0) {
+      throw new Error('invalid fcheck flag:' + ((cmf << 8) + flg) % 31);
+    } // fdict (not supported)
+
+
+    if (flg & 0x20) {
+      throw new Error('fdict flag is not supported');
+    } // RawInflate
+
+
+    this.rawinflate = new Zlib.RawInflate(input, {
+      'index': this.ip,
+      'bufferSize': opt_params['bufferSize'],
+      'bufferType': opt_params['bufferType'],
+      'resize': opt_params['resize']
+    });
+  };
+  /**
+   * @enum {number}
+   */
+
+
+  Zlib.Inflate.BufferType = Zlib.RawInflate.BufferType;
+  /**
+   * decompress.
+   * @return {!(Uint8Array|Array)} inflated buffer.
+   */
+
+  Zlib.Inflate.prototype.decompress = function () {
+    /** @type {!(Array|Uint8Array)} input buffer. */
+    var input = this.input;
+    /** @type {!(Uint8Array|Array)} inflated buffer. */
+
+    var buffer;
+    /** @type {number} adler-32 checksum */
+
+    var adler32;
+    buffer = this.rawinflate.decompress();
+    this.ip = this.rawinflate.ip; // verify adler-32
+
+    if (this.verify) {
+      adler32 = (input[this.ip++] << 24 | input[this.ip++] << 16 | input[this.ip++] << 8 | input[this.ip++]) >>> 0;
+
+      if (adler32 !== Zlib.Adler32(buffer)) {
+        throw new Error('invalid adler-32 checksum');
+      }
+    }
+
+    return buffer;
+  };
+  /* vim:set expandtab ts=2 sw=2 tw=80: */
+
+  /**
+   * @param {!(Uint8Array|Array)} input deflated buffer.
+   * @constructor
+   */
+
+
+  Zlib.InflateStream = function (input) {
+    /** @type {!(Uint8Array|Array)} */
+    this.input = input === void 0 ? new ( Uint8Array )() : input;
+    /** @type {number} */
+
+    this.ip = 0;
+    /** @type {Zlib.RawInflateStream} */
+
+    this.rawinflate = new Zlib.RawInflateStream(this.input, this.ip);
+    /** @type {Zlib.CompressionMethod} */
+
+    this.method;
+    /** @type {!(Array|Uint8Array)} */
+
+    this.output = this.rawinflate.output;
+  };
+  /**
+   * decompress.
+   * @return {!(Uint8Array|Array)} inflated buffer.
+   */
+
+
+  Zlib.InflateStream.prototype.decompress = function (input) {
+    /** @type {!(Uint8Array|Array)} inflated buffer. */
+    var buffer;
+    // XXX Array, Uint8Array のチェックを行うか確認する
+
+    if (input !== void 0) {
+      {
+        var tmp = new Uint8Array(this.input.length + input.length);
+        tmp.set(this.input, 0);
+        tmp.set(input, this.input.length);
+        this.input = tmp;
+      }
+    }
+
+    if (this.method === void 0) {
+      if (this.readHeader() < 0) {
+        return new ( Uint8Array )();
+      }
+    }
+
+    buffer = this.rawinflate.decompress(this.input, this.ip);
+
+    if (this.rawinflate.ip !== 0) {
+      this.input =  this.input.subarray(this.rawinflate.ip) ;
+      this.ip = 0;
+    } // verify adler-32
+
+    /*
+    if (this.verify) {
+      adler32 =
+        input[this.ip++] << 24 | input[this.ip++] << 16 |
+        input[this.ip++] << 8 | input[this.ip++];
+       if (adler32 !== Zlib.Adler32(buffer)) {
+        throw new Error('invalid adler-32 checksum');
+      }
+    }
+    */
+
+
+    return buffer;
+  };
+
+  Zlib.InflateStream.prototype.readHeader = function () {
+    var ip = this.ip;
+    var input = this.input; // Compression Method and Flags
+
+    var cmf = input[ip++];
+    var flg = input[ip++];
+
+    if (cmf === void 0 || flg === void 0) {
+      return -1;
+    } // compression method
+
+
+    switch (cmf & 0x0f) {
+      case Zlib.CompressionMethod.DEFLATE:
+        this.method = Zlib.CompressionMethod.DEFLATE;
+        break;
+
+      default:
+        throw new Error('unsupported compression method');
+    } // fcheck
+
+
+    if (((cmf << 8) + flg) % 31 !== 0) {
+      throw new Error('invalid fcheck flag:' + ((cmf << 8) + flg) % 31);
+    } // fdict (not supported)
+
+
+    if (flg & 0x20) {
+      throw new Error('fdict flag is not supported');
+    }
+
+    this.ip = ip;
+  };
+  /**
+   * @fileoverview GZIP (RFC1952) 展開コンテナ実装.
+   */
+
+  /**
+   * @constructor
+   * @param {!(Array|Uint8Array)} input input buffer.
+   * @param {Object=} opt_params option parameters.
+   */
+
+
+  Zlib.Gunzip = function (input, opt_params) {
+    /** @type {!(Array.<number>|Uint8Array)} input buffer. */
+    this.input = input;
+    /** @type {number} input buffer pointer. */
+
+    this.ip = 0;
+    /** @type {Array.<Zlib.GunzipMember>} */
+
+    this.member = [];
+    /** @type {boolean} */
+
+    this.decompressed = false;
+  };
+  /**
+   * @return {Array.<Zlib.GunzipMember>}
+   */
+
+
+  Zlib.Gunzip.prototype.getMembers = function () {
+    if (!this.decompressed) {
+      this.decompress();
+    }
+
+    return this.member.slice();
+  };
+  /**
+   * inflate gzip data.
+   * @return {!(Array.<number>|Uint8Array)} inflated buffer.
+   */
+
+
+  Zlib.Gunzip.prototype.decompress = function () {
+    /** @type {number} input length. */
+    var il = this.input.length;
+
+    while (this.ip < il) {
+      this.decodeMember();
+    }
+
+    this.decompressed = true;
+    return this.concatMember();
+  };
+  /**
+   * decode gzip member.
+   */
+
+
+  Zlib.Gunzip.prototype.decodeMember = function () {
+    /** @type {Zlib.GunzipMember} */
+    var member = new Zlib.GunzipMember();
+    /** @type {number} */
+
+    var isize;
+    /** @type {Zlib.RawInflate} RawInflate implementation. */
+
+    var rawinflate;
+    /** @type {!(Array.<number>|Uint8Array)} inflated data. */
+
+    var inflated;
+    /** @type {number} inflate size */
+
+    var inflen;
+    /** @type {number} character code */
+
+    var c;
+    /** @type {number} character index in string. */
+
+    var ci;
+    /** @type {Array.<string>} character array. */
+
+    var str;
+    /** @type {number} modification time. */
+
+    var mtime;
+    /** @type {number} */
+
+    var crc32;
+    var input = this.input;
+    var ip = this.ip;
+    member.id1 = input[ip++];
+    member.id2 = input[ip++]; // check signature
+
+    if (member.id1 !== 0x1f || member.id2 !== 0x8b) {
+      throw new Error('invalid file signature:' + member.id1 + ',' + member.id2);
+    } // check compression method
+
+
+    member.cm = input[ip++];
+
+    switch (member.cm) {
+      case 8:
+        /* XXX: use Zlib const */
+        break;
+
+      default:
+        throw new Error('unknown compression method: ' + member.cm);
+    } // flags
+
+
+    member.flg = input[ip++]; // modification time
+
+    mtime = input[ip++] | input[ip++] << 8 | input[ip++] << 16 | input[ip++] << 24;
+    member.mtime = new Date(mtime * 1000); // extra flags
+
+    member.xfl = input[ip++]; // operating system
+
+    member.os = input[ip++]; // extra
+
+    if ((member.flg & Zlib.Gzip.FlagsMask.FEXTRA) > 0) {
+      member.xlen = input[ip++] | input[ip++] << 8;
+      ip = this.decodeSubField(ip, member.xlen);
+    } // fname
+
+
+    if ((member.flg & Zlib.Gzip.FlagsMask.FNAME) > 0) {
+      for (str = [], ci = 0; (c = input[ip++]) > 0;) {
+        str[ci++] = String.fromCharCode(c);
+      }
+
+      member.name = str.join('');
+    } // fcomment
+
+
+    if ((member.flg & Zlib.Gzip.FlagsMask.FCOMMENT) > 0) {
+      for (str = [], ci = 0; (c = input[ip++]) > 0;) {
+        str[ci++] = String.fromCharCode(c);
+      }
+
+      member.comment = str.join('');
+    } // fhcrc
+
+
+    if ((member.flg & Zlib.Gzip.FlagsMask.FHCRC) > 0) {
+      member.crc16 = Zlib.CRC32.calc(input, 0, ip) & 0xffff;
+
+      if (member.crc16 !== (input[ip++] | input[ip++] << 8)) {
+        throw new Error('invalid header crc16');
+      }
+    } // isize を事前に取得すると展開後のサイズが分かるため、
+    // inflate処理のバッファサイズが事前に分かり、高速になる
+
+
+    isize = input[input.length - 4] | input[input.length - 3] << 8 | input[input.length - 2] << 16 | input[input.length - 1] << 24; // isize の妥当性チェック
+    // ハフマン符号では最小 2-bit のため、最大で 1/4 になる
+    // LZ77 符号では 長さと距離 2-Byte で最大 258-Byte を表現できるため、
+    // 1/128 になるとする
+    // ここから入力バッファの残りが isize の 512 倍以上だったら
+    // サイズ指定のバッファ確保は行わない事とする
+
+    if (input.length - ip -
+    /* CRC-32 */
+    4 -
+    /* ISIZE */
+    4 < isize * 512) {
+      inflen = isize;
+    } // compressed block
+
+
+    rawinflate = new Zlib.RawInflate(input, {
+      'index': ip,
+      'bufferSize': inflen
+    });
+    member.data = inflated = rawinflate.decompress();
+    ip = rawinflate.ip; // crc32
+
+    member.crc32 = crc32 = (input[ip++] | input[ip++] << 8 | input[ip++] << 16 | input[ip++] << 24) >>> 0;
+
+    if (Zlib.CRC32.calc(inflated) !== crc32) {
+      throw new Error('invalid CRC-32 checksum: 0x' + Zlib.CRC32.calc(inflated).toString(16) + ' / 0x' + crc32.toString(16));
+    } // input size
+
+
+    member.isize = isize = (input[ip++] | input[ip++] << 8 | input[ip++] << 16 | input[ip++] << 24) >>> 0;
+
+    if ((inflated.length & 0xffffffff) !== isize) {
+      throw new Error('invalid input size: ' + (inflated.length & 0xffffffff) + ' / ' + isize);
+    }
+
+    this.member.push(member);
+    this.ip = ip;
+  };
+  /**
+   * サブフィールドのデコード
+   * XXX: 現在は何もせずスキップする
+   */
+
+
+  Zlib.Gunzip.prototype.decodeSubField = function (ip, length) {
+    return ip + length;
+  };
+  /**
+   * @return {!(Array.<number>|Uint8Array)}
+   */
+
+
+  Zlib.Gunzip.prototype.concatMember = function () {
+    /** @type {Array.<Zlib.GunzipMember>} */
+    var member = this.member;
+    /** @type {number} */
+
+    var i;
+    /** @type {number} */
+
+    var il;
+    /** @type {number} */
+
+    var p = 0;
+    /** @type {number} */
+
+    var size = 0;
+    /** @type {!(Array.<number>|Uint8Array)} */
+
+    var buffer;
+
+    for (i = 0, il = member.length; i < il; ++i) {
+      size += member[i].data.length;
+    }
+
+    {
+      buffer = new Uint8Array(size);
+
+      for (i = 0; i < il; ++i) {
+        buffer.set(member[i].data, p);
+        p += member[i].data.length;
+      }
+    }
+
+    return buffer;
+  };
+  /**
+   * @constructor
+   */
+
+
+  Zlib.GunzipMember = function () {
+    /** @type {number} signature first byte. */
+    this.id1;
+    /** @type {number} signature second byte. */
+
+    this.id2;
+    /** @type {number} compression method. */
+
+    this.cm;
+    /** @type {number} flags. */
+
+    this.flg;
+    /** @type {Date} modification time. */
+
+    this.mtime;
+    /** @type {number} extra flags. */
+
+    this.xfl;
+    /** @type {number} operating system number. */
+
+    this.os;
+    /** @type {number} CRC-16 value for FHCRC flag. */
+
+    this.crc16;
+    /** @type {number} extra length. */
+
+    this.xlen;
+    /** @type {number} CRC-32 value for verification. */
+
+    this.crc32;
+    /** @type {number} input size modulo 32 value. */
+
+    this.isize;
+    /** @type {string} filename. */
+
+    this.name;
+    /** @type {string} comment. */
+
+    this.comment;
+    /** @type {!(Uint8Array|Array.<number>)} */
+
+    this.data;
+  };
+
+  Zlib.GunzipMember.prototype.getName = function () {
+    return this.name;
+  };
+
+  Zlib.GunzipMember.prototype.getData = function () {
+    return this.data;
+  };
+
+  Zlib.GunzipMember.prototype.getMtime = function () {
+    return this.mtime;
+  };
+  /**
+   * @fileoverview GZIP (RFC1952) 実装.
+   */
+
+  /**
+   * @constructor
+   * @param {!(Array|Uint8Array)} input input buffer.
+   * @param {Object=} opt_params option parameters.
+   */
+
+
+  Zlib.Gzip = function (input, opt_params) {
+    /** @type {!(Array.<number>|Uint8Array)} input buffer. */
+    this.input = input;
+    /** @type {number} input buffer pointer. */
+
+    this.ip = 0;
+    /** @type {!(Array.<number>|Uint8Array)} output buffer. */
+
+    this.output;
+    /** @type {number} output buffer. */
+
+    this.op = 0;
+    /** @type {!Object} flags option flags. */
+
+    this.flags = {};
+    /** @type {!string} filename. */
+
+    this.filename;
+    /** @type {!string} comment. */
+
+    this.comment;
+    /** @type {!Object} deflate options. */
+
+    this.deflateOptions; // option parameters
+
+    if (opt_params) {
+      if (opt_params['flags']) {
+        this.flags = opt_params['flags'];
+      }
+
+      if (typeof opt_params['filename'] === 'string') {
+        this.filename = opt_params['filename'];
+      }
+
+      if (typeof opt_params['comment'] === 'string') {
+        this.comment = opt_params['comment'];
+      }
+
+      if (opt_params['deflateOptions']) {
+        this.deflateOptions = opt_params['deflateOptions'];
+      }
+    }
+
+    if (!this.deflateOptions) {
+      this.deflateOptions = {};
+    }
+  };
+  /**
+   * @type {number}
+   * @const
+   */
+
+
+  Zlib.Gzip.DefaultBufferSize = 0x8000;
+  /**
+   * encode gzip members.
+   * @return {!(Array|Uint8Array)} gzip binary array.
+   */
+
+  Zlib.Gzip.prototype.compress = function () {
+    /** @type {number} flags. */
+    var flg;
+    /** @type {number} modification time. */
+
+    var mtime;
+    /** @type {number} CRC-16 value for FHCRC flag. */
+
+    var crc16;
+    /** @type {number} CRC-32 value for verification. */
+
+    var crc32;
+    /** @type {!Zlib.RawDeflate} raw deflate object. */
+
+    var rawdeflate;
+    /** @type {number} character code */
+
+    var c;
+    /** @type {number} loop counter. */
+
+    var i;
+    /** @type {number} loop limiter. */
+
+    var il;
+    /** @type {!(Array|Uint8Array)} output buffer. */
+
+    var output = new ( Uint8Array )(Zlib.Gzip.DefaultBufferSize);
+    /** @type {number} output buffer pointer. */
+
+    var op = 0;
+    var input = this.input;
+    var ip = this.ip;
+    var filename = this.filename;
+    var comment = this.comment; // check signature
+
+    output[op++] = 0x1f;
+    output[op++] = 0x8b; // check compression method
+
+    output[op++] = 8;
+    /* XXX: use Zlib const */
+    // flags
+
+    flg = 0;
+    if (this.flags['fname']) flg |= Zlib.Gzip.FlagsMask.FNAME;
+    if (this.flags['fcomment']) flg |= Zlib.Gzip.FlagsMask.FCOMMENT;
+    if (this.flags['fhcrc']) flg |= Zlib.Gzip.FlagsMask.FHCRC; // XXX: FTEXT
+    // XXX: FEXTRA
+
+    output[op++] = flg; // modification time
+
+    mtime = (Date.now ? Date.now() : +new Date()) / 1000 | 0;
+    output[op++] = mtime & 0xff;
+    output[op++] = mtime >>> 8 & 0xff;
+    output[op++] = mtime >>> 16 & 0xff;
+    output[op++] = mtime >>> 24 & 0xff; // extra flags
+
+    output[op++] = 0; // operating system
+
+    output[op++] = Zlib.Gzip.OperatingSystem.UNKNOWN; // extra
+
+    /* NOP */
+    // fname
+
+    if (this.flags['fname'] !== void 0) {
+      for (i = 0, il = filename.length; i < il; ++i) {
+        c = filename.charCodeAt(i);
+
+        if (c > 0xff) {
+          output[op++] = c >>> 8 & 0xff;
+        }
+
+        output[op++] = c & 0xff;
+      }
+
+      output[op++] = 0; // null termination
+    } // fcomment
+
+
+    if (this.flags['comment']) {
+      for (i = 0, il = comment.length; i < il; ++i) {
+        c = comment.charCodeAt(i);
+
+        if (c > 0xff) {
+          output[op++] = c >>> 8 & 0xff;
+        }
+
+        output[op++] = c & 0xff;
+      }
+
+      output[op++] = 0; // null termination
+    } // fhcrc
+
+
+    if (this.flags['fhcrc']) {
+      crc16 = Zlib.CRC32.calc(output, 0, op) & 0xffff;
+      output[op++] = crc16 & 0xff;
+      output[op++] = crc16 >>> 8 & 0xff;
+    } // add compress option
+
+
+    this.deflateOptions['outputBuffer'] = output;
+    this.deflateOptions['outputIndex'] = op; // compress
+
+    rawdeflate = new Zlib.RawDeflate(input, this.deflateOptions);
+    output = rawdeflate.compress();
+    op = rawdeflate.op; // expand buffer
+
+    {
+      if (op + 8 > output.buffer.byteLength) {
+        this.output = new Uint8Array(op + 8);
+        this.output.set(new Uint8Array(output.buffer));
+        output = this.output;
+      } else {
+        output = new Uint8Array(output.buffer);
+      }
+    } // crc32
+
+
+    crc32 = Zlib.CRC32.calc(input);
+    output[op++] = crc32 & 0xff;
+    output[op++] = crc32 >>> 8 & 0xff;
+    output[op++] = crc32 >>> 16 & 0xff;
+    output[op++] = crc32 >>> 24 & 0xff; // input size
+
+    il = input.length;
+    output[op++] = il & 0xff;
+    output[op++] = il >>> 8 & 0xff;
+    output[op++] = il >>> 16 & 0xff;
+    output[op++] = il >>> 24 & 0xff;
+    this.ip = ip;
+
+    if ( op < output.length) {
+      this.output = output = output.subarray(0, op);
+    }
+
+    return output;
+  };
+  /** @enum {number} */
+
+
+  Zlib.Gzip.OperatingSystem = {
+    FAT: 0,
+    AMIGA: 1,
+    VMS: 2,
+    UNIX: 3,
+    VM_CMS: 4,
+    ATARI_TOS: 5,
+    HPFS: 6,
+    MACINTOSH: 7,
+    Z_SYSTEM: 8,
+    CP_M: 9,
+    TOPS_20: 10,
+    NTFS: 11,
+    QDOS: 12,
+    ACORN_RISCOS: 13,
+    UNKNOWN: 255
+  };
+  /** @enum {number} */
+
+  Zlib.Gzip.FlagsMask = {
+    FTEXT: 0x01,
+    FHCRC: 0x02,
+    FEXTRA: 0x04,
+    FNAME: 0x08,
+    FCOMMENT: 0x10
+  };
+  /**
+   * @fileoverview Heap Sort 実装. ハフマン符号化で使用する.
+   */
+
+  /**
+   * カスタムハフマン符号で使用するヒープ実装
+   * @param {number} length ヒープサイズ.
+   * @constructor
+   */
+
+  Zlib.Heap = function (length) {
+    this.buffer = new ( Uint16Array )(length * 2);
+    this.length = 0;
+  };
+  /**
+   * 親ノードの index 取得
+   * @param {number} index 子ノードの index.
+   * @return {number} 親ノードの index.
+   *
+   */
+
+
+  Zlib.Heap.prototype.getParent = function (index) {
+    return ((index - 2) / 4 | 0) * 2;
+  };
+  /**
+   * 子ノードの index 取得
+   * @param {number} index 親ノードの index.
+   * @return {number} 子ノードの index.
+   */
+
+
+  Zlib.Heap.prototype.getChild = function (index) {
+    return 2 * index + 2;
+  };
+  /**
+   * Heap に値を追加する
+   * @param {number} index キー index.
+   * @param {number} value 値.
+   * @return {number} 現在のヒープ長.
+   */
+
+
+  Zlib.Heap.prototype.push = function (index, value) {
+    var current,
+        parent,
+        heap = this.buffer,
+        swap;
+    current = this.length;
+    heap[this.length++] = value;
+    heap[this.length++] = index; // ルートノードにたどり着くまで入れ替えを試みる
+
+    while (current > 0) {
+      parent = this.getParent(current); // 親ノードと比較して親の方が小さければ入れ替える
+
+      if (heap[current] > heap[parent]) {
+        swap = heap[current];
+        heap[current] = heap[parent];
+        heap[parent] = swap;
+        swap = heap[current + 1];
+        heap[current + 1] = heap[parent + 1];
+        heap[parent + 1] = swap;
+        current = parent; // 入れ替えが必要なくなったらそこで抜ける
+      } else {
+        break;
+      }
+    }
+
+    return this.length;
+  };
+  /**
+   * Heapから一番大きい値を返す
+   * @return {{index: number, value: number, length: number}} {index: キーindex,
+   *     value: 値, length: ヒープ長} の Object.
+   */
+
+
+  Zlib.Heap.prototype.pop = function () {
+    var index,
+        value,
+        heap = this.buffer,
+        swap,
+        current,
+        parent;
+    value = heap[0];
+    index = heap[1]; // 後ろから値を取る
+
+    this.length -= 2;
+    heap[0] = heap[this.length];
+    heap[1] = heap[this.length + 1];
+    parent = 0; // ルートノードから下がっていく
+
+    while (true) {
+      current = this.getChild(parent); // 範囲チェック
+
+      if (current >= this.length) {
+        break;
+      } // 隣のノードと比較して、隣の方が値が大きければ隣を現在ノードとして選択
+
+
+      if (current + 2 < this.length && heap[current + 2] > heap[current]) {
+        current += 2;
+      } // 親ノードと比較して親の方が小さい場合は入れ替える
+
+
+      if (heap[current] > heap[parent]) {
+        swap = heap[parent];
+        heap[parent] = heap[current];
+        heap[current] = swap;
+        swap = heap[parent + 1];
+        heap[parent + 1] = heap[current + 1];
+        heap[current + 1] = swap;
+      } else {
+        break;
+      }
+
+      parent = current;
+    }
+
+    return {
+      index: index,
+      value: value,
+      length: this.length
+    };
+  };
+  /* vim:set expandtab ts=2 sw=2 tw=80: */
+
+  /**
+   * @fileoverview Deflate (RFC1951) 符号化アルゴリズム実装.
+   */
+
+  /**
+   * Raw Deflate 実装
+   *
+   * @constructor
+   * @param {!(Array.<number>|Uint8Array)} input 符号化する対象のバッファ.
+   * @param {Object=} opt_params option parameters.
+   *
+   * typed array が使用可能なとき、outputBuffer が Array は自動的に Uint8Array に
+   * 変換されます.
+   * 別のオブジェクトになるため出力バッファを参照している変数などは
+   * 更新する必要があります.
+   */
+
+
+  Zlib.RawDeflate = function (input, opt_params) {
+    /** @type {Zlib.RawDeflate.CompressionType} */
+    this.compressionType = Zlib.RawDeflate.CompressionType.DYNAMIC;
+    /** @type {number} */
+
+    this.lazy = 0;
+    /** @type {!(Array.<number>|Uint32Array)} */
+
+    this.freqsLitLen;
+    /** @type {!(Array.<number>|Uint32Array)} */
+
+    this.freqsDist;
+    /** @type {!(Array.<number>|Uint8Array)} */
+
+    this.input =  input instanceof Array ? new Uint8Array(input) : input;
+    /** @type {!(Array.<number>|Uint8Array)} output output buffer. */
+
+    this.output;
+    /** @type {number} pos output buffer position. */
+
+    this.op = 0; // option parameters
+
+    if (opt_params) {
+      if (opt_params['lazy']) {
+        this.lazy = opt_params['lazy'];
+      }
+
+      if (typeof opt_params['compressionType'] === 'number') {
+        this.compressionType = opt_params['compressionType'];
+      }
+
+      if (opt_params['outputBuffer']) {
+        this.output =  opt_params['outputBuffer'] instanceof Array ? new Uint8Array(opt_params['outputBuffer']) : opt_params['outputBuffer'];
+      }
+
+      if (typeof opt_params['outputIndex'] === 'number') {
+        this.op = opt_params['outputIndex'];
+      }
+    }
+
+    if (!this.output) {
+      this.output = new ( Uint8Array )(0x8000);
+    }
+  };
+  /**
+   * @enum {number}
+   */
+
+
+  Zlib.RawDeflate.CompressionType = {
+    NONE: 0,
+    FIXED: 1,
+    DYNAMIC: 2,
+    RESERVED: 3
+  };
+  /**
+   * LZ77 の最小マッチ長
+   * @const
+   * @type {number}
+   */
+
+  Zlib.RawDeflate.Lz77MinLength = 3;
+  /**
+   * LZ77 の最大マッチ長
+   * @const
+   * @type {number}
+   */
+
+  Zlib.RawDeflate.Lz77MaxLength = 258;
+  /**
+   * LZ77 のウィンドウサイズ
+   * @const
+   * @type {number}
+   */
+
+  Zlib.RawDeflate.WindowSize = 0x8000;
+  /**
+   * 最長の符号長
+   * @const
+   * @type {number}
+   */
+
+  Zlib.RawDeflate.MaxCodeLength = 16;
+  /**
+   * ハフマン符号の最大数値
+   * @const
+   * @type {number}
+   */
+
+  Zlib.RawDeflate.HUFMAX = 286;
+  /**
+   * 固定ハフマン符号の符号化テーブル
+   * @const
+   * @type {Array.<Array.<number, number>>}
+   */
+
+  Zlib.RawDeflate.FixedHuffmanTable = function () {
+    var table = [],
+        i;
+
+    for (i = 0; i < 288; i++) {
+      switch (true) {
+        case i <= 143:
+          table.push([i + 0x030, 8]);
+          break;
+
+        case i <= 255:
+          table.push([i - 144 + 0x190, 9]);
+          break;
+
+        case i <= 279:
+          table.push([i - 256 + 0x000, 7]);
+          break;
+
+        case i <= 287:
+          table.push([i - 280 + 0x0C0, 8]);
+          break;
+
+        default:
+          throw 'invalid literal: ' + i;
+      }
+    }
+
+    return table;
+  }();
+  /**
+   * DEFLATE ブロックの作成
+   * @return {!(Array.<number>|Uint8Array)} 圧縮済み byte array.
+   */
+
+
+  Zlib.RawDeflate.prototype.compress = function () {
+    /** @type {!(Array.<number>|Uint8Array)} */
+    var blockArray;
+    /** @type {number} */
+
+    var position;
+    /** @type {number} */
+
+    var length;
+    var input = this.input; // compression
+
+    switch (this.compressionType) {
+      case Zlib.RawDeflate.CompressionType.NONE:
+        // each 65535-Byte (length header: 16-bit)
+        for (position = 0, length = input.length; position < length;) {
+          blockArray =  input.subarray(position, position + 0xffff) ;
+          position += blockArray.length;
+          this.makeNocompressBlock(blockArray, position === length);
+        }
+
+        break;
+
+      case Zlib.RawDeflate.CompressionType.FIXED:
+        this.output = this.makeFixedHuffmanBlock(input, true);
+        this.op = this.output.length;
+        break;
+
+      case Zlib.RawDeflate.CompressionType.DYNAMIC:
+        this.output = this.makeDynamicHuffmanBlock(input, true);
+        this.op = this.output.length;
+        break;
+
+      default:
+        throw 'invalid compression type';
+    }
+
+    return this.output;
+  };
+  /**
+   * 非圧縮ブロックの作成
+   * @param {!(Array.<number>|Uint8Array)} blockArray ブロックデータ byte array.
+   * @param {!boolean} isFinalBlock 最後のブロックならばtrue.
+   * @return {!(Array.<number>|Uint8Array)} 非圧縮ブロック byte array.
+   */
+
+
+  Zlib.RawDeflate.prototype.makeNocompressBlock = function (blockArray, isFinalBlock) {
+    /** @type {number} */
+    var bfinal;
+    /** @type {Zlib.RawDeflate.CompressionType} */
+
+    var btype;
+    /** @type {number} */
+
+    var len;
+    /** @type {number} */
+
+    var nlen;
+    var output = this.output;
+    var op = this.op; // expand buffer
+
+    {
+      output = new Uint8Array(this.output.buffer);
+
+      while (output.length <= op + blockArray.length + 5) {
+        output = new Uint8Array(output.length << 1);
+      }
+
+      output.set(this.output);
+    } // header
+
+
+    bfinal = isFinalBlock ? 1 : 0;
+    btype = Zlib.RawDeflate.CompressionType.NONE;
+    output[op++] = bfinal | btype << 1; // length
+
+    len = blockArray.length;
+    nlen = ~len + 0x10000 & 0xffff;
+    output[op++] = len & 0xff;
+    output[op++] = len >>> 8 & 0xff;
+    output[op++] = nlen & 0xff;
+    output[op++] = nlen >>> 8 & 0xff; // copy buffer
+
+    {
+      output.set(blockArray, op);
+      op += blockArray.length;
+      output = output.subarray(0, op);
+    }
+
+    this.op = op;
+    this.output = output;
+    return output;
+  };
+  /**
+   * 固定ハフマンブロックの作成
+   * @param {!(Array.<number>|Uint8Array)} blockArray ブロックデータ byte array.
+   * @param {!boolean} isFinalBlock 最後のブロックならばtrue.
+   * @return {!(Array.<number>|Uint8Array)} 固定ハフマン符号化ブロック byte array.
+   */
+
+
+  Zlib.RawDeflate.prototype.makeFixedHuffmanBlock = function (blockArray, isFinalBlock) {
+    /** @type {Zlib.BitStream} */
+    var stream = new Zlib.BitStream( new Uint8Array(this.output.buffer) , this.op);
+    /** @type {number} */
+
+    var bfinal;
+    /** @type {Zlib.RawDeflate.CompressionType} */
+
+    var btype;
+    /** @type {!(Array.<number>|Uint16Array)} */
+
+    var data; // header
+
+    bfinal = isFinalBlock ? 1 : 0;
+    btype = Zlib.RawDeflate.CompressionType.FIXED;
+    stream.writeBits(bfinal, 1, true);
+    stream.writeBits(btype, 2, true);
+    data = this.lz77(blockArray);
+    this.fixedHuffman(data, stream);
+    return stream.finish();
+  };
+  /**
+   * 動的ハフマンブロックの作成
+   * @param {!(Array.<number>|Uint8Array)} blockArray ブロックデータ byte array.
+   * @param {!boolean} isFinalBlock 最後のブロックならばtrue.
+   * @return {!(Array.<number>|Uint8Array)} 動的ハフマン符号ブロック byte array.
+   */
+
+
+  Zlib.RawDeflate.prototype.makeDynamicHuffmanBlock = function (blockArray, isFinalBlock) {
+    /** @type {Zlib.BitStream} */
+    var stream = new Zlib.BitStream( new Uint8Array(this.output.buffer) , this.op);
+    /** @type {number} */
+
+    var bfinal;
+    /** @type {Zlib.RawDeflate.CompressionType} */
+
+    var btype;
+    /** @type {!(Array.<number>|Uint16Array)} */
+
+    var data;
+    /** @type {number} */
+
+    var hlit;
+    /** @type {number} */
+
+    var hdist;
+    /** @type {number} */
+
+    var hclen;
+    /** @const @type {Array.<number>} */
+
+    var hclenOrder = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15];
+    /** @type {!(Array.<number>|Uint8Array)} */
+
+    var litLenLengths;
+    /** @type {!(Array.<number>|Uint16Array)} */
+
+    var litLenCodes;
+    /** @type {!(Array.<number>|Uint8Array)} */
+
+    var distLengths;
+    /** @type {!(Array.<number>|Uint16Array)} */
+
+    var distCodes;
+    /** @type {{
+     *   codes: !(Array.<number>|Uint32Array),
+     *   freqs: !(Array.<number>|Uint8Array)
+     * }} */
+
+    var treeSymbols;
+    /** @type {!(Array.<number>|Uint8Array)} */
+
+    var treeLengths;
+    /** @type {Array} */
+
+    var transLengths = new Array(19);
+    /** @type {!(Array.<number>|Uint16Array)} */
+
+    var treeCodes;
+    /** @type {number} */
+
+    var code;
+    /** @type {number} */
+
+    var bitlen;
+    /** @type {number} */
+
+    var i;
+    /** @type {number} */
+
+    var il; // header
+
+    bfinal = isFinalBlock ? 1 : 0;
+    btype = Zlib.RawDeflate.CompressionType.DYNAMIC;
+    stream.writeBits(bfinal, 1, true);
+    stream.writeBits(btype, 2, true);
+    data = this.lz77(blockArray); // リテラル・長さ, 距離のハフマン符号と符号長の算出
+
+    litLenLengths = this.getLengths_(this.freqsLitLen, 15);
+    litLenCodes = this.getCodesFromLengths_(litLenLengths);
+    distLengths = this.getLengths_(this.freqsDist, 7);
+    distCodes = this.getCodesFromLengths_(distLengths); // HLIT, HDIST の決定
+
+    for (hlit = 286; hlit > 257 && litLenLengths[hlit - 1] === 0; hlit--) {}
+
+    for (hdist = 30; hdist > 1 && distLengths[hdist - 1] === 0; hdist--) {} // HCLEN
+
+
+    treeSymbols = this.getTreeSymbols_(hlit, litLenLengths, hdist, distLengths);
+    treeLengths = this.getLengths_(treeSymbols.freqs, 7);
+
+    for (i = 0; i < 19; i++) {
+      transLengths[i] = treeLengths[hclenOrder[i]];
+    }
+
+    for (hclen = 19; hclen > 4 && transLengths[hclen - 1] === 0; hclen--) {}
+
+    treeCodes = this.getCodesFromLengths_(treeLengths); // 出力
+
+    stream.writeBits(hlit - 257, 5, true);
+    stream.writeBits(hdist - 1, 5, true);
+    stream.writeBits(hclen - 4, 4, true);
+
+    for (i = 0; i < hclen; i++) {
+      stream.writeBits(transLengths[i], 3, true);
+    } // ツリーの出力
+
+
+    for (i = 0, il = treeSymbols.codes.length; i < il; i++) {
+      code = treeSymbols.codes[i];
+      stream.writeBits(treeCodes[code], treeLengths[code], true); // extra bits
+
+      if (code >= 16) {
+        i++;
+
+        switch (code) {
+          case 16:
+            bitlen = 2;
+            break;
+
+          case 17:
+            bitlen = 3;
+            break;
+
+          case 18:
+            bitlen = 7;
+            break;
+
+          default:
+            throw 'invalid code: ' + code;
+        }
+
+        stream.writeBits(treeSymbols.codes[i], bitlen, true);
+      }
+    }
+
+    this.dynamicHuffman(data, [litLenCodes, litLenLengths], [distCodes, distLengths], stream);
+    return stream.finish();
+  };
+  /**
+   * 動的ハフマン符号化(カスタムハフマンテーブル)
+   * @param {!(Array.<number>|Uint16Array)} dataArray LZ77 符号化済み byte array.
+   * @param {!Zlib.BitStream} stream 書き込み用ビットストリーム.
+   * @return {!Zlib.BitStream} ハフマン符号化済みビットストリームオブジェクト.
+   */
+
+
+  Zlib.RawDeflate.prototype.dynamicHuffman = function (dataArray, litLen, dist, stream) {
+    /** @type {number} */
+    var index;
+    /** @type {number} */
+
+    var length;
+    /** @type {number} */
+
+    var literal;
+    /** @type {number} */
+
+    var code;
+    /** @type {number} */
+
+    var litLenCodes;
+    /** @type {number} */
+
+    var litLenLengths;
+    /** @type {number} */
+
+    var distCodes;
+    /** @type {number} */
+
+    var distLengths;
+    litLenCodes = litLen[0];
+    litLenLengths = litLen[1];
+    distCodes = dist[0];
+    distLengths = dist[1]; // 符号を BitStream に書き込んでいく
+
+    for (index = 0, length = dataArray.length; index < length; ++index) {
+      literal = dataArray[index]; // literal or length
+
+      stream.writeBits(litLenCodes[literal], litLenLengths[literal], true); // 長さ・距離符号
+
+      if (literal > 256) {
+        // length extra
+        stream.writeBits(dataArray[++index], dataArray[++index], true); // distance
+
+        code = dataArray[++index];
+        stream.writeBits(distCodes[code], distLengths[code], true); // distance extra
+
+        stream.writeBits(dataArray[++index], dataArray[++index], true); // 終端
+      } else if (literal === 256) {
+        break;
+      }
+    }
+
+    return stream;
+  };
+  /**
+   * 固定ハフマン符号化
+   * @param {!(Array.<number>|Uint16Array)} dataArray LZ77 符号化済み byte array.
+   * @param {!Zlib.BitStream} stream 書き込み用ビットストリーム.
+   * @return {!Zlib.BitStream} ハフマン符号化済みビットストリームオブジェクト.
+   */
+
+
+  Zlib.RawDeflate.prototype.fixedHuffman = function (dataArray, stream) {
+    /** @type {number} */
+    var index;
+    /** @type {number} */
+
+    var length;
+    /** @type {number} */
+
+    var literal; // 符号を BitStream に書き込んでいく
+
+    for (index = 0, length = dataArray.length; index < length; index++) {
+      literal = dataArray[index]; // 符号の書き込み
+
+      Zlib.BitStream.prototype.writeBits.apply(stream, Zlib.RawDeflate.FixedHuffmanTable[literal]); // 長さ・距離符号
+
+      if (literal > 0x100) {
+        // length extra
+        stream.writeBits(dataArray[++index], dataArray[++index], true); // distance
+
+        stream.writeBits(dataArray[++index], 5); // distance extra
+
+        stream.writeBits(dataArray[++index], dataArray[++index], true); // 終端
+      } else if (literal === 0x100) {
+        break;
+      }
+    }
+
+    return stream;
+  };
+  /**
+   * マッチ情報
+   * @param {!number} length マッチした長さ.
+   * @param {!number} backwardDistance マッチ位置との距離.
+   * @constructor
+   */
+
+
+  Zlib.RawDeflate.Lz77Match = function (length, backwardDistance) {
+    /** @type {number} match length. */
+    this.length = length;
+    /** @type {number} backward distance. */
+
+    this.backwardDistance = backwardDistance;
+  };
+  /**
+   * 長さ符号テーブル.
+   * [コード, 拡張ビット, 拡張ビット長] の配列となっている.
+   * @const
+   * @type {!(Array.<number>|Uint32Array)}
+   */
+
+
+  Zlib.RawDeflate.Lz77Match.LengthCodeTable = function (table) {
+    return  new Uint32Array(table) ;
+  }(function () {
+    /** @type {!Array} */
+    var table = [];
+    /** @type {number} */
+
+    var i;
+    /** @type {!Array.<number>} */
+
+    var c;
+
+    for (i = 3; i <= 258; i++) {
+      c = code(i);
+      table[i] = c[2] << 24 | c[1] << 16 | c[0];
+    }
+    /**
+     * @param {number} length lz77 length.
+     * @return {!Array.<number>} lz77 codes.
+     */
+
+
+    function code(length) {
+      switch (true) {
+        case length === 3:
+          return [257, length - 3, 0];
+          break;
+
+        case length === 4:
+          return [258, length - 4, 0];
+          break;
+
+        case length === 5:
+          return [259, length - 5, 0];
+          break;
+
+        case length === 6:
+          return [260, length - 6, 0];
+          break;
+
+        case length === 7:
+          return [261, length - 7, 0];
+          break;
+
+        case length === 8:
+          return [262, length - 8, 0];
+          break;
+
+        case length === 9:
+          return [263, length - 9, 0];
+          break;
+
+        case length === 10:
+          return [264, length - 10, 0];
+          break;
+
+        case length <= 12:
+          return [265, length - 11, 1];
+          break;
+
+        case length <= 14:
+          return [266, length - 13, 1];
+          break;
+
+        case length <= 16:
+          return [267, length - 15, 1];
+          break;
+
+        case length <= 18:
+          return [268, length - 17, 1];
+          break;
+
+        case length <= 22:
+          return [269, length - 19, 2];
+          break;
+
+        case length <= 26:
+          return [270, length - 23, 2];
+          break;
+
+        case length <= 30:
+          return [271, length - 27, 2];
+          break;
+
+        case length <= 34:
+          return [272, length - 31, 2];
+          break;
+
+        case length <= 42:
+          return [273, length - 35, 3];
+          break;
+
+        case length <= 50:
+          return [274, length - 43, 3];
+          break;
+
+        case length <= 58:
+          return [275, length - 51, 3];
+          break;
+
+        case length <= 66:
+          return [276, length - 59, 3];
+          break;
+
+        case length <= 82:
+          return [277, length - 67, 4];
+          break;
+
+        case length <= 98:
+          return [278, length - 83, 4];
+          break;
+
+        case length <= 114:
+          return [279, length - 99, 4];
+          break;
+
+        case length <= 130:
+          return [280, length - 115, 4];
+          break;
+
+        case length <= 162:
+          return [281, length - 131, 5];
+          break;
+
+        case length <= 194:
+          return [282, length - 163, 5];
+          break;
+
+        case length <= 226:
+          return [283, length - 195, 5];
+          break;
+
+        case length <= 257:
+          return [284, length - 227, 5];
+          break;
+
+        case length === 258:
+          return [285, length - 258, 0];
+          break;
+
+        default:
+          throw 'invalid length: ' + length;
+      }
+    }
+
+    return table;
+  }());
+  /**
+   * 距離符号テーブル
+   * @param {!number} dist 距離.
+   * @return {!Array.<number>} コード、拡張ビット、拡張ビット長の配列.
+   * @private
+   */
+
+
+  Zlib.RawDeflate.Lz77Match.prototype.getDistanceCode_ = function (dist) {
+    /** @type {!Array.<number>} distance code table. */
+    var r;
+
+    switch (true) {
+      case dist === 1:
+        r = [0, dist - 1, 0];
+        break;
+
+      case dist === 2:
+        r = [1, dist - 2, 0];
+        break;
+
+      case dist === 3:
+        r = [2, dist - 3, 0];
+        break;
+
+      case dist === 4:
+        r = [3, dist - 4, 0];
+        break;
+
+      case dist <= 6:
+        r = [4, dist - 5, 1];
+        break;
+
+      case dist <= 8:
+        r = [5, dist - 7, 1];
+        break;
+
+      case dist <= 12:
+        r = [6, dist - 9, 2];
+        break;
+
+      case dist <= 16:
+        r = [7, dist - 13, 2];
+        break;
+
+      case dist <= 24:
+        r = [8, dist - 17, 3];
+        break;
+
+      case dist <= 32:
+        r = [9, dist - 25, 3];
+        break;
+
+      case dist <= 48:
+        r = [10, dist - 33, 4];
+        break;
+
+      case dist <= 64:
+        r = [11, dist - 49, 4];
+        break;
+
+      case dist <= 96:
+        r = [12, dist - 65, 5];
+        break;
+
+      case dist <= 128:
+        r = [13, dist - 97, 5];
+        break;
+
+      case dist <= 192:
+        r = [14, dist - 129, 6];
+        break;
+
+      case dist <= 256:
+        r = [15, dist - 193, 6];
+        break;
+
+      case dist <= 384:
+        r = [16, dist - 257, 7];
+        break;
+
+      case dist <= 512:
+        r = [17, dist - 385, 7];
+        break;
+
+      case dist <= 768:
+        r = [18, dist - 513, 8];
+        break;
+
+      case dist <= 1024:
+        r = [19, dist - 769, 8];
+        break;
+
+      case dist <= 1536:
+        r = [20, dist - 1025, 9];
+        break;
+
+      case dist <= 2048:
+        r = [21, dist - 1537, 9];
+        break;
+
+      case dist <= 3072:
+        r = [22, dist - 2049, 10];
+        break;
+
+      case dist <= 4096:
+        r = [23, dist - 3073, 10];
+        break;
+
+      case dist <= 6144:
+        r = [24, dist - 4097, 11];
+        break;
+
+      case dist <= 8192:
+        r = [25, dist - 6145, 11];
+        break;
+
+      case dist <= 12288:
+        r = [26, dist - 8193, 12];
+        break;
+
+      case dist <= 16384:
+        r = [27, dist - 12289, 12];
+        break;
+
+      case dist <= 24576:
+        r = [28, dist - 16385, 13];
+        break;
+
+      case dist <= 32768:
+        r = [29, dist - 24577, 13];
+        break;
+
+      default:
+        throw 'invalid distance';
+    }
+
+    return r;
+  };
+  /**
+   * マッチ情報を LZ77 符号化配列で返す.
+   * なお、ここでは以下の内部仕様で符号化している
+   * [ CODE, EXTRA-BIT-LEN, EXTRA, CODE, EXTRA-BIT-LEN, EXTRA ]
+   * @return {!Array.<number>} LZ77 符号化 byte array.
+   */
+
+
+  Zlib.RawDeflate.Lz77Match.prototype.toLz77Array = function () {
+    /** @type {number} */
+    var length = this.length;
+    /** @type {number} */
+
+    var dist = this.backwardDistance;
+    /** @type {Array} */
+
+    var codeArray = [];
+    /** @type {number} */
+
+    var pos = 0;
+    /** @type {!Array.<number>} */
+
+    var code; // length
+
+    code = Zlib.RawDeflate.Lz77Match.LengthCodeTable[length];
+    codeArray[pos++] = code & 0xffff;
+    codeArray[pos++] = code >> 16 & 0xff;
+    codeArray[pos++] = code >> 24; // distance
+
+    code = this.getDistanceCode_(dist);
+    codeArray[pos++] = code[0];
+    codeArray[pos++] = code[1];
+    codeArray[pos++] = code[2];
+    return codeArray;
+  };
+  /**
+   * LZ77 実装
+   * @param {!(Array.<number>|Uint8Array)} dataArray LZ77 符号化するバイト配列.
+   * @return {!(Array.<number>|Uint16Array)} LZ77 符号化した配列.
+   */
+
+
+  Zlib.RawDeflate.prototype.lz77 = function (dataArray) {
+    /** @type {number} input position */
+    var position;
+    /** @type {number} input length */
+
+    var length;
+    /** @type {number} loop counter */
+
+    var i;
+    /** @type {number} loop limiter */
+
+    var il;
+    /** @type {number} chained-hash-table key */
+
+    var matchKey;
+    /** @type {Object.<number, Array.<number>>} chained-hash-table */
+
+    var table = {};
+    /** @const @type {number} */
+
+    var windowSize = Zlib.RawDeflate.WindowSize;
+    /** @type {Array.<number>} match list */
+
+    var matchList;
+    /** @type {Zlib.RawDeflate.Lz77Match} longest match */
+
+    var longestMatch;
+    /** @type {Zlib.RawDeflate.Lz77Match} previous longest match */
+
+    var prevMatch;
+    /** @type {!(Array.<number>|Uint16Array)} lz77 buffer */
+
+    var lz77buf =  new Uint16Array(dataArray.length * 2) ;
+    /** @type {number} lz77 output buffer pointer */
+
+    var pos = 0;
+    /** @type {number} lz77 skip length */
+
+    var skipLength = 0;
+    /** @type {!(Array.<number>|Uint32Array)} */
+
+    var freqsLitLen = new ( Uint32Array )(286);
+    /** @type {!(Array.<number>|Uint32Array)} */
+
+    var freqsDist = new ( Uint32Array )(30);
+    /** @type {number} */
+
+    var lazy = this.lazy;
+    /** @type {*} temporary variable */
+
+    var tmp; // 初期化
+
+    freqsLitLen[256] = 1; // EOB の最低出現回数は 1
+
+    /**
+     * マッチデータの書き込み
+     * @param {Zlib.RawDeflate.Lz77Match} match LZ77 Match data.
+     * @param {!number} offset スキップ開始位置(相対指定).
+     * @private
+     */
+
+    function writeMatch(match, offset) {
+      /** @type {Array.<number>} */
+      var lz77Array = match.toLz77Array();
+      /** @type {number} */
+
+      var i;
+      /** @type {number} */
+
+      var il;
+
+      for (i = 0, il = lz77Array.length; i < il; ++i) {
+        lz77buf[pos++] = lz77Array[i];
+      }
+
+      freqsLitLen[lz77Array[0]]++;
+      freqsDist[lz77Array[3]]++;
+      skipLength = match.length + offset - 1;
+      prevMatch = null;
+    } // LZ77 符号化
+
+
+    for (position = 0, length = dataArray.length; position < length; ++position) {
+      // ハッシュキーの作成
+      for (matchKey = 0, i = 0, il = Zlib.RawDeflate.Lz77MinLength; i < il; ++i) {
+        if (position + i === length) {
+          break;
+        }
+
+        matchKey = matchKey << 8 | dataArray[position + i];
+      } // テーブルが未定義だったら作成する
+
+
+      if (table[matchKey] === void 0) {
+        table[matchKey] = [];
+      }
+
+      matchList = table[matchKey]; // skip
+
+      if (skipLength-- > 0) {
+        matchList.push(position);
+        continue;
+      } // マッチテーブルの更新 (最大戻り距離を超えているものを削除する)
+
+
+      while (matchList.length > 0 && position - matchList[0] > windowSize) {
+        matchList.shift();
+      } // データ末尾でマッチしようがない場合はそのまま流しこむ
+
+
+      if (position + Zlib.RawDeflate.Lz77MinLength >= length) {
+        if (prevMatch) {
+          writeMatch(prevMatch, -1);
+        }
+
+        for (i = 0, il = length - position; i < il; ++i) {
+          tmp = dataArray[position + i];
+          lz77buf[pos++] = tmp;
+          ++freqsLitLen[tmp];
+        }
+
+        break;
+      } // マッチ候補から最長のものを探す
+
+
+      if (matchList.length > 0) {
+        longestMatch = this.searchLongestMatch_(dataArray, position, matchList);
+
+        if (prevMatch) {
+          // 現在のマッチの方が前回のマッチよりも長い
+          if (prevMatch.length < longestMatch.length) {
+            // write previous literal
+            tmp = dataArray[position - 1];
+            lz77buf[pos++] = tmp;
+            ++freqsLitLen[tmp]; // write current match
+
+            writeMatch(longestMatch, 0);
+          } else {
+            // write previous match
+            writeMatch(prevMatch, -1);
+          }
+        } else if (longestMatch.length < lazy) {
+          prevMatch = longestMatch;
+        } else {
+          writeMatch(longestMatch, 0);
+        } // 前回マッチしていて今回マッチがなかったら前回のを採用
+
+      } else if (prevMatch) {
+        writeMatch(prevMatch, -1);
+      } else {
+        tmp = dataArray[position];
+        lz77buf[pos++] = tmp;
+        ++freqsLitLen[tmp];
+      }
+
+      matchList.push(position); // マッチテーブルに現在の位置を保存
+    } // 終端処理
+
+
+    lz77buf[pos++] = 256;
+    freqsLitLen[256]++;
+    this.freqsLitLen = freqsLitLen;
+    this.freqsDist = freqsDist;
+    return (
+      /** @type {!(Uint16Array|Array.<number>)} */
+       lz77buf.subarray(0, pos) 
+    );
+  };
+  /**
+   * マッチした候補の中から最長一致を探す
+   * @param {!Object} data plain data byte array.
+   * @param {!number} position plain data byte array position.
+   * @param {!Array.<number>} matchList 候補となる位置の配列.
+   * @return {!Zlib.RawDeflate.Lz77Match} 最長かつ最短距離のマッチオブジェクト.
+   * @private
+   */
+
+
+  Zlib.RawDeflate.prototype.searchLongestMatch_ = function (data, position, matchList) {
+    var match,
+        currentMatch,
+        matchMax = 0,
+        matchLength,
+        i,
+        j,
+        l,
+        dl = data.length; // 候補を後ろから 1 つずつ絞り込んでゆく
+
+    permatch: for (i = 0, l = matchList.length; i < l; i++) {
+      match = matchList[l - i - 1];
+      matchLength = Zlib.RawDeflate.Lz77MinLength; // 前回までの最長一致を末尾から一致検索する
+
+      if (matchMax > Zlib.RawDeflate.Lz77MinLength) {
+        for (j = matchMax; j > Zlib.RawDeflate.Lz77MinLength; j--) {
+          if (data[match + j - 1] !== data[position + j - 1]) {
+            continue permatch;
+          }
+        }
+
+        matchLength = matchMax;
+      } // 最長一致探索
+
+
+      while (matchLength < Zlib.RawDeflate.Lz77MaxLength && position + matchLength < dl && data[match + matchLength] === data[position + matchLength]) {
+        ++matchLength;
+      } // マッチ長が同じ場合は後方を優先
+
+
+      if (matchLength > matchMax) {
+        currentMatch = match;
+        matchMax = matchLength;
+      } // 最長が確定したら後の処理は省略
+
+
+      if (matchLength === Zlib.RawDeflate.Lz77MaxLength) {
+        break;
+      }
+    }
+
+    return new Zlib.RawDeflate.Lz77Match(matchMax, position - currentMatch);
+  };
+  /**
+   * Tree-Transmit Symbols の算出
+   * reference: PuTTY Deflate implementation
+   * @param {number} hlit HLIT.
+   * @param {!(Array.<number>|Uint8Array)} litlenLengths リテラルと長さ符号の符号長配列.
+   * @param {number} hdist HDIST.
+   * @param {!(Array.<number>|Uint8Array)} distLengths 距離符号の符号長配列.
+   * @return {{
+   *   codes: !(Array.<number>|Uint32Array),
+   *   freqs: !(Array.<number>|Uint8Array)
+   * }} Tree-Transmit Symbols.
+   */
+
+
+  Zlib.RawDeflate.prototype.getTreeSymbols_ = function (hlit, litlenLengths, hdist, distLengths) {
+    var src = new ( Uint32Array )(hlit + hdist),
+        i,
+        j,
+        runLength,
+        l,
+        result = new ( Uint32Array )(286 + 30),
+        nResult,
+        rpt,
+        freqs = new ( Uint8Array )(19);
+    j = 0;
+
+    for (i = 0; i < hlit; i++) {
+      src[j++] = litlenLengths[i];
+    }
+
+    for (i = 0; i < hdist; i++) {
+      src[j++] = distLengths[i];
+    } // 初期化
+
+
+    nResult = 0;
+
+    for (i = 0, l = src.length; i < l; i += j) {
+      // Run Length Encoding
+      for (j = 1; i + j < l && src[i + j] === src[i]; ++j) {}
+
+      runLength = j;
+
+      if (src[i] === 0) {
+        // 0 の繰り返しが 3 回未満ならばそのまま
+        if (runLength < 3) {
+          while (runLength-- > 0) {
+            result[nResult++] = 0;
+            freqs[0]++;
+          }
+        } else {
+          while (runLength > 0) {
+            // 繰り返しは最大 138 までなので切り詰める
+            rpt = runLength < 138 ? runLength : 138;
+
+            if (rpt > runLength - 3 && rpt < runLength) {
+              rpt = runLength - 3;
+            } // 3-10 回 -> 17
+
+
+            if (rpt <= 10) {
+              result[nResult++] = 17;
+              result[nResult++] = rpt - 3;
+              freqs[17]++; // 11-138 回 -> 18
+            } else {
+              result[nResult++] = 18;
+              result[nResult++] = rpt - 11;
+              freqs[18]++;
+            }
+
+            runLength -= rpt;
+          }
+        }
+      } else {
+        result[nResult++] = src[i];
+        freqs[src[i]]++;
+        runLength--; // 繰り返し回数が3回未満ならばランレングス符号は要らない
+
+        if (runLength < 3) {
+          while (runLength-- > 0) {
+            result[nResult++] = src[i];
+            freqs[src[i]]++;
+          } // 3 回以上ならばランレングス符号化
+
+        } else {
+          while (runLength > 0) {
+            // runLengthを 3-6 で分割
+            rpt = runLength < 6 ? runLength : 6;
+
+            if (rpt > runLength - 3 && rpt < runLength) {
+              rpt = runLength - 3;
+            }
+
+            result[nResult++] = 16;
+            result[nResult++] = rpt - 3;
+            freqs[16]++;
+            runLength -= rpt;
+          }
+        }
+      }
+    }
+
+    return {
+      codes:  result.subarray(0, nResult) ,
+      freqs: freqs
+    };
+  };
+  /**
+   * ハフマン符号の長さを取得する
+   * @param {!(Array.<number>|Uint8Array|Uint32Array)} freqs 出現カウント.
+   * @param {number} limit 符号長の制限.
+   * @return {!(Array.<number>|Uint8Array)} 符号長配列.
+   * @private
+   */
+
+
+  Zlib.RawDeflate.prototype.getLengths_ = function (freqs, limit) {
+    /** @type {number} */
+    var nSymbols = freqs.length;
+    /** @type {Zlib.Heap} */
+
+    var heap = new Zlib.Heap(2 * Zlib.RawDeflate.HUFMAX);
+    /** @type {!(Array.<number>|Uint8Array)} */
+
+    var length = new ( Uint8Array )(nSymbols);
+    /** @type {Array} */
+
+    var nodes;
+    /** @type {!(Array.<number>|Uint32Array)} */
+
+    var values;
+    /** @type {!(Array.<number>|Uint8Array)} */
+
+    var codeLength;
+    /** @type {number} */
+
+    var i;
+    /** @type {number} */
+
+    var il; // 配列の初期化
+
+
+    for (i = 0; i < nSymbols; ++i) {
+      if (freqs[i] > 0) {
+        heap.push(i, freqs[i]);
+      }
+    }
+
+    nodes = new Array(heap.length / 2);
+    values = new ( Uint32Array )(heap.length / 2); // 非 0 の要素が一つだけだった場合は、そのシンボルに符号長 1 を割り当てて終了
+
+    if (nodes.length === 1) {
+      length[heap.pop().index] = 1;
+      return length;
+    } // Reverse Package Merge Algorithm による Canonical Huffman Code の符号長決定
+
+
+    for (i = 0, il = heap.length / 2; i < il; ++i) {
+      nodes[i] = heap.pop();
+      values[i] = nodes[i].value;
+    }
+
+    codeLength = this.reversePackageMerge_(values, values.length, limit);
+
+    for (i = 0, il = nodes.length; i < il; ++i) {
+      length[nodes[i].index] = codeLength[i];
+    }
+
+    return length;
+  };
+  /**
+   * Reverse Package Merge Algorithm.
+   * @param {!(Array.<number>|Uint32Array)} freqs sorted probability.
+   * @param {number} symbols number of symbols.
+   * @param {number} limit code length limit.
+   * @return {!(Array.<number>|Uint8Array)} code lengths.
+   */
+
+
+  Zlib.RawDeflate.prototype.reversePackageMerge_ = function (freqs, symbols, limit) {
+    /** @type {!(Array.<number>|Uint16Array)} */
+    var minimumCost = new ( Uint16Array )(limit);
+    /** @type {!(Array.<number>|Uint8Array)} */
+
+    var flag = new ( Uint8Array )(limit);
+    /** @type {!(Array.<number>|Uint8Array)} */
+
+    var codeLength = new ( Uint8Array )(symbols);
+    /** @type {Array} */
+
+    var value = new Array(limit);
+    /** @type {Array} */
+
+    var type = new Array(limit);
+    /** @type {Array.<number>} */
+
+    var currentPosition = new Array(limit);
+    /** @type {number} */
+
+    var excess = (1 << limit) - symbols;
+    /** @type {number} */
+
+    var half = 1 << limit - 1;
+    /** @type {number} */
+
+    var i;
+    /** @type {number} */
+
+    var j;
+    /** @type {number} */
+
+    var t;
+    /** @type {number} */
+
+    var weight;
+    /** @type {number} */
+
+    var next;
+    /**
+     * @param {number} j
+     */
+
+    function takePackage(j) {
+      /** @type {number} */
+      var x = type[j][currentPosition[j]];
+
+      if (x === symbols) {
+        takePackage(j + 1);
+        takePackage(j + 1);
+      } else {
+        --codeLength[x];
+      }
+
+      ++currentPosition[j];
+    }
+
+    minimumCost[limit - 1] = symbols;
+
+    for (j = 0; j < limit; ++j) {
+      if (excess < half) {
+        flag[j] = 0;
+      } else {
+        flag[j] = 1;
+        excess -= half;
+      }
+
+      excess <<= 1;
+      minimumCost[limit - 2 - j] = (minimumCost[limit - 1 - j] / 2 | 0) + symbols;
+    }
+
+    minimumCost[0] = flag[0];
+    value[0] = new Array(minimumCost[0]);
+    type[0] = new Array(minimumCost[0]);
+
+    for (j = 1; j < limit; ++j) {
+      if (minimumCost[j] > 2 * minimumCost[j - 1] + flag[j]) {
+        minimumCost[j] = 2 * minimumCost[j - 1] + flag[j];
+      }
+
+      value[j] = new Array(minimumCost[j]);
+      type[j] = new Array(minimumCost[j]);
+    }
+
+    for (i = 0; i < symbols; ++i) {
+      codeLength[i] = limit;
+    }
+
+    for (t = 0; t < minimumCost[limit - 1]; ++t) {
+      value[limit - 1][t] = freqs[t];
+      type[limit - 1][t] = t;
+    }
+
+    for (i = 0; i < limit; ++i) {
+      currentPosition[i] = 0;
+    }
+
+    if (flag[limit - 1] === 1) {
+      --codeLength[0];
+      ++currentPosition[limit - 1];
+    }
+
+    for (j = limit - 2; j >= 0; --j) {
+      i = 0;
+      weight = 0;
+      next = currentPosition[j + 1];
+
+      for (t = 0; t < minimumCost[j]; t++) {
+        weight = value[j + 1][next] + value[j + 1][next + 1];
+
+        if (weight > freqs[i]) {
+          value[j][t] = weight;
+          type[j][t] = symbols;
+          next += 2;
+        } else {
+          value[j][t] = freqs[i];
+          type[j][t] = i;
+          ++i;
+        }
+      }
+
+      currentPosition[j] = 0;
+
+      if (flag[j] === 1) {
+        takePackage(j);
+      }
+    }
+
+    return codeLength;
+  };
+  /**
+   * 符号長配列からハフマン符号を取得する
+   * reference: PuTTY Deflate implementation
+   * @param {!(Array.<number>|Uint8Array)} lengths 符号長配列.
+   * @return {!(Array.<number>|Uint16Array)} ハフマン符号配列.
+   * @private
+   */
+
+
+  Zlib.RawDeflate.prototype.getCodesFromLengths_ = function (lengths) {
+    var codes = new ( Uint16Array )(lengths.length),
+        count = [],
+        startCode = [],
+        code = 0,
+        i,
+        il,
+        j,
+        m; // Count the codes of each length.
+
+    for (i = 0, il = lengths.length; i < il; i++) {
+      count[lengths[i]] = (count[lengths[i]] | 0) + 1;
+    } // Determine the starting code for each length block.
+
+
+    for (i = 1, il = Zlib.RawDeflate.MaxCodeLength; i <= il; i++) {
+      startCode[i] = code;
+      code += count[i] | 0;
+      code <<= 1;
+    } // Determine the code for each symbol. Mirrored, of course.
+
+
+    for (i = 0, il = lengths.length; i < il; i++) {
+      code = startCode[lengths[i]];
+      startCode[lengths[i]] += 1;
+      codes[i] = 0;
+
+      for (j = 0, m = lengths[i]; j < m; j++) {
+        codes[i] = codes[i] << 1 | code & 1;
+        code >>>= 1;
+      }
+    }
+
+    return codes;
+  };
+  /**
+   * @param {!(Array.<number>|Uint8Array)} input input buffer.
+   * @param {Object=} opt_params options.
+   * @constructor
+   */
+
+
+  Zlib.Unzip = function (input, opt_params) {
+    opt_params = opt_params || {};
+    /** @type {!(Array.<number>|Uint8Array)} */
+
+    this.input =  input instanceof Array ? new Uint8Array(input) : input;
+    /** @type {number} */
+
+    this.ip = 0;
+    /** @type {number} */
+
+    this.eocdrOffset;
+    /** @type {number} */
+
+    this.numberOfThisDisk;
+    /** @type {number} */
+
+    this.startDisk;
+    /** @type {number} */
+
+    this.totalEntriesThisDisk;
+    /** @type {number} */
+
+    this.totalEntries;
+    /** @type {number} */
+
+    this.centralDirectorySize;
+    /** @type {number} */
+
+    this.centralDirectoryOffset;
+    /** @type {number} */
+
+    this.commentLength;
+    /** @type {(Array.<number>|Uint8Array)} */
+
+    this.comment;
+    /** @type {Array.<Zlib.Unzip.FileHeader>} */
+
+    this.fileHeaderList;
+    /** @type {Object.<string, number>} */
+
+    this.filenameToIndex;
+    /** @type {boolean} */
+
+    this.verify = opt_params['verify'] || false;
+    /** @type {(Array.<number>|Uint8Array)} */
+
+    this.password = opt_params['password'];
+  };
+
+  Zlib.Unzip.CompressionMethod = Zlib.Zip.CompressionMethod;
+  /**
+   * @type {Array.<number>}
+   * @const
+   */
+
+  Zlib.Unzip.FileHeaderSignature = Zlib.Zip.FileHeaderSignature;
+  /**
+   * @type {Array.<number>}
+   * @const
+   */
+
+  Zlib.Unzip.LocalFileHeaderSignature = Zlib.Zip.LocalFileHeaderSignature;
+  /**
+   * @type {Array.<number>}
+   * @const
+   */
+
+  Zlib.Unzip.CentralDirectorySignature = Zlib.Zip.CentralDirectorySignature;
+  /**
+   * @param {!(Array.<number>|Uint8Array)} input input buffer.
+   * @param {number} ip input position.
+   * @constructor
+   */
+
+  Zlib.Unzip.FileHeader = function (input, ip) {
+    /** @type {!(Array.<number>|Uint8Array)} */
+    this.input = input;
+    /** @type {number} */
+
+    this.offset = ip;
+    /** @type {number} */
+
+    this.length;
+    /** @type {number} */
+
+    this.version;
+    /** @type {number} */
+
+    this.os;
+    /** @type {number} */
+
+    this.needVersion;
+    /** @type {number} */
+
+    this.flags;
+    /** @type {number} */
+
+    this.compression;
+    /** @type {number} */
+
+    this.time;
+    /** @type {number} */
+
+    this.date;
+    /** @type {number} */
+
+    this.crc32;
+    /** @type {number} */
+
+    this.compressedSize;
+    /** @type {number} */
+
+    this.plainSize;
+    /** @type {number} */
+
+    this.fileNameLength;
+    /** @type {number} */
+
+    this.extraFieldLength;
+    /** @type {number} */
+
+    this.fileCommentLength;
+    /** @type {number} */
+
+    this.diskNumberStart;
+    /** @type {number} */
+
+    this.internalFileAttributes;
+    /** @type {number} */
+
+    this.externalFileAttributes;
+    /** @type {number} */
+
+    this.relativeOffset;
+    /** @type {string} */
+
+    this.filename;
+    /** @type {!(Array.<number>|Uint8Array)} */
+
+    this.extraField;
+    /** @type {!(Array.<number>|Uint8Array)} */
+
+    this.comment;
+  };
+
+  Zlib.Unzip.FileHeader.prototype.parse = function () {
+    /** @type {!(Array.<number>|Uint8Array)} */
+    var input = this.input;
+    /** @type {number} */
+
+    var ip = this.offset; // central file header signature
+
+    if (input[ip++] !== Zlib.Unzip.FileHeaderSignature[0] || input[ip++] !== Zlib.Unzip.FileHeaderSignature[1] || input[ip++] !== Zlib.Unzip.FileHeaderSignature[2] || input[ip++] !== Zlib.Unzip.FileHeaderSignature[3]) {
+      throw new Error('invalid file header signature');
+    } // version made by
+
+
+    this.version = input[ip++];
+    this.os = input[ip++]; // version needed to extract
+
+    this.needVersion = input[ip++] | input[ip++] << 8; // general purpose bit flag
+
+    this.flags = input[ip++] | input[ip++] << 8; // compression method
+
+    this.compression = input[ip++] | input[ip++] << 8; // last mod file time
+
+    this.time = input[ip++] | input[ip++] << 8; //last mod file date
+
+    this.date = input[ip++] | input[ip++] << 8; // crc-32
+
+    this.crc32 = (input[ip++] | input[ip++] << 8 | input[ip++] << 16 | input[ip++] << 24) >>> 0; // compressed size
+
+    this.compressedSize = (input[ip++] | input[ip++] << 8 | input[ip++] << 16 | input[ip++] << 24) >>> 0; // uncompressed size
+
+    this.plainSize = (input[ip++] | input[ip++] << 8 | input[ip++] << 16 | input[ip++] << 24) >>> 0; // file name length
+
+    this.fileNameLength = input[ip++] | input[ip++] << 8; // extra field length
+
+    this.extraFieldLength = input[ip++] | input[ip++] << 8; // file comment length
+
+    this.fileCommentLength = input[ip++] | input[ip++] << 8; // disk number start
+
+    this.diskNumberStart = input[ip++] | input[ip++] << 8; // internal file attributes
+
+    this.internalFileAttributes = input[ip++] | input[ip++] << 8; // external file attributes
+
+    this.externalFileAttributes = input[ip++] | input[ip++] << 8 | input[ip++] << 16 | input[ip++] << 24; // relative offset of local header
+
+    this.relativeOffset = (input[ip++] | input[ip++] << 8 | input[ip++] << 16 | input[ip++] << 24) >>> 0; // file name
+
+    this.filename = String.fromCharCode.apply(null,  input.subarray(ip, ip += this.fileNameLength) ); // extra field
+
+    this.extraField =  input.subarray(ip, ip += this.extraFieldLength) ; // file comment
+
+    this.comment =  input.subarray(ip, ip + this.fileCommentLength) ;
+    this.length = ip - this.offset;
+  };
+  /**
+   * @param {!(Array.<number>|Uint8Array)} input input buffer.
+   * @param {number} ip input position.
+   * @constructor
+   */
+
+
+  Zlib.Unzip.LocalFileHeader = function (input, ip) {
+    /** @type {!(Array.<number>|Uint8Array)} */
+    this.input = input;
+    /** @type {number} */
+
+    this.offset = ip;
+    /** @type {number} */
+
+    this.length;
+    /** @type {number} */
+
+    this.needVersion;
+    /** @type {number} */
+
+    this.flags;
+    /** @type {number} */
+
+    this.compression;
+    /** @type {number} */
+
+    this.time;
+    /** @type {number} */
+
+    this.date;
+    /** @type {number} */
+
+    this.crc32;
+    /** @type {number} */
+
+    this.compressedSize;
+    /** @type {number} */
+
+    this.plainSize;
+    /** @type {number} */
+
+    this.fileNameLength;
+    /** @type {number} */
+
+    this.extraFieldLength;
+    /** @type {string} */
+
+    this.filename;
+    /** @type {!(Array.<number>|Uint8Array)} */
+
+    this.extraField;
+  };
+
+  Zlib.Unzip.LocalFileHeader.Flags = Zlib.Zip.Flags;
+
+  Zlib.Unzip.LocalFileHeader.prototype.parse = function () {
+    /** @type {!(Array.<number>|Uint8Array)} */
+    var input = this.input;
+    /** @type {number} */
+
+    var ip = this.offset; // local file header signature
+
+    if (input[ip++] !== Zlib.Unzip.LocalFileHeaderSignature[0] || input[ip++] !== Zlib.Unzip.LocalFileHeaderSignature[1] || input[ip++] !== Zlib.Unzip.LocalFileHeaderSignature[2] || input[ip++] !== Zlib.Unzip.LocalFileHeaderSignature[3]) {
+      throw new Error('invalid local file header signature');
+    } // version needed to extract
+
+
+    this.needVersion = input[ip++] | input[ip++] << 8; // general purpose bit flag
+
+    this.flags = input[ip++] | input[ip++] << 8; // compression method
+
+    this.compression = input[ip++] | input[ip++] << 8; // last mod file time
+
+    this.time = input[ip++] | input[ip++] << 8; //last mod file date
+
+    this.date = input[ip++] | input[ip++] << 8; // crc-32
+
+    this.crc32 = (input[ip++] | input[ip++] << 8 | input[ip++] << 16 | input[ip++] << 24) >>> 0; // compressed size
+
+    this.compressedSize = (input[ip++] | input[ip++] << 8 | input[ip++] << 16 | input[ip++] << 24) >>> 0; // uncompressed size
+
+    this.plainSize = (input[ip++] | input[ip++] << 8 | input[ip++] << 16 | input[ip++] << 24) >>> 0; // file name length
+
+    this.fileNameLength = input[ip++] | input[ip++] << 8; // extra field length
+
+    this.extraFieldLength = input[ip++] | input[ip++] << 8; // file name
+
+    this.filename = String.fromCharCode.apply(null,  input.subarray(ip, ip += this.fileNameLength) ); // extra field
+
+    this.extraField =  input.subarray(ip, ip += this.extraFieldLength) ;
+    this.length = ip - this.offset;
+  };
+
+  Zlib.Unzip.prototype.searchEndOfCentralDirectoryRecord = function () {
+    /** @type {!(Array.<number>|Uint8Array)} */
+    var input = this.input;
+    /** @type {number} */
+
+    var ip;
+
+    for (ip = input.length - 12; ip > 0; --ip) {
+      if (input[ip] === Zlib.Unzip.CentralDirectorySignature[0] && input[ip + 1] === Zlib.Unzip.CentralDirectorySignature[1] && input[ip + 2] === Zlib.Unzip.CentralDirectorySignature[2] && input[ip + 3] === Zlib.Unzip.CentralDirectorySignature[3]) {
+        this.eocdrOffset = ip;
+        return;
+      }
+    }
+
+    throw new Error('End of Central Directory Record not found');
+  };
+
+  Zlib.Unzip.prototype.parseEndOfCentralDirectoryRecord = function () {
+    /** @type {!(Array.<number>|Uint8Array)} */
+    var input = this.input;
+    /** @type {number} */
+
+    var ip;
+
+    if (!this.eocdrOffset) {
+      this.searchEndOfCentralDirectoryRecord();
+    }
+
+    ip = this.eocdrOffset; // signature
+
+    if (input[ip++] !== Zlib.Unzip.CentralDirectorySignature[0] || input[ip++] !== Zlib.Unzip.CentralDirectorySignature[1] || input[ip++] !== Zlib.Unzip.CentralDirectorySignature[2] || input[ip++] !== Zlib.Unzip.CentralDirectorySignature[3]) {
+      throw new Error('invalid signature');
+    } // number of this disk
+
+
+    this.numberOfThisDisk = input[ip++] | input[ip++] << 8; // number of the disk with the start of the central directory
+
+    this.startDisk = input[ip++] | input[ip++] << 8; // total number of entries in the central directory on this disk
+
+    this.totalEntriesThisDisk = input[ip++] | input[ip++] << 8; // total number of entries in the central directory
+
+    this.totalEntries = input[ip++] | input[ip++] << 8; // size of the central directory
+
+    this.centralDirectorySize = (input[ip++] | input[ip++] << 8 | input[ip++] << 16 | input[ip++] << 24) >>> 0; // offset of start of central directory with respect to the starting disk number
+
+    this.centralDirectoryOffset = (input[ip++] | input[ip++] << 8 | input[ip++] << 16 | input[ip++] << 24) >>> 0; // .ZIP file comment length
+
+    this.commentLength = input[ip++] | input[ip++] << 8; // .ZIP file comment
+
+    this.comment =  input.subarray(ip, ip + this.commentLength) ;
+  };
+
+  Zlib.Unzip.prototype.parseFileHeader = function () {
+    /** @type {Array.<Zlib.Unzip.FileHeader>} */
+    var filelist = [];
+    /** @type {Object.<string, number>} */
+
+    var filetable = {};
+    /** @type {number} */
+
+    var ip;
+    /** @type {Zlib.Unzip.FileHeader} */
+
+    var fileHeader;
+    /*: @type {number} */
+
+    var i;
+    /*: @type {number} */
+
+    var il;
+
+    if (this.fileHeaderList) {
+      return;
+    }
+
+    if (this.centralDirectoryOffset === void 0) {
+      this.parseEndOfCentralDirectoryRecord();
+    }
+
+    ip = this.centralDirectoryOffset;
+
+    for (i = 0, il = this.totalEntries; i < il; ++i) {
+      fileHeader = new Zlib.Unzip.FileHeader(this.input, ip);
+      fileHeader.parse();
+      ip += fileHeader.length;
+      filelist[i] = fileHeader;
+      filetable[fileHeader.filename] = i;
+    }
+
+    if (this.centralDirectorySize < ip - this.centralDirectoryOffset) {
+      throw new Error('invalid file header size');
+    }
+
+    this.fileHeaderList = filelist;
+    this.filenameToIndex = filetable;
+  };
+  /**
+   * @param {number} index file header index.
+   * @param {Object=} opt_params
+   * @return {!(Array.<number>|Uint8Array)} file data.
+   */
+
+
+  Zlib.Unzip.prototype.getFileData = function (index, opt_params) {
+    opt_params = opt_params || {};
+    /** @type {!(Array.<number>|Uint8Array)} */
+
+    var input = this.input;
+    /** @type {Array.<Zlib.Unzip.FileHeader>} */
+
+    var fileHeaderList = this.fileHeaderList;
+    /** @type {Zlib.Unzip.LocalFileHeader} */
+
+    var localFileHeader;
+    /** @type {number} */
+
+    var offset;
+    /** @type {number} */
+
+    var length;
+    /** @type {!(Array.<number>|Uint8Array)} */
+
+    var buffer;
+    /** @type {number} */
+
+    var crc32;
+    /** @type {Array.<number>|Uint32Array|Object} */
+
+    var key;
+    /** @type {number} */
+
+    var i;
+    /** @type {number} */
+
+    var il;
+
+    if (!fileHeaderList) {
+      this.parseFileHeader();
+    }
+
+    if (fileHeaderList[index] === void 0) {
+      throw new Error('wrong index');
+    }
+
+    offset = fileHeaderList[index].relativeOffset;
+    localFileHeader = new Zlib.Unzip.LocalFileHeader(this.input, offset);
+    localFileHeader.parse();
+    offset += localFileHeader.length;
+    length = localFileHeader.compressedSize; // decryption
+
+    if ((localFileHeader.flags & Zlib.Unzip.LocalFileHeader.Flags.ENCRYPT) !== 0) {
+      if (!(opt_params['password'] || this.password)) {
+        throw new Error('please set password');
+      }
+
+      key = this.createDecryptionKey(opt_params['password'] || this.password); // encryption header
+
+      for (i = offset, il = offset + 12; i < il; ++i) {
+        this.decode(key, input[i]);
+      }
+
+      offset += 12;
+      length -= 12; // decryption
+
+      for (i = offset, il = offset + length; i < il; ++i) {
+        input[i] = this.decode(key, input[i]);
+      }
+    }
+
+    switch (localFileHeader.compression) {
+      case Zlib.Unzip.CompressionMethod.STORE:
+        buffer =  this.input.subarray(offset, offset + length) ;
+        break;
+
+      case Zlib.Unzip.CompressionMethod.DEFLATE:
+        buffer = new Zlib.RawInflate(this.input, {
+          'index': offset,
+          'bufferSize': localFileHeader.plainSize
+        }).decompress();
+        break;
+
+      default:
+        throw new Error('unknown compression type');
+    }
+
+    if (this.verify) {
+      crc32 = Zlib.CRC32.calc(buffer);
+
+      if (localFileHeader.crc32 !== crc32) {
+        throw new Error('wrong crc: file=0x' + localFileHeader.crc32.toString(16) + ', data=0x' + crc32.toString(16));
+      }
+    }
+
+    return buffer;
+  };
+  /**
+   * @return {Array.<string>}
+   */
+
+
+  Zlib.Unzip.prototype.getFilenames = function () {
+    /** @type {Array.<string>} */
+    var filenameList = [];
+    /** @type {number} */
+
+    var i;
+    /** @type {number} */
+
+    var il;
+    /** @type {Array.<Zlib.Unzip.FileHeader>} */
+
+    var fileHeaderList;
+
+    if (!this.fileHeaderList) {
+      this.parseFileHeader();
+    }
+
+    fileHeaderList = this.fileHeaderList;
+
+    for (i = 0, il = fileHeaderList.length; i < il; ++i) {
+      filenameList[i] = fileHeaderList[i].filename;
+    }
+
+    return filenameList;
+  };
+  /**
+   * @param {string} filename extract filename.
+   * @param {Object=} opt_params
+   * @return {!(Array.<number>|Uint8Array)} decompressed data.
+   */
+
+
+  Zlib.Unzip.prototype.decompress = function (filename, opt_params) {
+    /** @type {number} */
+    var index;
+
+    if (!this.filenameToIndex) {
+      this.parseFileHeader();
+    }
+
+    index = this.filenameToIndex[filename];
+
+    if (index === void 0) {
+      throw new Error(filename + ' not found');
+    }
+
+    return this.getFileData(index, opt_params);
+  };
+  /**
+   * @param {(Array.<number>|Uint8Array)} password
+   */
+
+
+  Zlib.Unzip.prototype.setPassword = function (password) {
+    this.password = password;
+  };
+  /**
+   * @param {(Array.<number>|Uint32Array|Object)} key
+   * @param {number} n
+   * @return {number}
+   */
+
+
+  Zlib.Unzip.prototype.decode = function (key, n) {
+    n ^= this.getByte(
+    /** @type {(Array.<number>|Uint32Array)} */
+    key);
+    this.updateKeys(
+    /** @type {(Array.<number>|Uint32Array)} */
+    key, n);
+    return n;
+  }; // common method
+
+
+  Zlib.Unzip.prototype.updateKeys = Zlib.Zip.prototype.updateKeys;
+  Zlib.Unzip.prototype.createDecryptionKey = Zlib.Zip.prototype.createEncryptionKey;
+  Zlib.Unzip.prototype.getByte = Zlib.Zip.prototype.getByte;
+  /**
+   * @fileoverview 雑多な関数群をまとめたモジュール実装.
+   */
+
+  /**
+   * Byte String から Byte Array に変換.
+   * @param {!string} str byte string.
+   * @return {!Array.<number>} byte array.
+   */
+
+  Zlib.Util.stringToByteArray = function (str) {
+    /** @type {!Array.<(string|number)>} */
+    var tmp = str.split('');
+    /** @type {number} */
+
+    var i;
+    /** @type {number} */
+
+    var il;
+
+    for (i = 0, il = tmp.length; i < il; i++) {
+      tmp[i] = (tmp[i].charCodeAt(0) & 0xff) >>> 0;
+    }
+
+    return tmp;
+  };
+  /**
+   * @fileoverview Adler32 checksum 実装.
+   */
+
+  /**
+   * Adler32 ハッシュ値の作成
+   * @param {!(Array|Uint8Array|string)} array 算出に使用する byte array.
+   * @return {number} Adler32 ハッシュ値.
+   */
+
+
+  Zlib.Adler32 = function (array) {
+    if (typeof array === 'string') {
+      array = Zlib.Util.stringToByteArray(array);
+    }
+
+    return Zlib.Adler32.update(1, array);
+  };
+  /**
+   * Adler32 ハッシュ値の更新
+   * @param {number} adler 現在のハッシュ値.
+   * @param {!(Array|Uint8Array)} array 更新に使用する byte array.
+   * @return {number} Adler32 ハッシュ値.
+   */
+
+
+  Zlib.Adler32.update = function (adler, array) {
+    /** @type {number} */
+    var s1 = adler & 0xffff;
+    /** @type {number} */
+
+    var s2 = adler >>> 16 & 0xffff;
+    /** @type {number} array length */
+
+    var len = array.length;
+    /** @type {number} loop length (don't overflow) */
+
+    var tlen;
+    /** @type {number} array index */
+
+    var i = 0;
+
+    while (len > 0) {
+      tlen = len > Zlib.Adler32.OptimizationParameter ? Zlib.Adler32.OptimizationParameter : len;
+      len -= tlen;
+
+      do {
+        s1 += array[i++];
+        s2 += s1;
+      } while (--tlen);
+
+      s1 %= 65521;
+      s2 %= 65521;
+    }
+
+    return (s2 << 16 | s1) >>> 0;
+  };
+  /**
+   * Adler32 最適化パラメータ
+   * 現状では 1024 程度が最適.
+   * @see http://jsperf.com/adler-32-simple-vs-optimized/3
+   * @define {number}
+   */
+
+
+  Zlib.Adler32.OptimizationParameter = 1024;
+  /**
+   * ビットストリーム
+   * @constructor
+   * @param {!(Array|Uint8Array)=} buffer output buffer.
+   * @param {number=} bufferPosition start buffer pointer.
+   */
+
+  Zlib.BitStream = function (buffer, bufferPosition) {
+    /** @type {number} buffer index. */
+    this.index = typeof bufferPosition === 'number' ? bufferPosition : 0;
+    /** @type {number} bit index. */
+
+    this.bitindex = 0;
+    /** @type {!(Array|Uint8Array)} bit-stream output buffer. */
+
+    this.buffer = buffer instanceof ( Uint8Array ) ? buffer : new ( Uint8Array )(Zlib.BitStream.DefaultBlockSize); // 入力された index が足りなかったら拡張するが、倍にしてもダメなら不正とする
+
+    if (this.buffer.length * 2 <= this.index) {
+      throw new Error("invalid index");
+    } else if (this.buffer.length <= this.index) {
+      this.expandBuffer();
+    }
+  };
+  /**
+   * デフォルトブロックサイズ.
+   * @const
+   * @type {number}
+   */
+
+
+  Zlib.BitStream.DefaultBlockSize = 0x8000;
+  /**
+   * expand buffer.
+   * @return {!(Array|Uint8Array)} new buffer.
+   */
+
+  Zlib.BitStream.prototype.expandBuffer = function () {
+    /** @type {!(Array|Uint8Array)} old buffer. */
+    var oldbuf = this.buffer;
+    /** @type {number} loop limiter. */
+
+    var il = oldbuf.length;
+    /** @type {!(Array|Uint8Array)} new buffer. */
+
+    var buffer = new ( Uint8Array )(il << 1); // copy buffer
+
+    {
+      buffer.set(oldbuf);
+    }
+
+    return this.buffer = buffer;
+  };
+  /**
+   * 数値をビットで指定した数だけ書き込む.
+   * @param {number} number 書き込む数値.
+   * @param {number} n 書き込むビット数.
+   * @param {boolean=} reverse 逆順に書き込むならば true.
+   */
+
+
+  Zlib.BitStream.prototype.writeBits = function (number, n, reverse) {
+    var buffer = this.buffer;
+    var index = this.index;
+    var bitindex = this.bitindex;
+    /** @type {number} current octet. */
+
+    var current = buffer[index];
+    /** @type {number} loop counter. */
+
+    var i;
+    /**
+     * 32-bit 整数のビット順を逆にする
+     * @param {number} n 32-bit integer.
+     * @return {number} reversed 32-bit integer.
+     * @private
+     */
+
+    function rev32_(n) {
+      return Zlib.BitStream.ReverseTable[n & 0xFF] << 24 | Zlib.BitStream.ReverseTable[n >>> 8 & 0xFF] << 16 | Zlib.BitStream.ReverseTable[n >>> 16 & 0xFF] << 8 | Zlib.BitStream.ReverseTable[n >>> 24 & 0xFF];
+    }
+
+    if (reverse && n > 1) {
+      number = n > 8 ? rev32_(number) >> 32 - n : Zlib.BitStream.ReverseTable[number] >> 8 - n;
+    } // Byte 境界を超えないとき
+
+
+    if (n + bitindex < 8) {
+      current = current << n | number;
+      bitindex += n; // Byte 境界を超えるとき
+    } else {
+      for (i = 0; i < n; ++i) {
+        current = current << 1 | number >> n - i - 1 & 1; // next byte
+
+        if (++bitindex === 8) {
+          bitindex = 0;
+          buffer[index++] = Zlib.BitStream.ReverseTable[current];
+          current = 0; // expand
+
+          if (index === buffer.length) {
+            buffer = this.expandBuffer();
+          }
+        }
+      }
+    }
+
+    buffer[index] = current;
+    this.buffer = buffer;
+    this.bitindex = bitindex;
+    this.index = index;
+  };
+  /**
+   * ストリームの終端処理を行う
+   * @return {!(Array|Uint8Array)} 終端処理後のバッファを byte array で返す.
+   */
+
+
+  Zlib.BitStream.prototype.finish = function () {
+    var buffer = this.buffer;
+    var index = this.index;
+    /** @type {!(Array|Uint8Array)} output buffer. */
+
+    var output; // bitindex が 0 の時は余分に index が進んでいる状態
+
+    if (this.bitindex > 0) {
+      buffer[index] <<= 8 - this.bitindex;
+      buffer[index] = Zlib.BitStream.ReverseTable[buffer[index]];
+      index++;
+    } // array truncation
+
+
+    {
+      output = buffer.subarray(0, index);
+    }
+
+    return output;
+  };
+  /**
+   * 0-255 のビット順を反転したテーブル
+   * @const
+   * @type {!(Uint8Array|Array.<number>)}
+   */
+
+
+  Zlib.BitStream.ReverseTable = function (table) {
+    return table;
+  }(function () {
+    /** @type {!(Array|Uint8Array)} reverse table. */
+    var table = new ( Uint8Array )(256);
+    /** @type {number} loop counter. */
+
+    var i; // generate
+
+    for (i = 0; i < 256; ++i) {
+      table[i] = function (n) {
+        var r = n;
+        var s = 7;
+
+        for (n >>>= 1; n; n >>>= 1) {
+          r <<= 1;
+          r |= n & 1;
+          --s;
+        }
+
+        return (r << s & 0xff) >>> 0;
+      }(i);
+    }
+
+    return table;
+  }());
+  /**
+   * CRC32 ハッシュ値を取得
+   * @param {!(Array.<number>|Uint8Array)} data data byte array.
+   * @param {number=} pos data position.
+   * @param {number=} length data length.
+   * @return {number} CRC32.
+   */
+
+  Zlib.CRC32.calc = function (data, pos, length) {
+    return Zlib.CRC32.update(data, 0, pos, length);
+  };
+  /**
+   * CRC32ハッシュ値を更新
+   * @param {!(Array.<number>|Uint8Array)} data data byte array.
+   * @param {number} crc CRC32.
+   * @param {number=} pos data position.
+   * @param {number=} length data length.
+   * @return {number} CRC32.
+   */
+
+
+  Zlib.CRC32.update = function (data, crc, pos, length) {
+    var table = Zlib.CRC32.Table;
+    var i = typeof pos === 'number' ? pos : pos = 0;
+    var il = typeof length === 'number' ? length : data.length;
+    crc ^= 0xffffffff; // loop unrolling for performance
+
+    for (i = il & 7; i--; ++pos) {
+      crc = crc >>> 8 ^ table[(crc ^ data[pos]) & 0xff];
+    }
+
+    for (i = il >> 3; i--; pos += 8) {
+      crc = crc >>> 8 ^ table[(crc ^ data[pos]) & 0xff];
+      crc = crc >>> 8 ^ table[(crc ^ data[pos + 1]) & 0xff];
+      crc = crc >>> 8 ^ table[(crc ^ data[pos + 2]) & 0xff];
+      crc = crc >>> 8 ^ table[(crc ^ data[pos + 3]) & 0xff];
+      crc = crc >>> 8 ^ table[(crc ^ data[pos + 4]) & 0xff];
+      crc = crc >>> 8 ^ table[(crc ^ data[pos + 5]) & 0xff];
+      crc = crc >>> 8 ^ table[(crc ^ data[pos + 6]) & 0xff];
+      crc = crc >>> 8 ^ table[(crc ^ data[pos + 7]) & 0xff];
+    }
+
+    return (crc ^ 0xffffffff) >>> 0;
+  };
+  /**
+   * @param {number} num
+   * @param {number} crc
+   * @returns {number}
+   */
+
+
+  Zlib.CRC32.single = function (num, crc) {
+    return (Zlib.CRC32.Table[(num ^ crc) & 0xff] ^ num >>> 8) >>> 0;
+  };
+  /**
+   * @type {Array.<number>}
+   * @const
+   * @private
+   */
+
+
+  Zlib.CRC32.Table_ = [0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f, 0xe963a535, 0x9e6495a3, 0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988, 0x09b64c2b, 0x7eb17cbd, 0xe7b82d07, 0x90bf1d91, 0x1db71064, 0x6ab020f2, 0xf3b97148, 0x84be41de, 0x1adad47d, 0x6ddde4eb, 0xf4d4b551, 0x83d385c7, 0x136c9856, 0x646ba8c0, 0xfd62f97a, 0x8a65c9ec, 0x14015c4f, 0x63066cd9, 0xfa0f3d63, 0x8d080df5, 0x3b6e20c8, 0x4c69105e, 0xd56041e4, 0xa2677172, 0x3c03e4d1, 0x4b04d447, 0xd20d85fd, 0xa50ab56b, 0x35b5a8fa, 0x42b2986c, 0xdbbbc9d6, 0xacbcf940, 0x32d86ce3, 0x45df5c75, 0xdcd60dcf, 0xabd13d59, 0x26d930ac, 0x51de003a, 0xc8d75180, 0xbfd06116, 0x21b4f4b5, 0x56b3c423, 0xcfba9599, 0xb8bda50f, 0x2802b89e, 0x5f058808, 0xc60cd9b2, 0xb10be924, 0x2f6f7c87, 0x58684c11, 0xc1611dab, 0xb6662d3d, 0x76dc4190, 0x01db7106, 0x98d220bc, 0xefd5102a, 0x71b18589, 0x06b6b51f, 0x9fbfe4a5, 0xe8b8d433, 0x7807c9a2, 0x0f00f934, 0x9609a88e, 0xe10e9818, 0x7f6a0dbb, 0x086d3d2d, 0x91646c97, 0xe6635c01, 0x6b6b51f4, 0x1c6c6162, 0x856530d8, 0xf262004e, 0x6c0695ed, 0x1b01a57b, 0x8208f4c1, 0xf50fc457, 0x65b0d9c6, 0x12b7e950, 0x8bbeb8ea, 0xfcb9887c, 0x62dd1ddf, 0x15da2d49, 0x8cd37cf3, 0xfbd44c65, 0x4db26158, 0x3ab551ce, 0xa3bc0074, 0xd4bb30e2, 0x4adfa541, 0x3dd895d7, 0xa4d1c46d, 0xd3d6f4fb, 0x4369e96a, 0x346ed9fc, 0xad678846, 0xda60b8d0, 0x44042d73, 0x33031de5, 0xaa0a4c5f, 0xdd0d7cc9, 0x5005713c, 0x270241aa, 0xbe0b1010, 0xc90c2086, 0x5768b525, 0x206f85b3, 0xb966d409, 0xce61e49f, 0x5edef90e, 0x29d9c998, 0xb0d09822, 0xc7d7a8b4, 0x59b33d17, 0x2eb40d81, 0xb7bd5c3b, 0xc0ba6cad, 0xedb88320, 0x9abfb3b6, 0x03b6e20c, 0x74b1d29a, 0xead54739, 0x9dd277af, 0x04db2615, 0x73dc1683, 0xe3630b12, 0x94643b84, 0x0d6d6a3e, 0x7a6a5aa8, 0xe40ecf0b, 0x9309ff9d, 0x0a00ae27, 0x7d079eb1, 0xf00f9344, 0x8708a3d2, 0x1e01f268, 0x6906c2fe, 0xf762575d, 0x806567cb, 0x196c3671, 0x6e6b06e7, 0xfed41b76, 0x89d32be0, 0x10da7a5a, 0x67dd4acc, 0xf9b9df6f, 0x8ebeeff9, 0x17b7be43, 0x60b08ed5, 0xd6d6a3e8, 0xa1d1937e, 0x38d8c2c4, 0x4fdff252, 0xd1bb67f1, 0xa6bc5767, 0x3fb506dd, 0x48b2364b, 0xd80d2bda, 0xaf0a1b4c, 0x36034af6, 0x41047a60, 0xdf60efc3, 0xa867df55, 0x316e8eef, 0x4669be79, 0xcb61b38c, 0xbc66831a, 0x256fd2a0, 0x5268e236, 0xcc0c7795, 0xbb0b4703, 0x220216b9, 0x5505262f, 0xc5ba3bbe, 0xb2bd0b28, 0x2bb45a92, 0x5cb36a04, 0xc2d7ffa7, 0xb5d0cf31, 0x2cd99e8b, 0x5bdeae1d, 0x9b64c2b0, 0xec63f226, 0x756aa39c, 0x026d930a, 0x9c0906a9, 0xeb0e363f, 0x72076785, 0x05005713, 0x95bf4a82, 0xe2b87a14, 0x7bb12bae, 0x0cb61b38, 0x92d28e9b, 0xe5d5be0d, 0x7cdcefb7, 0x0bdbdf21, 0x86d3d2d4, 0xf1d4e242, 0x68ddb3f8, 0x1fda836e, 0x81be16cd, 0xf6b9265b, 0x6fb077e1, 0x18b74777, 0x88085ae6, 0xff0f6a70, 0x66063bca, 0x11010b5c, 0x8f659eff, 0xf862ae69, 0x616bffd3, 0x166ccf45, 0xa00ae278, 0xd70dd2ee, 0x4e048354, 0x3903b3c2, 0xa7672661, 0xd06016f7, 0x4969474d, 0x3e6e77db, 0xaed16a4a, 0xd9d65adc, 0x40df0b66, 0x37d83bf0, 0xa9bcae53, 0xdebb9ec5, 0x47b2cf7f, 0x30b5ffe9, 0xbdbdf21c, 0xcabac28a, 0x53b39330, 0x24b4a3a6, 0xbad03605, 0xcdd70693, 0x54de5729, 0x23d967bf, 0xb3667a2e, 0xc4614ab8, 0x5d681b02, 0x2a6f2b94, 0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d];
+  /**
+   * @type {!(Array.<number>|Uint32Array)} CRC-32 Table.
+   * @const
+   */
+
+  Zlib.CRC32.Table =   new Uint32Array(Zlib.CRC32.Table_) ;
+  /**
+   * @fileoverview Deflate (RFC1951) 実装.
+   * Deflateアルゴリズム本体は Zlib.RawDeflate で実装されている.
+   */
+
+  /**
+   * Zlib Deflate
+   * @constructor
+   * @param {!(Array|Uint8Array)} input 符号化する対象の byte array.
+   * @param {Object=} opt_params option parameters.
+   */
+
+  Zlib.Deflate = function (input, opt_params) {
+    /** @type {!(Array|Uint8Array)} */
+    this.input = input;
+    /** @type {!(Array|Uint8Array)} */
+
+    this.output = new ( Uint8Array )(Zlib.Deflate.DefaultBufferSize);
+    /** @type {Zlib.Deflate.CompressionType} */
+
+    this.compressionType = Zlib.Deflate.CompressionType.DYNAMIC;
+    /** @type {Zlib.RawDeflate} */
+
+    this.rawDeflate;
+    /** @type {Object} */
+
+    var rawDeflateOption = {};
+    /** @type {string} */
+
+    var prop; // option parameters
+
+    if (opt_params || !(opt_params = {})) {
+      if (typeof opt_params['compressionType'] === 'number') {
+        this.compressionType = opt_params['compressionType'];
+      }
+    } // copy options
+
+
+    for (prop in opt_params) {
+      rawDeflateOption[prop] = opt_params[prop];
+    } // set raw-deflate output buffer
+
+
+    rawDeflateOption['outputBuffer'] = this.output;
+    this.rawDeflate = new Zlib.RawDeflate(this.input, rawDeflateOption);
+  };
+  /**
+   * @const
+   * @type {number} デフォルトバッファサイズ.
+   */
+
+
+  Zlib.Deflate.DefaultBufferSize = 0x8000;
+  /**
+   * @enum {number}
+   */
+
+  Zlib.Deflate.CompressionType = Zlib.RawDeflate.CompressionType;
+  /**
+   * 直接圧縮に掛ける.
+   * @param {!(Array|Uint8Array)} input target buffer.
+   * @param {Object=} opt_params option parameters.
+   * @return {!(Array|Uint8Array)} compressed data byte array.
+   */
+
+  Zlib.Deflate.compress = function (input, opt_params) {
+    return new Zlib.Deflate(input, opt_params).compress();
+  };
+  /**
+   * Deflate Compression.
+   * @return {!(Array|Uint8Array)} compressed data byte array.
+   */
+
+
+  Zlib.Deflate.prototype.compress = function () {
+    /** @type {Zlib.CompressionMethod} */
+    var cm;
+    /** @type {number} */
+
+    var cinfo;
+    /** @type {number} */
+
+    var cmf;
+    /** @type {number} */
+
+    var flg;
+    /** @type {number} */
+
+    var fcheck;
+    /** @type {number} */
+
+    var fdict;
+    /** @type {number} */
+
+    var flevel;
+    /** @type {number} */
+
+    var adler;
+    /** @type {!(Array|Uint8Array)} */
+
+    var output;
+    /** @type {number} */
+
+    var pos = 0;
+    output = this.output; // Compression Method and Flags
+
+    cm = Zlib.CompressionMethod.DEFLATE;
+
+    switch (cm) {
+      case Zlib.CompressionMethod.DEFLATE:
+        cinfo = Math.LOG2E * Math.log(Zlib.RawDeflate.WindowSize) - 8;
+        break;
+
+      default:
+        throw new Error('invalid compression method');
+    }
+
+    cmf = cinfo << 4 | cm;
+    output[pos++] = cmf; // Flags
+
+    fdict = 0;
+
+    switch (cm) {
+      case Zlib.CompressionMethod.DEFLATE:
+        switch (this.compressionType) {
+          case Zlib.Deflate.CompressionType.NONE:
+            flevel = 0;
+            break;
+
+          case Zlib.Deflate.CompressionType.FIXED:
+            flevel = 1;
+            break;
+
+          case Zlib.Deflate.CompressionType.DYNAMIC:
+            flevel = 2;
+            break;
+
+          default:
+            throw new Error('unsupported compression type');
+        }
+
+        break;
+
+      default:
+        throw new Error('invalid compression method');
+    }
+
+    flg = flevel << 6 | fdict << 5;
+    fcheck = 31 - (cmf * 256 + flg) % 31;
+    flg |= fcheck;
+    output[pos++] = flg; // Adler-32 checksum
+
+    adler = Zlib.Adler32(this.input);
+    this.rawDeflate.op = pos;
+    output = this.rawDeflate.compress();
+    pos = output.length;
+
+    {
+      // subarray 分を元にもどす
+      output = new Uint8Array(output.buffer); // expand buffer
+
+      if (output.length <= pos + 4) {
+        this.output = new Uint8Array(output.length + 4);
+        this.output.set(output);
+        output = this.output;
+      }
+
+      output = output.subarray(0, pos + 4);
+    } // adler32
+
+
+    output[pos++] = adler >> 24 & 0xff;
+    output[pos++] = adler >> 16 & 0xff;
+    output[pos++] = adler >> 8 & 0xff;
+    output[pos++] = adler & 0xff;
+    return output;
+  };
+
+  var isNode = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
+  var crossFetch = isNode ? require("node-fetch") : fetch;
+
+  var BrowserLocalFile =
+  /*#__PURE__*/
+  function () {
+    function BrowserLocalFile(blob) {
+      _classCallCheck(this, BrowserLocalFile);
+
+      this.file = blob;
+    }
+
+    _createClass(BrowserLocalFile, [{
+      key: "read",
+      value: function () {
+        var _read = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee(position, length) {
+          var file;
+          return regeneratorRuntime.wrap(function _callee$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  file = this.file;
+                  return _context.abrupt("return", new Promise(function (fullfill, reject) {
+                    var fileReader = new FileReader();
+
+                    fileReader.onload = function (e) {
+                      fullfill(fileReader.result);
+                    };
+
+                    fileReader.onerror = function (e) {
+                      console.err("Error reading local file " + file.name);
+                      reject(null, fileReader);
+                    };
+
+                    if (position !== undefined) {
+                      var blob = file.slice(position, position + length);
+                      fileReader.readAsArrayBuffer(blob);
+                    } else {
+                      fileReader.readAsArrayBuffer(file);
+                    }
+                  }));
+
+                case 2:
+                case "end":
+                  return _context.stop();
+              }
+            }
+          }, _callee, this);
+        }));
+
+        function read(_x, _x2) {
+          return _read.apply(this, arguments);
+        }
+
+        return read;
+      }()
+    }]);
+
+    return BrowserLocalFile;
+  }();
+
+  var isNode$1 = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
+
+  var RemoteFile =
+  /*#__PURE__*/
+  function () {
+    function RemoteFile(args) {
+      _classCallCheck(this, RemoteFile);
+
+      this.config = args;
+      this.url = mapUrl(args.path || args.url);
+    }
+
+    _createClass(RemoteFile, [{
+      key: "read",
+      value: function () {
+        var _read = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee2(position, length) {
+          var headers, rangeString, url, token, isSafari, isChrome, isAmazonV4Signed, response, status, err, resolveToken, _resolveToken;
+
+          return regeneratorRuntime.wrap(function _callee2$(_context2) {
+            while (1) {
+              switch (_context2.prev = _context2.next) {
+                case 0:
+                  _resolveToken = function _ref2() {
+                    _resolveToken = _asyncToGenerator(
+                    /*#__PURE__*/
+                    regeneratorRuntime.mark(function _callee(token) {
+                      return regeneratorRuntime.wrap(function _callee$(_context) {
+                        while (1) {
+                          switch (_context.prev = _context.next) {
+                            case 0:
+                              if (!(typeof token === 'function')) {
+                                _context.next = 6;
+                                break;
+                              }
+
+                              _context.next = 3;
+                              return Promise.resolve(token());
+
+                            case 3:
+                              return _context.abrupt("return", _context.sent);
+
+                            case 6:
+                              return _context.abrupt("return", token);
+
+                            case 7:
+                            case "end":
+                              return _context.stop();
+                          }
+                        }
+                      }, _callee);
+                    }));
+                    return _resolveToken.apply(this, arguments);
+                  };
+
+                  resolveToken = function _ref(_x3) {
+                    return _resolveToken.apply(this, arguments);
+                  };
+
+                  headers = this.config.headers || {};
+                  rangeString = "bytes=" + position + "-" + (position + length - 1);
+                  headers['Range'] = rangeString;
+                  url = this.url.slice(); // slice => copy
+
+                  if (isNode$1) {
+                    headers['User-Agent'] = 'straw';
+                  } else {
+                    if (this.config.oauthToken) {
+                      token = resolveToken(this.config.oauthToken);
+                      headers['Authorization'] = "Bearer ".concat(token);
+                    }
+
+                    isSafari = navigator.vendor.indexOf("Apple") == 0 && /\sSafari\//.test(navigator.userAgent);
+                    isChrome = navigator.userAgent.indexOf('Chrome') > -1;
+                    isAmazonV4Signed = this.url.indexOf("X-Amz-Signature") > -1;
+
+                    if (isChrome && !isAmazonV4Signed) {
+                      url = addParameter(url, "randomSeed", Math.random().toString(36));
+                    }
+                  }
+
+                  if (this.config.apiKey) {
+                    url = addParameter(url, "key", this.config.apiKey);
+                  }
+
+                  _context2.next = 10;
+                  return crossFetch(url, {
+                    method: 'GET',
+                    headers: headers,
+                    redirect: 'follow',
+                    mode: 'cors'
+                  });
+
+                case 10:
+                  response = _context2.sent;
+                  status = response.status;
+
+                  if (!(status >= 400)) {
+                    _context2.next = 18;
+                    break;
+                  }
+
+                  err = Error(response.statusText);
+                  err.code = status;
+                  throw err;
+
+                case 18:
+                  return _context2.abrupt("return", response.arrayBuffer());
+
+                case 19:
+                case "end":
+                  return _context2.stop();
+              }
+            }
+          }, _callee2, this);
+        }));
+
+        function read(_x, _x2) {
+          return _read.apply(this, arguments);
+        }
+
+        return read;
+      }()
+    }]);
+
+    return RemoteFile;
+  }();
+
+  function mapUrl(url) {
+    if (url.includes("//www.dropbox.com")) {
+      return url.replace("//www.dropbox.com", "//dl.dropboxusercontent.com");
+    } else if (url.startsWith("ftp://ftp.ncbi.nlm.nih.gov")) {
+      return url.replace("ftp://", "https://");
+    } else {
+      return url;
+    }
+  }
+
+  function addParameter(url, name, value) {
+    var paramSeparator = url.includes("?") ? "&" : "?";
+    return url + paramSeparator + name + "=" + value;
+  }
+
+  var ThrottledFile =
+  /*#__PURE__*/
+  function () {
+    function ThrottledFile(file, rateLimiter) {
+      _classCallCheck(this, ThrottledFile);
+
+      this.file = file;
+      this.rateLimiter = rateLimiter;
+    }
+
+    _createClass(ThrottledFile, [{
+      key: "read",
+      value: function () {
+        var _read = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee2(position, length) {
+          var file, rateLimiter;
+          return regeneratorRuntime.wrap(function _callee2$(_context2) {
+            while (1) {
+              switch (_context2.prev = _context2.next) {
+                case 0:
+                  file = this.file;
+                  rateLimiter = this.rateLimiter;
+                  return _context2.abrupt("return", new Promise(function (fulfill, reject) {
+                    rateLimiter.limiter(
+                    /*#__PURE__*/
+                    function () {
+                      var _ref = _asyncToGenerator(
+                      /*#__PURE__*/
+                      regeneratorRuntime.mark(function _callee(f) {
+                        var result;
+                        return regeneratorRuntime.wrap(function _callee$(_context) {
+                          while (1) {
+                            switch (_context.prev = _context.next) {
+                              case 0:
+                                _context.prev = 0;
+                                _context.next = 3;
+                                return f.read(position, length);
+
+                              case 3:
+                                result = _context.sent;
+                                fulfill(result);
+                                _context.next = 10;
+                                break;
+
+                              case 7:
+                                _context.prev = 7;
+                                _context.t0 = _context["catch"](0);
+                                reject(_context.t0);
+
+                              case 10:
+                              case "end":
+                                return _context.stop();
+                            }
+                          }
+                        }, _callee, null, [[0, 7]]);
+                      }));
+
+                      return function (_x3) {
+                        return _ref.apply(this, arguments);
+                      };
+                    }())(file);
+                  }));
+
+                case 3:
+                case "end":
+                  return _context2.stop();
+              }
+            }
+          }, _callee2, this);
+        }));
+
+        function read(_x, _x2) {
+          return _read.apply(this, arguments);
+        }
+
+        return read;
+      }()
+    }]);
+
+    return ThrottledFile;
+  }();
+
+  var RateLimiter =
+  /*#__PURE__*/
+  function () {
+    function RateLimiter(wait) {
+      _classCallCheck(this, RateLimiter);
+
+      this.wait = wait === undefined ? 100 : wait;
+      this.isCalled = false;
+      this.calls = [];
+    }
+
+    _createClass(RateLimiter, [{
+      key: "limiter",
+      value: function limiter(fn) {
+        var self = this;
+
+        var caller = function caller() {
+          if (self.calls.length && !self.isCalled) {
+            self.isCalled = true;
+            self.calls.shift().call();
+            setTimeout(function () {
+              self.isCalled = false;
+              caller();
+            }, self.wait);
+          }
+        };
+
+        return function () {
+          self.calls.push(fn.bind.apply(fn, [this].concat(Array.prototype.slice.call(arguments))));
+          caller();
+        };
+      }
+    }]);
+
+    return RateLimiter;
+  }();
+
+  var BufferedFile =
+  /*#__PURE__*/
+  function () {
+    function BufferedFile(args) {
+      _classCallCheck(this, BufferedFile);
+
+      this.file = args.file;
+      this.size = args.size || 64000;
+      this.position = 0;
+      this.bufferStart = 0;
+      this.bufferLength = 0;
+      this.buffer = undefined;
+    }
+
+    _createClass(BufferedFile, [{
+      key: "read",
+      value: function () {
+        var _read = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee(position, length) {
+          var start, end, bufferStart, bufferEnd, sliceStart, sliceEnd, l1, a1, l2, a2, _l, _sliceStart, _a, _l2, _a2;
+
+          return regeneratorRuntime.wrap(function _callee$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  start = position;
+                  end = position + length;
+                  bufferStart = this.bufferStart;
+                  bufferEnd = this.bufferStart + this.bufferLength;
+
+                  if (!(length > this.size)) {
+                    _context.next = 9;
+                    break;
+                  }
+
+                  // Request larger than max buffer size,  pass through to underlying file
+                  //console.log("0")
+                  this.buffer = undefined;
+                  this.bufferStart = 0;
+                  this.bufferLength = 0;
+                  return _context.abrupt("return", this.file.read(position, length));
+
+                case 9:
+                  if (!(start >= bufferStart && end <= bufferEnd)) {
+                    _context.next = 15;
+                    break;
+                  }
+
+                  // Request within buffer bounds
+                  //console.log("1")
+                  sliceStart = start - bufferStart;
+                  sliceEnd = sliceStart + length;
+                  return _context.abrupt("return", this.buffer.slice(sliceStart, sliceEnd));
+
+                case 15:
+                  if (!(start < bufferStart && end > bufferStart)) {
+                    _context.next = 29;
+                    break;
+                  }
+
+                  // Overlap left, here for completness but this is an unexpected case in straw.  We don't adjust the buffer.
+                  //console.log("2")
+                  l1 = bufferStart - start;
+                  _context.next = 19;
+                  return this.file.read(position, l1);
+
+                case 19:
+                  a1 = _context.sent;
+                  l2 = length - l1;
+
+                  if (!(l2 > 0)) {
+                    _context.next = 26;
+                    break;
+                  }
+
+                  //this.buffer = await this.file.read(bufferStart, this.size)
+                  a2 = this.buffer.slice(0, l2);
+                  return _context.abrupt("return", concatBuffers(a1, a2));
+
+                case 26:
+                  return _context.abrupt("return", a1);
+
+                case 27:
+                  _context.next = 63;
+                  break;
+
+                case 29:
+                  if (!(start < bufferEnd && end > bufferEnd)) {
+                    _context.next = 57;
+                    break;
+                  }
+
+                  // Overlap right
+                  // console.log("3")
+                  _l = bufferEnd - start;
+                  _sliceStart = this.bufferLength - _l;
+                  _a = this.buffer.slice(_sliceStart, this.bufferLength);
+                  _l2 = length - _l;
+
+                  if (!(_l2 > 0)) {
+                    _context.next = 54;
+                    break;
+                  }
+
+                  _context.prev = 35;
+                  _context.next = 38;
+                  return this.file.read(bufferEnd, this.size);
+
+                case 38:
+                  this.buffer = _context.sent;
+                  this.bufferStart = bufferEnd;
+                  this.bufferLength = this.buffer.byteLength;
+                  _a2 = this.buffer.slice(0, _l2);
+                  return _context.abrupt("return", concatBuffers(_a, _a2));
+
+                case 45:
+                  _context.prev = 45;
+                  _context.t0 = _context["catch"](35);
+
+                  if (!(_context.t0.code && _context.t0.code === 416)) {
+                    _context.next = 51;
+                    break;
+                  }
+
+                  return _context.abrupt("return", _a);
+
+                case 51:
+                  throw _context.t0;
+
+                case 52:
+                  _context.next = 55;
+                  break;
+
+                case 54:
+                  return _context.abrupt("return", _a);
+
+                case 55:
+                  _context.next = 63;
+                  break;
+
+                case 57:
+                  _context.next = 59;
+                  return this.file.read(position, this.size);
+
+                case 59:
+                  this.buffer = _context.sent;
+                  this.bufferStart = position;
+                  this.bufferLength = this.buffer.byteLength;
+                  return _context.abrupt("return", this.buffer.slice(0, length));
+
+                case 63:
+                case "end":
+                  return _context.stop();
+              }
+            }
+          }, _callee, this, [[35, 45]]);
+        }));
+
+        function read(_x, _x2) {
+          return _read.apply(this, arguments);
+        }
+
+        return read;
+      }()
+    }]);
+
+    return BufferedFile;
+  }();
+  /**
+   * concatenates 2 array buffers.
+   * Credit: https://gist.github.com/72lions/4528834
+   *
+   * @private
+   * @param {ArrayBuffers} buffer1 The first buffer.
+   * @param {ArrayBuffers} buffer2 The second buffer.
+   * @return {ArrayBuffers} The new ArrayBuffer created out of the two.
+   */
+
+
+  var concatBuffers = function concatBuffers(buffer1, buffer2) {
+    var tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
+    tmp.set(new Uint8Array(buffer1), 0);
+    tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
+    return tmp.buffer;
+  };
+
+  // TODO -- big endian
+  var BinaryParser = function BinaryParser(dataView, littleEndian) {
+    this.littleEndian = littleEndian !== undefined ? littleEndian : true;
+    this.position = 0;
+    this.view = dataView;
+    this.length = dataView.byteLength;
+  };
+
+  BinaryParser.prototype.available = function () {
+    return this.length - this.position;
+  };
+
+  BinaryParser.prototype.remLength = function () {
+    return this.length - this.position;
+  };
+
+  BinaryParser.prototype.hasNext = function () {
+    return this.position < this.length - 1;
+  };
+
+  BinaryParser.prototype.getByte = function () {
+    var retValue = this.view.getUint8(this.position, this.littleEndian);
+    this.position++;
+    return retValue;
+  };
+
+  BinaryParser.prototype.getShort = function () {
+    var retValue = this.view.getInt16(this.position, this.littleEndian);
+    this.position += 2;
+    return retValue;
+  };
+
+  BinaryParser.prototype.getUShort = function () {
+    // var byte1 = this.getByte(),
+    //     byte2 = this.getByte(),
+    //     retValue = ((byte2 << 24 >>> 16) + (byte1 << 24 >>> 24));
+    //     return retValue;
+    //
+    var retValue = this.view.getUint16(this.position, this.littleEndian);
+    this.position += 2;
+    return retValue;
+  };
+
+  BinaryParser.prototype.getInt = function () {
+    var retValue = this.view.getInt32(this.position, this.littleEndian);
+    this.position += 4;
+    return retValue;
+  };
+
+  BinaryParser.prototype.getUInt = function () {
+    var retValue = this.view.getUint32(this.position, this.littleEndian);
+    this.position += 4;
+    return retValue;
+  };
+
+  BinaryParser.prototype.getLong = function () {
+    // DataView doesn't support long. So we'll try manually
+    var b = [];
+    b[0] = this.view.getUint8(this.position);
+    b[1] = this.view.getUint8(this.position + 1);
+    b[2] = this.view.getUint8(this.position + 2);
+    b[3] = this.view.getUint8(this.position + 3);
+    b[4] = this.view.getUint8(this.position + 4);
+    b[5] = this.view.getUint8(this.position + 5);
+    b[6] = this.view.getUint8(this.position + 6);
+    b[7] = this.view.getUint8(this.position + 7);
+    var value = 0;
+
+    if (this.littleEndian) {
+      for (var i = b.length - 1; i >= 0; i--) {
+        value = value * 256 + b[i];
+      }
+    } else {
+      for (var i = 0; i < b.length; i++) {
+        value = value * 256 + b[i];
+      }
+    }
+
+    this.position += 8;
+    return value;
+  };
+
+  BinaryParser.prototype.getString = function (len) {
+    var s = "";
+    var c;
+
+    while ((c = this.view.getUint8(this.position++)) != 0) {
+      s += String.fromCharCode(c);
+      if (len && s.length == len) break;
+    }
+
+    return s;
+  };
+
+  BinaryParser.prototype.getFixedLengthString = function (len) {
+    var s = "";
+    var i;
+    var c;
+
+    for (i = 0; i < len; i++) {
+      c = this.view.getUint8(this.position++);
+
+      if (c > 0) {
+        s += String.fromCharCode(c);
+      }
+    }
+
+    return s;
+  };
+
+  BinaryParser.prototype.getFixedLengthTrimmedString = function (len) {
+    var s = "";
+    var i;
+    var c;
+
+    for (i = 0; i < len; i++) {
+      c = this.view.getUint8(this.position++);
+
+      if (c > 32) {
+        s += String.fromCharCode(c);
+      }
+    }
+
+    return s;
+  };
+
+  BinaryParser.prototype.getFloat = function () {
+    var retValue = this.view.getFloat32(this.position, this.littleEndian);
+    this.position += 4;
+    return retValue;
+  };
+
+  BinaryParser.prototype.getDouble = function () {
+    var retValue = this.view.getFloat64(this.position, this.littleEndian);
+    this.position += 8;
+    return retValue;
+  };
+
+  BinaryParser.prototype.skip = function (n) {
+    this.position += n;
+    return this.position;
+  };
+  /**
+   * Return a bgzip (bam and tabix) virtual pointer
+   * TODO -- why isn't 8th byte used ?
+   * @returns {*}
+   */
+
+
+  BinaryParser.prototype.getVPointer = function () {
+    var position = this.position,
+        offset = this.view.getUint8(position + 1) << 8 | this.view.getUint8(position),
+        byte6 = (this.view.getUint8(position + 6) & 0xff) * 0x100000000,
+        byte5 = (this.view.getUint8(position + 5) & 0xff) * 0x1000000,
+        byte4 = (this.view.getUint8(position + 4) & 0xff) * 0x10000,
+        byte3 = (this.view.getUint8(position + 3) & 0xff) * 0x100,
+        byte2 = this.view.getUint8(position + 2) & 0xff,
+        block = byte6 + byte5 + byte4 + byte3 + byte2;
+    this.position += 8; //       if (block == 0 && offset == 0) {
+    //           return null;
+    //       } else {
+
+    return new VPointer(block, offset); //       }
+  };
+
+  function VPointer(block, offset) {
+    this.block = block;
+    this.offset = offset;
+  }
+
+  VPointer.prototype.isLessThan = function (vp) {
+    return this.block < vp.block || this.block === vp.block && this.offset < vp.offset;
+  };
+
+  VPointer.prototype.isGreaterThan = function (vp) {
+    return this.block > vp.block || this.block === vp.block && this.offset > vp.offset;
+  };
+
+  VPointer.prototype.print = function () {
+    return "" + this.block + ":" + this.offset;
+  };
+
+  var Matrix =
+  /*#__PURE__*/
+  function () {
+    function Matrix(chr1, chr2, zoomDataList) {
+      _classCallCheck(this, Matrix);
+
+      var self = this;
+      this.chr1 = chr1;
+      this.chr2 = chr2;
+      this.bpZoomData = [];
+      this.fragZoomData = [];
+      zoomDataList.forEach(function (zd) {
+        if (zd.zoom.unit === "BP") {
+          self.bpZoomData.push(zd);
+        } else {
+          self.fragZoomData.push(zd);
+        }
+      });
+    }
+
+    _createClass(Matrix, [{
+      key: "getZoomDataByIndex",
+      value: function getZoomDataByIndex(index, unit) {
+        var zdArray = "FRAG" === unit ? this.fragZoomData : this.bpZoomData;
+        return zdArray[index];
+      }
+    }, {
+      key: "findZoomForResolution",
+      value: function findZoomForResolution(binSize, unit) {
+        var zdArray = "FRAG" === unit ? this.fragZoomData : this.bpZoomData;
+
+        for (var i = 1; i < zdArray.length; i++) {
+          var zd = zdArray[i];
+
+          if (zd.zoom.binSize < binSize) {
+            return i - 1;
+          }
+        }
+
+        return zdArray.length - 1;
+      } // Legacy implementation, used only in tests.
+
+    }, {
+      key: "getZoomData",
+      value: function getZoomData(zoom) {
+        var zdArray = zoom.unit === "BP" ? this.bpZoomData : this.fragZoomData;
+
+        for (var i = 0; i < zdArray.length; i++) {
+          var zd = zdArray[i];
+
+          if (zoom.binSize === zd.zoom.binSize) {
+            return zd;
+          }
+        }
+
+        return undefined;
+      }
+    }]);
+
+    return Matrix;
+  }();
+
+  var MatrixZoomData =
+  /*#__PURE__*/
+  function () {
+    function MatrixZoomData(chr1, chr2, zoom, blockBinCount, blockColumnCount, chr1Sites, chr2Sites) {
+      _classCallCheck(this, MatrixZoomData);
+
+      this.chr1 = chr1; // chromosome index
+
+      this.chr2 = chr2;
+      this.zoom = zoom;
+      this.blockBinCount = blockBinCount;
+      this.blockColumnCount = blockColumnCount;
+      this.chr1Sites = chr1Sites;
+      this.chr2Sites = chr2Sites;
+    }
+
+    _createClass(MatrixZoomData, [{
+      key: "getKey",
+      value: function getKey() {
+        return this.chr1.name + "_" + this.chr2.name + "_" + this.zoom.unit + "_" + this.zoom.binSize;
+      }
+    }]);
+
+    return MatrixZoomData;
+  }();
+
+  /*
+   *  The MIT License (MIT)
+   *
+   * Copyright (c) 2016-2017 The Regents of the University of California
+   *
+   * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+   * associated documentation files (the "Software"), to deal in the Software without restriction, including
+   * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the
+   * following conditions:
+   *
+   * The above copyright notice and this permission notice shall be included in all copies or substantial
+   * portions of the Software.
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+   * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,  FITNESS FOR A PARTICULAR PURPOSE AND
+   * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+   * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+   * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+   * THE SOFTWARE.
+   *
+   */
+
+  /**
+   * @author Jim Robinson
+   */
+  var NormalizationVector =
+  /*#__PURE__*/
+  function () {
+    function NormalizationVector(type, chrIdx, unit, resolution, values) {
+      _classCallCheck(this, NormalizationVector);
+
+      var avg = mean(values),
+          i;
+
+      if (avg > 0) {
+        for (i = 0; i < values.length; i++) {
+          values[i] /= avg;
+        }
+      }
+
+      this.type = type;
+      this.chrIdx = chrIdx;
+      this.unit = unit;
+      this.resolution = resolution;
+      this.data = values;
+    }
+
+    _createClass(NormalizationVector, [{
+      key: "getKey",
+      value: function getKey() {
+        return NormalizationVector.getKey(this.type, this.chrIdx, this.unit, this.resolution);
+      }
+    }], [{
+      key: "getNormalizationVectorKey",
+      value: function getNormalizationVectorKey(type, chrIdx, unit, resolution) {
+        return type + "_" + chrIdx + "_" + unit + "_" + resolution;
+      }
+    }]);
+
+    return NormalizationVector;
+  }();
+
+  function mean(array) {
+    var t = 0,
+        n = 0,
+        i;
+
+    for (i = 0; i < array.length; i++) {
+      if (!isNaN(array[i])) {
+        t += array[i];
+        n++;
+      }
+    }
+
+    return n > 0 ? t / n : 0;
+  }
+
+  var ContactRecord =
+  /*#__PURE__*/
+  function () {
+    function ContactRecord(bin1, bin2, counts) {
+      _classCallCheck(this, ContactRecord);
+
+      this.bin1 = bin1;
+      this.bin2 = bin2;
+      this.counts = counts;
+    }
+
+    _createClass(ContactRecord, [{
+      key: "getKey",
+      value: function getKey() {
+        return "" + this.bin1 + "_" + this.bin2;
+      }
+    }]);
+
+    return ContactRecord;
+  }();
+
+  var Short_MIN_VALUE = -32768;
+  var googleRateLimiter = new RateLimiter(100);
+
+  var Block = function Block(blockNumber, zoomData, records, idx) {
+    _classCallCheck(this, Block);
+
+    this.blockNumber = blockNumber;
+    this.zoomData = zoomData;
+    this.records = records;
+    this.idx = idx;
+  };
+
+  var HicFile =
+  /*#__PURE__*/
+  function () {
+    function HicFile(args) {
+      _classCallCheck(this, HicFile);
+
+      this.config = args;
+      this.loadFragData = args.loadFragData;
+      this.fragmentSitesCache = {};
+      this.normVectorCache = {};
+      this.normalizationTypes = ['NONE']; // args may specify an io.File object, a local path (Node only), or a url
+
+      if (args.file) {
+        this.file = args.file;
+      } else if (args.blob) {
+        this.file = new BrowserLocalFile(args.blob);
+      } else {
+        this.url = args.path || args.url;
+
+        if (this.url.startsWith("http://") || this.url.startsWith("https://")) {
+          this.remote = true; // Google drive must be rate limited.  Perhaps all
+
+          var remoteFile = new RemoteFile(args);
+
+          if (isGoogleDrive(this.url)) {
+            this.file = new ThrottledFile(remoteFile, googleRateLimiter);
+          } else {
+            this.file = remoteFile;
+          }
+        } else {
+          throw Error("Arguments must include file, blob, or url");
+        }
+      }
+    }
+
+    _createClass(HicFile, [{
+      key: "init",
+      value: function () {
+        var _init = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee() {
+          return regeneratorRuntime.wrap(function _callee$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  if (!this.initialized) {
+                    _context.next = 4;
+                    break;
+                  }
+
+                  return _context.abrupt("return");
+
+                case 4:
+                  _context.next = 6;
+                  return this.readHeader();
+
+                case 6:
+                  _context.next = 8;
+                  return this.readFooter();
+
+                case 8:
+                  this.initialized = true;
+
+                case 9:
+                case "end":
+                  return _context.stop();
+              }
+            }
+          }, _callee, this);
+        }));
+
+        function init() {
+          return _init.apply(this, arguments);
+        }
+
+        return init;
+      }()
+    }, {
+      key: "getMetaData",
+      value: function () {
+        var _getMetaData = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee2() {
+          return regeneratorRuntime.wrap(function _callee2$(_context2) {
+            while (1) {
+              switch (_context2.prev = _context2.next) {
+                case 0:
+                  _context2.next = 2;
+                  return this.init();
+
+                case 2:
+                  return _context2.abrupt("return", this.meta);
+
+                case 3:
+                case "end":
+                  return _context2.stop();
+              }
+            }
+          }, _callee2, this);
+        }));
+
+        function getMetaData() {
+          return _getMetaData.apply(this, arguments);
+        }
+
+        return getMetaData;
+      }()
+    }, {
+      key: "readHeader",
+      value: function () {
+        var _readHeader = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee3() {
+          var data, binaryParser, nAttributes, nChrs, i, chr, nBpResolutions, nFragResolutions, nSites, _i, _Object$keys, chrName;
+
+          return regeneratorRuntime.wrap(function _callee3$(_context3) {
+            while (1) {
+              switch (_context3.prev = _context3.next) {
+                case 0:
+                  _context3.next = 2;
+                  return this.file.read(0, 64000);
+
+                case 2:
+                  data = _context3.sent;
+
+                  if (data) {
+                    _context3.next = 5;
+                    break;
+                  }
+
+                  return _context3.abrupt("return", undefined);
+
+                case 5:
+                  binaryParser = new BinaryParser(new DataView(data));
+                  this.magic = binaryParser.getString();
+                  this.version = binaryParser.getInt();
+                  this.masterIndexPos = binaryParser.getLong();
+                  this.genomeId = binaryParser.getString();
+                  this.attributes = {};
+                  nAttributes = binaryParser.getInt();
+
+                  while (nAttributes-- > 0) {
+                    this.attributes[binaryParser.getString()] = binaryParser.getString();
+                  }
+
+                  this.chromosomes = [];
+                  this.chromosomeIndexMap = {};
+                  nChrs = binaryParser.getInt();
+                  i = 0;
+
+                  while (nChrs-- > 0) {
+                    chr = {
+                      index: i,
+                      name: binaryParser.getString(),
+                      size: binaryParser.getInt()
+                    };
+
+                    if (chr.name.toLowerCase() === "all") {
+                      this.wholeGenomeChromosome = chr;
+                      this.wholeGenomeResolution = Math.round(chr.size * (1000 / 500)); // Hardcoded in juicer
+                    }
+
+                    this.chromosomes.push(chr);
+                    this.chromosomeIndexMap[chr.name] = chr.index;
+                    i++;
+                  }
+
+                  this.bpResolutions = [];
+                  nBpResolutions = binaryParser.getInt();
+
+                  while (nBpResolutions-- > 0) {
+                    this.bpResolutions.push(binaryParser.getInt());
+                  }
+
+                  if (this.loadFragData) {
+                    this.fragResolutions = [];
+                    nFragResolutions = binaryParser.getInt();
+
+                    while (nFragResolutions-- > 0) {
+                      this.fragResolutions.push(binaryParser.getInt());
+                    }
+
+                    if (nFragResolutions > 0) {
+                      this.sites = [];
+                      nSites = binaryParser.getInt();
+
+                      while (nSites-- > 0) {
+                        this.sites.push(binaryParser.getInt());
+                      }
+                    }
+                  } // Build lookup table for well-known chr aliases
+
+
+                  this.chrAliasTable = {};
+
+                  for (_i = 0, _Object$keys = Object.keys(this.chromosomeIndexMap); _i < _Object$keys.length; _i++) {
+                    chrName = _Object$keys[_i];
+
+                    if (chrName.startsWith("chr")) {
+                      this.chrAliasTable[chrName.substr(3)] = chrName;
+                    } else if (chrName === "MT") {
+                      this.chrAliasTable["chrM"] = chrName;
+                    } else {
+                      this.chrAliasTable["chr" + chrName] = chrName;
+                    }
+                  } // Meta data for the API
+
+
+                  this.meta = {
+                    "version": this.version,
+                    "genome": this.genomeId,
+                    "chromosomes": this.chromosomes,
+                    "resolutions": this.bpResolutions
+                  };
+
+                case 25:
+                case "end":
+                  return _context3.stop();
+              }
+            }
+          }, _callee3, this);
+        }));
+
+        function readHeader() {
+          return _readHeader.apply(this, arguments);
+        }
+
+        return readHeader;
+      }()
+    }, {
+      key: "readFooter",
+      value: function () {
+        var _readFooter = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee4() {
+          var data, binaryParser, nBytes, nEntries, miSize, range, key, pos, size;
+          return regeneratorRuntime.wrap(function _callee4$(_context4) {
+            while (1) {
+              switch (_context4.prev = _context4.next) {
+                case 0:
+                  _context4.next = 2;
+                  return this.file.read(this.masterIndexPos, 8);
+
+                case 2:
+                  data = _context4.sent;
+
+                  if (data) {
+                    _context4.next = 5;
+                    break;
+                  }
+
+                  return _context4.abrupt("return", null);
+
+                case 5:
+                  binaryParser = new BinaryParser(new DataView(data));
+                  nBytes = binaryParser.getInt(); // Total size, master index + expected values
+
+                  nEntries = binaryParser.getInt(); // Estimate the size of the master index. String length of key is unknown, be conservative (100 bytes)
+
+                  miSize = nEntries * (100 + 64 + 32);
+                  range = {
+                    start: this.masterIndexPos + 8,
+                    size: Math.min(miSize, nBytes - 4)
+                  };
+                  _context4.next = 12;
+                  return this.file.read(this.masterIndexPos + 8, Math.min(miSize, nBytes - 4));
+
+                case 12:
+                  data = _context4.sent;
+                  binaryParser = new BinaryParser(new DataView(data));
+                  this.masterIndex = {};
+
+                  while (nEntries-- > 0) {
+                    key = binaryParser.getString();
+                    pos = binaryParser.getLong();
+                    size = binaryParser.getInt();
+                    this.masterIndex[key] = {
+                      start: pos,
+                      size: size
+                    };
+                  }
+
+                  this.expectedValueVectors = {};
+                  nEntries = binaryParser.getInt(); // Expected values
+                  // while (nEntries-- > 0) {
+                  //     type = "NONE";
+                  //     unit = binaryParser.getString();
+                  //     binSize = binaryParser.getInt();
+                  //     nValues = binaryParser.getInt();
+                  //     values = [];
+                  //     while (nValues-- > 0) {
+                  //         values.push(binaryParser.getDouble());
+                  //     }
+                  //
+                  //     nChrScaleFactors = binaryParser.getInt();
+                  //     normFactors = {};
+                  //     while (nChrScaleFactors-- > 0) {
+                  //         normFactors[binaryParser.getInt()] = binaryParser.getDouble();
+                  //     }
+                  //
+                  //     // key = unit + "_" + binSize + "_" + type;
+                  //     //  NOT USED YET SO DON'T STORE
+                  //     //  dataset.expectedValueVectors[key] =
+                  //     //      new ExpectedValueFunction(type, unit, binSize, values, normFactors);
+                  // }
+
+                  this.normExpectedValueVectorsPosition = this.masterIndexPos + 4 + nBytes;
+                  return _context4.abrupt("return", this);
+
+                case 20:
+                case "end":
+                  return _context4.stop();
+              }
+            }
+          }, _callee4, this);
+        }));
+
+        function readFooter() {
+          return _readFooter.apply(this, arguments);
+        }
+
+        return readFooter;
+      }()
+    }, {
+      key: "readMatrix",
+      value: function () {
+        var _readMatrix = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee5(chrIdx1, chrIdx2) {
+          var tmp, key, idx, data, dis, c1, c2, chr1, chr2, nResolutions, zdList, sites1, sites2, bytesAvailable, filePosition, zd, bytesUsed;
+          return regeneratorRuntime.wrap(function _callee5$(_context5) {
+            while (1) {
+              switch (_context5.prev = _context5.next) {
+                case 0:
+                  _context5.next = 2;
+                  return this.init();
+
+                case 2:
+                  if (chrIdx1 > chrIdx2) {
+                    tmp = chrIdx1;
+                    chrIdx1 = chrIdx2;
+                    chrIdx2 = tmp;
+                  }
+
+                  key = "" + chrIdx1 + "_" + chrIdx2;
+                  idx = this.masterIndex[key];
+
+                  if (idx) {
+                    _context5.next = 7;
+                    break;
+                  }
+
+                  return _context5.abrupt("return", undefined);
+
+                case 7:
+                  _context5.next = 9;
+                  return this.file.read(idx.start, idx.size);
+
+                case 9:
+                  data = _context5.sent;
+
+                  if (data) {
+                    _context5.next = 12;
+                    break;
+                  }
+
+                  return _context5.abrupt("return", undefined);
+
+                case 12:
+                  dis = new BinaryParser(new DataView(data));
+                  c1 = dis.getInt(); // Should equal chrIdx1
+
+                  c2 = dis.getInt(); // Should equal chrIdx2
+                  // TODO validate this
+
+                  chr1 = this.chromosomes[c1];
+                  chr2 = this.chromosomes[c2]; // # of resolution levels (bp and frags)
+
+                  nResolutions = dis.getInt();
+                  zdList = [];
+                  _context5.next = 21;
+                  return this.getSites.call(this, chr1.name);
+
+                case 21:
+                  sites1 = _context5.sent;
+                  _context5.next = 24;
+                  return this.getSites.call(this, chr2.name);
+
+                case 24:
+                  sites2 = _context5.sent;
+                  bytesAvailable = dis.available();
+                  filePosition = idx.start;
+
+                  while (nResolutions-- > 0) {
+                    zd = parseMatixZoomData(chr1, chr2, sites1, sites2, dis);
+                    bytesUsed = bytesAvailable - dis.available();
+                    zd.idx = {
+                      start: filePosition,
+                      size: bytesUsed
+                    };
+                    bytesAvailable = dis.available();
+                    zdList.push(zd); //console.log(`zd${z++}: ${bytesUsed}`)
+                  }
+
+                  return _context5.abrupt("return", new Matrix(chrIdx1, chrIdx2, zdList));
+
+                case 30:
+                case "end":
+                  return _context5.stop();
+              }
+            }
+          }, _callee5, this);
+        }));
+
+        function readMatrix(_x, _x2) {
+          return _readMatrix.apply(this, arguments);
+        }
+
+        return readMatrix;
+      }()
+      /***
+       * Return the raw data for the block.  Function provided for testing and development
+       * @param blockNumber
+       * @param zd
+       * @returns {Promise<void>}
+       */
+
+    }, {
+      key: "readBlockData",
+      value: function () {
+        var _readBlockData = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee6(blockNumber, zd) {
+          var idx, blockIndex;
+          return regeneratorRuntime.wrap(function _callee6$(_context6) {
+            while (1) {
+              switch (_context6.prev = _context6.next) {
+                case 0:
+                  idx = null;
+                  blockIndex = zd.blockIndexMap;
+
+                  if (blockIndex) {
+                    idx = blockIndex[blockNumber];
+                  }
+
+                  if (idx) {
+                    _context6.next = 7;
+                    break;
+                  }
+
+                  return _context6.abrupt("return", undefined);
+
+                case 7:
+                  return _context6.abrupt("return", this.file.read(idx.filePosition, idx.size));
+
+                case 8:
+                case "end":
+                  return _context6.stop();
+              }
+            }
+          }, _callee6, this);
+        }));
+
+        function readBlockData(_x3, _x4) {
+          return _readBlockData.apply(this, arguments);
+        }
+
+        return readBlockData;
+      }()
+    }, {
+      key: "readBlock",
+      value: function () {
+        var _readBlock = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee7(blockNumber, zd) {
+          var self, idx, i, j, blockIndex, data, inflate, plain, parser, nRecords, records, binX, binY, counts, binXOffset, binYOffset, useShort, type, rowCount, colCount, nPts, w, row, col, bin1, bin2;
+          return regeneratorRuntime.wrap(function _callee7$(_context7) {
+            while (1) {
+              switch (_context7.prev = _context7.next) {
+                case 0:
+                  self = this, idx = null;
+                  blockIndex = zd.blockIndexMap;
+
+                  if (blockIndex) {
+                    idx = blockIndex[blockNumber];
+                  }
+
+                  if (idx) {
+                    _context7.next = 7;
+                    break;
+                  }
+
+                  return _context7.abrupt("return", undefined);
+
+                case 7:
+                  _context7.next = 9;
+                  return this.file.read(idx.filePosition, idx.size);
+
+                case 9:
+                  data = _context7.sent;
+
+                  if (data) {
+                    _context7.next = 12;
+                    break;
+                  }
+
+                  return _context7.abrupt("return", undefined);
+
+                case 12:
+                  inflate = new Zlib.Inflate(new Uint8Array(data));
+                  plain = inflate.decompress(); //var plain = zlib.inflateSync(Buffer.from(data))   //.decompress();
+
+                  data = plain.buffer;
+                  parser = new BinaryParser(new DataView(data));
+                  nRecords = parser.getInt();
+                  records = [];
+
+                  if (!(self.version < 7)) {
+                    _context7.next = 22;
+                    break;
+                  }
+
+                  for (i = 0; i < nRecords; i++) {
+                    binX = parser.getInt();
+                    binY = parser.getInt();
+                    counts = parser.getFloat();
+                    records.push(new ContactRecord(binX, binY, counts));
+                  }
+
+                  _context7.next = 38;
+                  break;
+
+                case 22:
+                  binXOffset = parser.getInt();
+                  binYOffset = parser.getInt();
+                  useShort = parser.getByte() == 0;
+                  type = parser.getByte();
+
+                  if (!(type === 1)) {
+                    _context7.next = 31;
+                    break;
+                  }
+
+                  // List-of-rows representation
+                  rowCount = parser.getShort();
+
+                  for (i = 0; i < rowCount; i++) {
+                    binY = binYOffset + parser.getShort();
+                    colCount = parser.getShort();
+
+                    for (j = 0; j < colCount; j++) {
+                      binX = binXOffset + parser.getShort();
+                      counts = useShort ? parser.getShort() : parser.getFloat();
+                      records.push(new ContactRecord(binX, binY, counts));
+                    }
+                  }
+
+                  _context7.next = 38;
+                  break;
+
+                case 31:
+                  if (!(type == 2)) {
+                    _context7.next = 37;
+                    break;
+                  }
+
+                  nPts = parser.getInt();
+                  w = parser.getShort();
+
+                  for (i = 0; i < nPts; i++) {
+                    //int idx = (p.y - binOffset2) * w + (p.x - binOffset1);
+                    row = Math.floor(i / w);
+                    col = i - row * w;
+                    bin1 = binXOffset + col;
+                    bin2 = binYOffset + row;
+
+                    if (useShort) {
+                      counts = parser.getShort();
+
+                      if (counts != Short_MIN_VALUE) {
+                        records.push(new ContactRecord(bin1, bin2, counts));
+                      }
+                    } else {
+                      counts = parser.getFloat();
+
+                      if (!isNaN(counts)) {
+                        records.push(new ContactRecord(bin1, bin2, counts));
+                      }
+                    }
+                  }
+
+                  _context7.next = 38;
+                  break;
+
+                case 37:
+                  throw new Error("Unknown block type: " + type);
+
+                case 38:
+                  return _context7.abrupt("return", new Block(blockNumber, zd, records, idx));
+
+                case 39:
+                case "end":
+                  return _context7.stop();
+              }
+            }
+          }, _callee7, this);
+        }));
+
+        function readBlock(_x5, _x6) {
+          return _readBlock.apply(this, arguments);
+        }
+
+        return readBlock;
+      }()
+    }, {
+      key: "getSites",
+      value: function () {
+        var _getSites = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee8(chrName) {
+          return regeneratorRuntime.wrap(function _callee8$(_context8) {
+            while (1) {
+              switch (_context8.prev = _context8.next) {
+                case 0:
+                  return _context8.abrupt("return", undefined);
+
+                case 1:
+                case "end":
+                  return _context8.stop();
+              }
+            }
+          }, _callee8);
+        }));
+
+        function getSites(_x7) {
+          return _getSites.apply(this, arguments);
+        }
+
+        return getSites;
+      }()
+    }, {
+      key: "getNormalizationVector",
+      value: function () {
+        var _getNormalizationVector = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee9(type, chr, unit, binSize) {
+          var chrIdx, canonicalName, key, normVectorIndex, idx, data, parser, nValues, values, allNaN, i;
+          return regeneratorRuntime.wrap(function _callee9$(_context9) {
+            while (1) {
+              switch (_context9.prev = _context9.next) {
+                case 0:
+                  _context9.next = 2;
+                  return this.init();
+
+                case 2:
+                  if (Number.isInteger(chr)) {
+                    chrIdx = chr;
+                  } else {
+                    canonicalName = this.getFileChrName(chr);
+                    chrIdx = this.chromosomeIndexMap[canonicalName];
+                  }
+
+                  key = getNormalizationVectorKey(type, chrIdx, unit.toString(), binSize);
+
+                  if (!this.normVectorCache.hasOwnProperty(key)) {
+                    _context9.next = 6;
+                    break;
+                  }
+
+                  return _context9.abrupt("return", Promise.resolve(this.normVectorCache[key]));
+
+                case 6:
+                  _context9.next = 8;
+                  return this.getNormVectorIndex();
+
+                case 8:
+                  normVectorIndex = _context9.sent;
+
+                  if (normVectorIndex) {
+                    _context9.next = 11;
+                    break;
+                  }
+
+                  return _context9.abrupt("return", undefined);
+
+                case 11:
+                  idx = normVectorIndex[key];
+
+                  if (idx) {
+                    _context9.next = 14;
+                    break;
+                  }
+
+                  return _context9.abrupt("return", undefined);
+
+                case 14:
+                  _context9.next = 16;
+                  return this.file.read(idx.filePosition, idx.size);
+
+                case 16:
+                  data = _context9.sent;
+
+                  if (data) {
+                    _context9.next = 19;
+                    break;
+                  }
+
+                  return _context9.abrupt("return", undefined);
+
+                case 19:
+                  parser = new BinaryParser(new DataView(data));
+                  nValues = parser.getInt();
+                  values = [];
+                  allNaN = true;
+
+                  for (i = 0; i < nValues; i++) {
+                    values[i] = parser.getDouble();
+
+                    if (!isNaN(values[i])) {
+                      allNaN = false;
+                    }
+                  }
+
+                  if (!allNaN) {
+                    _context9.next = 28;
+                    break;
+                  }
+
+                  return _context9.abrupt("return", undefined);
+
+                case 28:
+                  return _context9.abrupt("return", new NormalizationVector(type, chrIdx, unit, binSize, values));
+
+                case 29:
+                case "end":
+                  return _context9.stop();
+              }
+            }
+          }, _callee9, this);
+        }));
+
+        function getNormalizationVector(_x8, _x9, _x10, _x11) {
+          return _getNormalizationVector.apply(this, arguments);
+        }
+
+        return getNormalizationVector;
+      }()
+    }, {
+      key: "getNormVectorIndex",
+      value: function () {
+        var _getNormVectorIndex = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee10() {
+          var url, key, nviResponse, nvi, nviArray, range;
+          return regeneratorRuntime.wrap(function _callee10$(_context10) {
+            while (1) {
+              switch (_context10.prev = _context10.next) {
+                case 0:
+                  if (this.normVectorIndex) {
+                    _context10.next = 27;
+                    break;
+                  }
+
+                  if (!(!this.config.nvi && this.remote && this.url)) {
+                    _context10.next = 12;
+                    break;
+                  }
+
+                  url = new URL(this.url);
+                  key = encodeURIComponent(url.hostname + url.pathname);
+                  _context10.next = 6;
+                  return crossFetch('https://t5dvc6kn3f.execute-api.us-east-1.amazonaws.com/dev/nvi/' + key);
+
+                case 6:
+                  nviResponse = _context10.sent;
+
+                  if (!(nviResponse.status === 200)) {
+                    _context10.next = 12;
+                    break;
+                  }
+
+                  _context10.next = 10;
+                  return nviResponse.text();
+
+                case 10:
+                  nvi = _context10.sent;
+
+                  if (nvi) {
+                    this.config.nvi = nvi;
+                  }
+
+                case 12:
+                  if (!this.config.nvi) {
+                    _context10.next = 18;
+                    break;
+                  }
+
+                  nviArray = decodeURIComponent(this.config.nvi).split(",");
+                  range = {
+                    start: parseInt(nviArray[0]),
+                    size: parseInt(nviArray[1])
+                  };
+                  return _context10.abrupt("return", this.readNormVectorIndex(range));
+
+                case 18:
+                  _context10.prev = 18;
+                  _context10.next = 21;
+                  return this.readNormExpectedValuesAndNormVectorIndex();
+
+                case 21:
+                  return _context10.abrupt("return", this.normVectorIndex);
+
+                case 24:
+                  _context10.prev = 24;
+                  _context10.t0 = _context10["catch"](18);
+
+                  if (_context10.t0.code === "416" || _context10.t0.code === 416) {
+                    // This is expected if file does not contain norm vectors
+                    this.normExpectedValueVectorsPosition = undefined;
+                  } else {
+                    console.error(_context10.t0);
+                  }
+
+                case 27:
+                  return _context10.abrupt("return", this.normVectorIndex);
+
+                case 28:
+                case "end":
+                  return _context10.stop();
+              }
+            }
+          }, _callee10, this, [[18, 24]]);
+        }));
+
+        function getNormVectorIndex() {
+          return _getNormVectorIndex.apply(this, arguments);
+        }
+
+        return getNormVectorIndex;
+      }()
+    }, {
+      key: "getNormalizationOptions",
+      value: function () {
+        var _getNormalizationOptions = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee11() {
+          return regeneratorRuntime.wrap(function _callee11$(_context11) {
+            while (1) {
+              switch (_context11.prev = _context11.next) {
+                case 0:
+                  _context11.next = 2;
+                  return this.getNormVectorIndex();
+
+                case 2:
+                  return _context11.abrupt("return", this.normalizationTypes);
+
+                case 3:
+                case "end":
+                  return _context11.stop();
+              }
+            }
+          }, _callee11, this);
+        }));
+
+        function getNormalizationOptions() {
+          return _getNormalizationOptions.apply(this, arguments);
+        }
+
+        return getNormalizationOptions;
+      }()
+      /**
+       * Return a promise to load the normalization vector index
+       *
+       * @param dataset
+       * @param range  -- file range {position, size}
+       * @returns Promise for the normalization vector index
+       */
+
+    }, {
+      key: "readNormVectorIndex",
+      value: function () {
+        var _readNormVectorIndex = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee12(range) {
+          var data, binaryParser, nEntries;
+          return regeneratorRuntime.wrap(function _callee12$(_context12) {
+            while (1) {
+              switch (_context12.prev = _context12.next) {
+                case 0:
+                  _context12.next = 2;
+                  return this.init();
+
+                case 2:
+                  this.normalizationVectorIndexRange = range;
+                  _context12.next = 5;
+                  return this.file.read(range.start, range.size);
+
+                case 5:
+                  data = _context12.sent;
+                  binaryParser = new BinaryParser(new DataView(data));
+                  this.normVectorIndex = {};
+                  nEntries = binaryParser.getInt();
+
+                  while (nEntries-- > 0) {
+                    this.parseNormVectorEntry(binaryParser);
+                  }
+
+                  return _context12.abrupt("return", this.normVectorIndex);
+
+                case 11:
+                case "end":
+                  return _context12.stop();
+              }
+            }
+          }, _callee12, this);
+        }));
+
+        function readNormVectorIndex(_x12) {
+          return _readNormVectorIndex.apply(this, arguments);
+        }
+
+        return readNormVectorIndex;
+      }()
+      /**
+       * This function is used when the position of the norm vector index is unknown.  We must read through the expected
+       * values to find the index
+       *
+       * @param dataset
+       * @returns {Promise}
+       */
+
+    }, {
+      key: "readNormExpectedValuesAndNormVectorIndex",
+      value: function () {
+        var _readNormExpectedValuesAndNormVectorIndex = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee14() {
+          var nviStart, byteCount, data, binaryParser, nEntries, sizeEstimate, range, processEntries, _processEntries;
+
+          return regeneratorRuntime.wrap(function _callee14$(_context14) {
+            while (1) {
+              switch (_context14.prev = _context14.next) {
+                case 0:
+                  _processEntries = function _ref2() {
+                    _processEntries = _asyncToGenerator(
+                    /*#__PURE__*/
+                    regeneratorRuntime.mark(function _callee13(nEntries, data) {
+                      var binaryParser, _sizeEstimate, _range, _data;
+
+                      return regeneratorRuntime.wrap(function _callee13$(_context13) {
+                        while (1) {
+                          switch (_context13.prev = _context13.next) {
+                            case 0:
+                              binaryParser = new BinaryParser(new DataView(data));
+
+                            case 1:
+                              if (!(nEntries-- > 0)) {
+                                _context13.next = 14;
+                                break;
+                              }
+
+                              if (!(binaryParser.available() < 100)) {
+                                _context13.next = 11;
+                                break;
+                              }
+
+                              nEntries++; // Reset counter as entry is not processed
+
+                              byteCount += binaryParser.position;
+                              _sizeEstimate = Math.max(1000, nEntries * 30);
+                              _range = {
+                                start: nviStart + byteCount,
+                                size: _sizeEstimate
+                              };
+                              _context13.next = 9;
+                              return this.file.read(_range.start, _range.size);
+
+                            case 9:
+                              _data = _context13.sent;
+                              return _context13.abrupt("return", processEntries.call(this, nEntries, _data));
+
+                            case 11:
+                              this.parseNormVectorEntry(binaryParser);
+                              _context13.next = 1;
+                              break;
+
+                            case 14:
+                              byteCount += binaryParser.position;
+
+                            case 15:
+                            case "end":
+                              return _context13.stop();
+                          }
+                        }
+                      }, _callee13, this);
+                    }));
+                    return _processEntries.apply(this, arguments);
+                  };
+
+                  processEntries = function _ref(_x13, _x14) {
+                    return _processEntries.apply(this, arguments);
+                  };
+
+                  _context14.next = 4;
+                  return this.init();
+
+                case 4:
+                  if (!(this.normExpectedValueVectorsPosition === undefined)) {
+                    _context14.next = 6;
+                    break;
+                  }
+
+                  return _context14.abrupt("return");
+
+                case 6:
+                  _context14.next = 8;
+                  return this.skipExpectedValues(this.normExpectedValueVectorsPosition);
+
+                case 8:
+                  nviStart = _context14.sent;
+                  byteCount = 4;
+                  _context14.next = 12;
+                  return this.file.read(nviStart, 4);
+
+                case 12:
+                  data = _context14.sent;
+                  binaryParser = new BinaryParser(new DataView(data));
+                  nEntries = binaryParser.getInt();
+                  sizeEstimate = nEntries * 30;
+                  range = {
+                    start: nviStart + byteCount,
+                    size: sizeEstimate
+                  };
+                  _context14.next = 19;
+                  return this.file.read(range.start, range.size);
+
+                case 19:
+                  data = _context14.sent;
+                  this.normalizedExpectedValueVectors = {};
+                  this.normVectorIndex = {}; // Recursively process entries
+
+                  _context14.next = 24;
+                  return processEntries.call(this, nEntries, data);
+
+                case 24:
+                  this.config.nvi = nviStart.toString() + "," + byteCount;
+
+                case 25:
+                case "end":
+                  return _context14.stop();
+              }
+            }
+          }, _callee14, this);
+        }));
+
+        function readNormExpectedValuesAndNormVectorIndex() {
+          return _readNormExpectedValuesAndNormVectorIndex.apply(this, arguments);
+        }
+
+        return readNormExpectedValuesAndNormVectorIndex;
+      }()
+      /**
+       * This function is used when the position of the norm vector index is unknown.  We must read through the expected
+       * values to find the index
+       *
+       * @param dataset
+       * @returns {Promise}
+       */
+
+    }, {
+      key: "skipExpectedValues",
+      value: function () {
+        var _skipExpectedValues = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee16(start) {
+          var file, range, data, binaryParser, nEntries, parseNext, _parseNext;
+
+          return regeneratorRuntime.wrap(function _callee16$(_context16) {
+            while (1) {
+              switch (_context16.prev = _context16.next) {
+                case 0:
+                  _parseNext = function _ref4() {
+                    _parseNext = _asyncToGenerator(
+                    /*#__PURE__*/
+                    regeneratorRuntime.mark(function _callee15(start, nEntries) {
+                      var range, chunkSize, p0, data, binaryParser, nValues, nChrScaleFactors;
+                      return regeneratorRuntime.wrap(function _callee15$(_context15) {
+                        while (1) {
+                          switch (_context15.prev = _context15.next) {
+                            case 0:
+                              range = {
+                                start: start,
+                                size: 500
+                              };
+                              chunkSize = 0;
+                              p0 = start;
+                              _context15.next = 5;
+                              return file.read(range.start, range.size);
+
+                            case 5:
+                              data = _context15.sent;
+                              binaryParser = new BinaryParser(new DataView(data));
+                              binaryParser.getString(); // type
+
+                              binaryParser.getString(); // unit
+
+                              binaryParser.getInt(); // binSize
+
+                              nValues = binaryParser.getInt();
+                              chunkSize += binaryParser.position + nValues * 8;
+                              range = {
+                                start: start + chunkSize,
+                                size: 4
+                              };
+                              _context15.next = 15;
+                              return file.read(range.start, range.size);
+
+                            case 15:
+                              data = _context15.sent;
+                              binaryParser = new BinaryParser(new DataView(data));
+                              nChrScaleFactors = binaryParser.getInt();
+                              chunkSize += 4 + nChrScaleFactors * (4 + 8);
+                              nEntries--;
+
+                              if (!(nEntries === 0)) {
+                                _context15.next = 24;
+                                break;
+                              }
+
+                              return _context15.abrupt("return", Promise.resolve(p0 + chunkSize));
+
+                            case 24:
+                              return _context15.abrupt("return", parseNext(p0 + chunkSize, nEntries));
+
+                            case 25:
+                            case "end":
+                              return _context15.stop();
+                          }
+                        }
+                      }, _callee15);
+                    }));
+                    return _parseNext.apply(this, arguments);
+                  };
+
+                  parseNext = function _ref3(_x16, _x17) {
+                    return _parseNext.apply(this, arguments);
+                  };
+
+                  file = new BufferedFile({
+                    file: this.file,
+                    size: 256000
+                  });
+                  range = {
+                    start: start,
+                    size: 4
+                  };
+                  _context16.next = 6;
+                  return file.read(range.start, range.size);
+
+                case 6:
+                  data = _context16.sent;
+                  binaryParser = new BinaryParser(new DataView(data));
+                  nEntries = binaryParser.getInt(); // Total # of expected value chunks
+
+                  if (!(nEntries === 0)) {
+                    _context16.next = 13;
+                    break;
+                  }
+
+                  return _context16.abrupt("return", range.start + range.size);
+
+                case 13:
+                  return _context16.abrupt("return", parseNext(start + 4, nEntries));
+
+                case 14:
+                case "end":
+                  return _context16.stop();
+              }
+            }
+          }, _callee16, this);
+        }));
+
+        function skipExpectedValues(_x15) {
+          return _skipExpectedValues.apply(this, arguments);
+        }
+
+        return skipExpectedValues;
+      }()
+    }, {
+      key: "getZoomIndexForBinSize",
+      value: function getZoomIndexForBinSize(binSize, unit) {
+        unit = unit || "BP";
+        var resolutionArray;
+
+        if (unit === "BP") {
+          resolutionArray = this.bpResolutions;
+        } else if (unit === "FRAG") {
+          resolutionArray = this.fragResolutions;
+        } else {
+          throw new Error("Invalid unit: " + unit);
+        }
+
+        for (var i = 0; i < resolutionArray.length; i++) {
+          if (resolutionArray[i] === binSize) return i;
+        }
+
+        return -1;
+      }
+    }, {
+      key: "parseNormVectorEntry",
+      value: function parseNormVectorEntry(binaryParser) {
+        var type = binaryParser.getString(); //15
+
+        var chrIdx = binaryParser.getInt(); //4
+
+        var unit = binaryParser.getString(); //3
+
+        var binSize = binaryParser.getInt(); //4
+
+        var filePosition = binaryParser.getLong(); //8
+
+        var sizeInBytes = binaryParser.getInt(); //4
+
+        var key = type + "_" + chrIdx + "_" + unit + "_" + binSize; // TODO -- why does this not work?  NormalizationVector.getNormalizationVectorKey(type, chrIdx, unit, binSize);
+
+        if (!this.normalizationTypes.includes(type)) {
+          this.normalizationTypes.push(type);
+        }
+
+        this.normVectorIndex[key] = {
+          filePosition: filePosition,
+          size: sizeInBytes
+        };
+      }
+    }, {
+      key: "getFileChrName",
+      value: function getFileChrName(chrAlias) {
+        if (this.chrAliasTable.hasOwnProperty(chrAlias)) {
+          return this.chrAliasTable[chrAlias];
+        } else {
+          return chrAlias;
+        }
+      }
+    }]);
+
+    return HicFile;
+  }();
+
+  function parseMatixZoomData(chr1, chr2, chr1Sites, chr2Sites, dis) {
+    var unit, sumCounts, occupiedCellCount, stdDev, percent95, binSize, zoom, blockBinCount, blockColumnCount, zd, nBlocks, blockIndex, nBins1, nBins2, avgCount, blockNumber, filePosition, blockSizeInBytes;
+    unit = dis.getString();
+    dis.getInt(); // Old "zoom" index -- not used, must be read
+    // Stats.  Not used yet, but we need to read them anyway
+
+    sumCounts = dis.getFloat();
+    occupiedCellCount = dis.getFloat();
+    stdDev = dis.getFloat();
+    percent95 = dis.getFloat();
+    binSize = dis.getInt();
+    zoom = {
+      unit: unit,
+      binSize: binSize
+    };
+    blockBinCount = dis.getInt();
+    blockColumnCount = dis.getInt();
+    zd = new MatrixZoomData(chr1, chr2, zoom, blockBinCount, blockColumnCount, chr1Sites, chr2Sites);
+    nBlocks = dis.getInt();
+    blockIndex = {};
+
+    while (nBlocks-- > 0) {
+      blockNumber = dis.getInt();
+      filePosition = dis.getLong();
+      blockSizeInBytes = dis.getInt();
+      blockIndex[blockNumber] = {
+        filePosition: filePosition,
+        size: blockSizeInBytes
+      };
+    }
+
+    zd.blockIndexMap = blockIndex;
+    nBins1 = chr1.size / binSize;
+    nBins2 = chr2.size / binSize;
+    avgCount = sumCounts / nBins1 / nBins2; // <= trying to avoid overflows
+
+    zd.averageCount = avgCount;
+    zd.sumCounts = sumCounts;
+    zd.stdDev = stdDev;
+    zd.occupiedCellCount = occupiedCellCount;
+    zd.percent95 = percent95;
+    return zd;
+  }
+
+  function getNormalizationVectorKey(type, chrIdx, unit, resolution) {
+    return type + "_" + chrIdx + "_" + unit + "_" + resolution;
+  }
+
+  function isGoogleDrive(url) {
+    return url.indexOf("drive.google.com") >= 0 || url.indexOf("www.googleapis.com/drive") > 0;
+  }
+
+  var Straw =
+  /*#__PURE__*/
+  function () {
+    function Straw(config) {
+      _classCallCheck(this, Straw);
+
+      this.config = config;
+      this.hicFile = new HicFile(config);
+    }
+
+    _createClass(Straw, [{
+      key: "getMetaData",
+      value: function () {
+        var _getMetaData = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee() {
+          return regeneratorRuntime.wrap(function _callee$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  _context.next = 2;
+                  return this.hicFile.getMetaData();
+
+                case 2:
+                  return _context.abrupt("return", _context.sent);
+
+                case 3:
+                case "end":
+                  return _context.stop();
+              }
+            }
+          }, _callee, this);
+        }));
+
+        function getMetaData() {
+          return _getMetaData.apply(this, arguments);
+        }
+
+        return getMetaData;
+      }()
+    }, {
+      key: "getBlocks",
+      value: function () {
+        var _getBlocks = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee2(region1, region2, units, binsize) {
+          var chr1, chr2, idx1, idx2, x1, x2, y1, y2, matrix, z, zd, msg, blockBinCount, col1, col2, row1, row2, promises, sameChr, row, column, blockNumber;
+          return regeneratorRuntime.wrap(function _callee2$(_context2) {
+            while (1) {
+              switch (_context2.prev = _context2.next) {
+                case 0:
+                  _context2.next = 2;
+                  return this.hicFile.init();
+
+                case 2:
+                  chr1 = this.hicFile.getFileChrName(region1.chr);
+                  chr2 = this.hicFile.getFileChrName(region2.chr);
+                  idx1 = this.hicFile.chromosomeIndexMap[chr1];
+                  idx2 = this.hicFile.chromosomeIndexMap[chr2];
+
+                  if (!(idx1 === undefined)) {
+                    _context2.next = 8;
+                    break;
+                  }
+
+                  return _context2.abrupt("return", []);
+
+                case 8:
+                  if (!(idx2 === undefined)) {
+                    _context2.next = 10;
+                    break;
+                  }
+
+                  return _context2.abrupt("return", []);
+
+                case 10:
+                  x1 = region1.start === undefined ? undefined : region1.start / binsize;
+                  x2 = region1.end === undefined ? undefined : region1.end / binsize;
+                  y1 = region2.start === undefined ? undefined : region2.start / binsize;
+                  y2 = region2.end === undefined ? undefined : region2.end / binsize;
+                  _context2.next = 16;
+                  return this.hicFile.readMatrix(idx1, idx2);
+
+                case 16:
+                  matrix = _context2.sent;
+
+                  if (matrix) {
+                    _context2.next = 19;
+                    break;
+                  }
+
+                  return _context2.abrupt("return", []);
+
+                case 19:
+                  // Find the requested resolution
+                  z = undefined === binsize ? 0 : this.hicFile.getZoomIndexForBinSize(binsize, units);
+
+                  if (!(z === -1)) {
+                    _context2.next = 22;
+                    break;
+                  }
+
+                  throw new Error("Invalid bin size");
+
+                case 22:
+                  zd = matrix.bpZoomData[z];
+
+                  if (!(zd === null)) {
+                    _context2.next = 26;
+                    break;
+                  }
+
+                  msg = "No data avalailble for resolution: ".concat(binsize, "  for map ").concat(region1.chr, "-").concat(region2.chr);
+                  throw new Error(msg);
+
+                case 26:
+                  blockBinCount = zd.blockBinCount; // Dimension in bins of a block (width = height = blockBinCount)
+
+                  col1 = x1 === undefined ? 0 : Math.floor(x1 / blockBinCount);
+                  col2 = x1 === undefined ? zd.blockColumnCount : Math.floor(x2 / blockBinCount);
+                  row1 = y1 === undefined ? 0 : Math.floor(y1 / blockBinCount);
+                  row2 = y2 === undefined ? zd.blockColumnCount : Math.floor(y2 / blockBinCount);
+                  promises = [];
+                  sameChr = idx1 === idx2;
+
+                  for (row = row1; row <= row2; row++) {
+                    for (column = col1; column <= col2; column++) {
+                      blockNumber = void 0;
+
+                      if (sameChr && row < column) {
+                        blockNumber = column * zd.blockColumnCount + row;
+                      } else {
+                        blockNumber = row * zd.blockColumnCount + column;
+                      }
+
+                      promises.push(this.hicFile.readBlock(blockNumber, zd));
+                    }
+                  }
+
+                  return _context2.abrupt("return", Promise.all(promises));
+
+                case 35:
+                case "end":
+                  return _context2.stop();
+              }
+            }
+          }, _callee2, this);
+        }));
+
+        function getBlocks(_x, _x2, _x3, _x4) {
+          return _getBlocks.apply(this, arguments);
+        }
+
+        return getBlocks;
+      }() //straw <NONE/VC/VC_SQRT/KR> <ile> <chr1>[:x1:x2] <chr2>[:y1:y2] <BP/FRAG> <binsize>
+
+    }, {
+      key: "getContactRecords",
+      value: function () {
+        var _getContactRecords = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee3(normalization, region1, region2, units, binsize) {
+          var blocks, chr1, chr2, x1, x2, y1, y2, normVector1, normVector2, isNorm, contactRecords, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, block, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, rec, x, y, nvnv, counts;
+
+          return regeneratorRuntime.wrap(function _callee3$(_context3) {
+            while (1) {
+              switch (_context3.prev = _context3.next) {
+                case 0:
+                  _context3.next = 2;
+                  return this.getBlocks(region1, region2, units, binsize);
+
+                case 2:
+                  blocks = _context3.sent;
+
+                  if (!(!blocks || blocks.length === 0)) {
+                    _context3.next = 5;
+                    break;
+                  }
+
+                  return _context3.abrupt("return", []);
+
+                case 5:
+                  chr1 = this.hicFile.getFileChrName(region1.chr);
+                  chr2 = this.hicFile.getFileChrName(region2.chr);
+                  x1 = region1.start === undefined ? undefined : region1.start / binsize;
+                  x2 = region1.end === undefined ? undefined : region1.end / binsize;
+                  y1 = region2.start === undefined ? undefined : region2.start / binsize;
+                  y2 = region2.end === undefined ? undefined : region2.end / binsize;
+                  isNorm = normalization && normalization !== "NONE";
+
+                  if (!isNorm) {
+                    _context3.next = 23;
+                    break;
+                  }
+
+                  _context3.next = 15;
+                  return this.hicFile.getNormalizationVector(normalization, chr1, units, binsize);
+
+                case 15:
+                  normVector1 = _context3.sent;
+
+                  if (!(chr1 === chr2)) {
+                    _context3.next = 20;
+                    break;
+                  }
+
+                  normVector2 = normVector1;
+                  _context3.next = 23;
+                  break;
+
+                case 20:
+                  _context3.next = 22;
+                  return this.hicFile.getNormalizationVector(normalization, chr2, units, binsize);
+
+                case 22:
+                  normVector2 = _context3.sent;
+
+                case 23:
+                  contactRecords = [];
+                  _iteratorNormalCompletion = true;
+                  _didIteratorError = false;
+                  _iteratorError = undefined;
+                  _context3.prev = 27;
+                  _iterator = blocks[Symbol.iterator]();
+
+                case 29:
+                  if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+                    _context3.next = 54;
+                    break;
+                  }
+
+                  block = _step.value;
+
+                  if (!block) {
+                    _context3.next = 51;
+                    break;
+                  }
+
+                  // This is most likely caused by a base pair range outside the chromosome
+                  _iteratorNormalCompletion2 = true;
+                  _didIteratorError2 = false;
+                  _iteratorError2 = undefined;
+                  _context3.prev = 35;
+
+                  for (_iterator2 = block.records[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    rec = _step2.value;
+
+                    // transpose?
+                    if (x1 === undefined || rec.bin1 >= x1 && rec.bin1 <= x2 && rec.bin2 >= y1 && rec.bin2 <= y2) {
+                      if (isNorm) {
+                        x = rec.bin1;
+                        y = rec.bin2;
+                        nvnv = normVector1.data[x] * normVector2.data[y];
+
+                        if (nvnv[x] !== 0 && !isNaN(nvnv)) {
+                          counts = rec.counts / nvnv;
+                          contactRecords.push(new ContactRecord(x, y, counts));
+                        }
+                      } else {
+                        contactRecords.push(rec);
+                      }
+                    }
+                  }
+
+                  _context3.next = 43;
+                  break;
+
+                case 39:
+                  _context3.prev = 39;
+                  _context3.t0 = _context3["catch"](35);
+                  _didIteratorError2 = true;
+                  _iteratorError2 = _context3.t0;
+
+                case 43:
+                  _context3.prev = 43;
+                  _context3.prev = 44;
+
+                  if (!_iteratorNormalCompletion2 && _iterator2["return"] != null) {
+                    _iterator2["return"]();
+                  }
+
+                case 46:
+                  _context3.prev = 46;
+
+                  if (!_didIteratorError2) {
+                    _context3.next = 49;
+                    break;
+                  }
+
+                  throw _iteratorError2;
+
+                case 49:
+                  return _context3.finish(46);
+
+                case 50:
+                  return _context3.finish(43);
+
+                case 51:
+                  _iteratorNormalCompletion = true;
+                  _context3.next = 29;
+                  break;
+
+                case 54:
+                  _context3.next = 60;
+                  break;
+
+                case 56:
+                  _context3.prev = 56;
+                  _context3.t1 = _context3["catch"](27);
+                  _didIteratorError = true;
+                  _iteratorError = _context3.t1;
+
+                case 60:
+                  _context3.prev = 60;
+                  _context3.prev = 61;
+
+                  if (!_iteratorNormalCompletion && _iterator["return"] != null) {
+                    _iterator["return"]();
+                  }
+
+                case 63:
+                  _context3.prev = 63;
+
+                  if (!_didIteratorError) {
+                    _context3.next = 66;
+                    break;
+                  }
+
+                  throw _iteratorError;
+
+                case 66:
+                  return _context3.finish(63);
+
+                case 67:
+                  return _context3.finish(60);
+
+                case 68:
+                  return _context3.abrupt("return", contactRecords);
+
+                case 69:
+                case "end":
+                  return _context3.stop();
+              }
+            }
+          }, _callee3, this, [[27, 56, 60, 68], [35, 39, 43, 51], [44,, 46, 50], [61,, 63, 67]]);
+        }));
+
+        function getContactRecords(_x5, _x6, _x7, _x8, _x9) {
+          return _getContactRecords.apply(this, arguments);
+        }
+
+        return getContactRecords;
+      }()
+    }, {
+      key: "getNormalizationOptions",
+      value: function () {
+        var _getNormalizationOptions = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee4() {
+          return regeneratorRuntime.wrap(function _callee4$(_context4) {
+            while (1) {
+              switch (_context4.prev = _context4.next) {
+                case 0:
+                  return _context4.abrupt("return", this.hicFile.getNormalizationOptions());
+
+                case 1:
+                case "end":
+                  return _context4.stop();
+              }
+            }
+          }, _callee4, this);
+        }));
+
+        function getNormalizationOptions() {
+          return _getNormalizationOptions.apply(this, arguments);
+        }
+
+        return getNormalizationOptions;
+      }()
+    }, {
+      key: "getNVI",
+      value: function () {
+        var _getNVI = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee5() {
+          return regeneratorRuntime.wrap(function _callee5$(_context5) {
+            while (1) {
+              switch (_context5.prev = _context5.next) {
+                case 0:
+                  _context5.next = 2;
+                  return this.hicFile.getNormVectorIndex();
+
+                case 2:
+                  return _context5.abrupt("return", this.hicFile.config.nvi);
+
+                case 3:
+                case "end":
+                  return _context5.stop();
+              }
+            }
+          }, _callee5, this);
+        }));
+
+        function getNVI() {
+          return _getNVI.apply(this, arguments);
+        }
+
+        return getNVI;
+      }()
+    }, {
+      key: "getFileChrName",
+      value: function getFileChrName(chrAlias) {
+        if (this.hicFile.chrAliasTable.hasOwnProperty(chrAlias)) {
+          return this.hicFile.chrAliasTable[chrAlias];
+        } else {
+          return chrAlias;
+        }
+      }
+    }]);
+
+    return Straw;
+  }();
+
+  // Entry point for webpack.
+
+  return Straw;
+
+}));
+

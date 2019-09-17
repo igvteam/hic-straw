@@ -12,4 +12,4 @@ class ContactRecord {
     }
 }
 
-module.exports = ContactRecord
+export default ContactRecord;

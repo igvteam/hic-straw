@@ -34,4 +34,4 @@ class BrowserLocalFile {
     }
 }
 
-module.exports = BrowserLocalFile
+export default BrowserLocalFile;

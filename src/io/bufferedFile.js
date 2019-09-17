@@ -112,4 +112,4 @@ var concatBuffers = function (buffer1, buffer2) {
 };
 
 
-module.exports = BufferedFile
+export default BufferedFile;

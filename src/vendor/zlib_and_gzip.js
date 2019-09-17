@@ -1,5 +1,12 @@
 // from https://github.com/imaya/zlib.js
 
+/**
+ * @fileoverview Zlib namespace. Zlib の仕様に準拠した圧縮は Zlib.Deflate で実装
+ * されている. これは Inflate との共存を考慮している為.
+ */
+
+var USE_TYPEDARRAY = true;
+
 var Zlib = {
   Huffman: {},
   Util: {},
@@ -92,7 +99,7 @@ Zlib.Zip.CentralDirectorySignature = [0x50, 0x4b, 0x05, 0x06];
 Zlib.Zip.prototype.addFile = function(input, opt_params) {
   opt_params = opt_params || {};
   /** @type {string} */
-  var filename =  opt_params['filename'];
+  var filename = '' || opt_params['filename'];
   /** @type {boolean} */
   var compressed;
   /** @type {number} */
@@ -100,7 +107,7 @@ Zlib.Zip.prototype.addFile = function(input, opt_params) {
   /** @type {number} */
   var crc32 = 0;
 
-  if ( input instanceof Array) {
+  if (USE_TYPEDARRAY && input instanceof Array) {
     input = new Uint8Array(input);
   }
 
@@ -251,10 +258,12 @@ Zlib.Zip.prototype.compress = function() {
 
       // add header
       buffer = file.buffer;
-      {
+      if (USE_TYPEDARRAY) {
         tmp = new Uint8Array(buffer.length + 12);
         tmp.set(buffer, 12);
         buffer = tmp;
+      } else {
+        buffer.unshift(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
       }
 
       for (j = 0; j < 12; ++j) {
@@ -285,7 +294,7 @@ Zlib.Zip.prototype.compress = function() {
 
   // end of central directory
   endOfCentralDirectorySize = 22 + (this.comment ? this.comment.length : 0);
-  output = new ( Uint8Array )(
+  output = new (USE_TYPEDARRAY ? Uint8Array : Array)(
     localFileSize + centralDirectorySize + endOfCentralDirectorySize
   );
   op1 = 0;
@@ -418,31 +427,43 @@ Zlib.Zip.prototype.compress = function() {
     // filename
     filename = file.option['filename'];
     if (filename) {
-      {
+      if (USE_TYPEDARRAY) {
         output.set(filename, op1);
         output.set(filename, op2);
         op1 += filenameLength;
         op2 += filenameLength;
+      } else {
+        for (j = 0; j < filenameLength; ++j) {
+          output[op1++] = output[op2++] = filename[j];
+        }
       }
     }
 
     // extra field
     extraField = file.option['extraField'];
     if (extraField) {
-      {
+      if (USE_TYPEDARRAY) {
         output.set(extraField, op1);
         output.set(extraField, op2);
         op1 += extraFieldLength;
         op2 += extraFieldLength;
+      } else {
+        for (j = 0; j < commentLength; ++j) {
+          output[op1++] = output[op2++] = extraField[j];
+        }
       }
     }
 
     // comment
     comment = file.option['comment'];
     if (comment) {
-      {
+      if (USE_TYPEDARRAY) {
         output.set(comment, op2);
         op2 += commentLength;
+      } else {
+        for (j = 0; j < commentLength; ++j) {
+          output[op2++] = comment[j];
+        }
       }
     }
 
@@ -450,9 +471,13 @@ Zlib.Zip.prototype.compress = function() {
     // file data
     //-------------------------------------------------------------------------
 
-    {
+    if (USE_TYPEDARRAY) {
       output.set(file.buffer, op1);
       op1 += file.buffer.length;
+    } else {
+      for (j = 0, jl = file.buffer.length; j < jl; ++j) {
+        output[op1++] = file.buffer[j];
+      }
     }
   }
 
@@ -501,9 +526,13 @@ Zlib.Zip.prototype.compress = function() {
 
   // .ZIP file comment
   if (this.comment) {
-    {
+    if (USE_TYPEDARRAY) {
       output.set(this.comment, op3);
       op3 += commentLength;
+    } else {
+      for (j = 0, jl = commentLength; j < jl; ++j) {
+        output[op3++] = this.comment[j];
+      }
     }
   }
 
@@ -570,7 +599,7 @@ Zlib.Zip.prototype.createEncryptionKey = function(password) {
   /** @type {number} */
   var il;
 
-  {
+  if (USE_TYPEDARRAY) {
     key = new Uint32Array(key);
   }
 
@@ -632,7 +661,7 @@ Zlib.Huffman.buildHuffmanTable = function(lengths) {
   }
 
   size = 1 << maxCodeLength;
-  table = new ( Uint32Array )(size);
+  table = new (USE_TYPEDARRAY ? Uint32Array : Array)(size);
 
   // ビット長の短い順からハフマン符号を割り当てる
   for (bitLength = 1, code = 0, skip = 2; bitLength <= maxCodeLength;) {
@@ -706,7 +735,7 @@ Zlib.RawInflate = function(input, opt_params) {
   /** @type {!number} bit stream reader buffer size. */
   this.bitsbuflen = 0;
   /** @type {!(Array.<number>|Uint8Array)} input buffer. */
-  this.input =  new Uint8Array(input) ;
+  this.input = USE_TYPEDARRAY ? new Uint8Array(input) : input;
   /** @type {!(Uint8Array|Array.<number>)} output buffer. */
   this.output;
   /** @type {!number} output buffer pointer. */
@@ -739,7 +768,7 @@ Zlib.RawInflate = function(input, opt_params) {
     case Zlib.RawInflate.BufferType.BLOCK:
       this.op = Zlib.RawInflate.MaxBackwardLength;
       this.output =
-        new ( Uint8Array )(
+        new (USE_TYPEDARRAY ? Uint8Array : Array)(
           Zlib.RawInflate.MaxBackwardLength +
           this.bufferSize +
           Zlib.RawInflate.MaxCopyLength
@@ -747,7 +776,7 @@ Zlib.RawInflate = function(input, opt_params) {
       break;
     case Zlib.RawInflate.BufferType.ADAPTIVE:
       this.op = 0;
-      this.output = new ( Uint8Array )(this.bufferSize);
+      this.output = new (USE_TYPEDARRAY ? Uint8Array : Array)(this.bufferSize);
       break;
     default:
       throw new Error('invalid inflate mode');
@@ -799,7 +828,7 @@ Zlib.RawInflate.MaxCopyLength = 258;
  * @type {!(Array.<number>|Uint8Array)}
  */
 Zlib.RawInflate.Order = (function(table) {
-  return  new Uint16Array(table) ;
+  return USE_TYPEDARRAY ? new Uint16Array(table) : table;
 })([16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15]);
 
 /**
@@ -808,7 +837,7 @@ Zlib.RawInflate.Order = (function(table) {
  * @type {!(Array.<number>|Uint16Array)}
  */
 Zlib.RawInflate.LengthCodeTable = (function(table) {
-  return  new Uint16Array(table) ;
+  return USE_TYPEDARRAY ? new Uint16Array(table) : table;
 })([
   0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x000a, 0x000b,
   0x000d, 0x000f, 0x0011, 0x0013, 0x0017, 0x001b, 0x001f, 0x0023, 0x002b,
@@ -822,7 +851,7 @@ Zlib.RawInflate.LengthCodeTable = (function(table) {
  * @type {!(Array.<number>|Uint8Array)}
  */
 Zlib.RawInflate.LengthExtraTable = (function(table) {
-  return  new Uint8Array(table) ;
+  return USE_TYPEDARRAY ? new Uint8Array(table) : table;
 })([
   0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5,
   5, 5, 0, 0, 0
@@ -834,7 +863,7 @@ Zlib.RawInflate.LengthExtraTable = (function(table) {
  * @type {!(Array.<number>|Uint16Array)}
  */
 Zlib.RawInflate.DistCodeTable = (function(table) {
-  return  new Uint16Array(table) ;
+  return USE_TYPEDARRAY ? new Uint16Array(table) : table;
 })([
   0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0007, 0x0009, 0x000d, 0x0011,
   0x0019, 0x0021, 0x0031, 0x0041, 0x0061, 0x0081, 0x00c1, 0x0101, 0x0181,
@@ -848,7 +877,7 @@ Zlib.RawInflate.DistCodeTable = (function(table) {
  * @type {!(Array.<number>|Uint8Array)}
  */
 Zlib.RawInflate.DistExtraTable = (function(table) {
-  return  new Uint8Array(table) ;
+  return USE_TYPEDARRAY ? new Uint8Array(table) : table;
 })([
   0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11,
   11, 12, 12, 13, 13
@@ -862,7 +891,7 @@ Zlib.RawInflate.DistExtraTable = (function(table) {
 Zlib.RawInflate.FixedLiteralLengthTable = (function(table) {
   return table;
 })((function() {
-  var lengths = new ( Uint8Array )(288);
+  var lengths = new (USE_TYPEDARRAY ? Uint8Array : Array)(288);
   var i, il;
 
   for (i = 0, il = lengths.length; i < il; ++i) {
@@ -884,7 +913,7 @@ Zlib.RawInflate.FixedLiteralLengthTable = (function(table) {
 Zlib.RawInflate.FixedDistanceTable = (function(table) {
   return table;
 })((function() {
-  var lengths = new ( Uint8Array )(30);
+  var lengths = new (USE_TYPEDARRAY ? Uint8Array : Array)(30);
   var i, il;
 
   for (i = 0, il = lengths.length; i < il; ++i) {
@@ -1063,10 +1092,14 @@ Zlib.RawInflate.prototype.parseUncompressedBlock = function() {
       while (op + len > output.length) {
         preCopy = olength - op;
         len -= preCopy;
-        {
+        if (USE_TYPEDARRAY) {
           output.set(input.subarray(ip, ip + preCopy), op);
           op += preCopy;
           ip += preCopy;
+        } else {
+          while (preCopy--) {
+            output[op++] = input[ip++];
+          }
         }
         this.op = op;
         output = this.expandBufferBlock();
@@ -1083,10 +1116,14 @@ Zlib.RawInflate.prototype.parseUncompressedBlock = function() {
   }
 
   // copy
-  {
+  if (USE_TYPEDARRAY) {
     output.set(input.subarray(ip, ip + len), op);
     op += len;
     ip += len;
+  } else {
+    while (len--) {
+      output[op++] = input[ip++];
+    }
   }
 
   this.ip = ip;
@@ -1128,7 +1165,7 @@ Zlib.RawInflate.prototype.parseDynamicHuffmanBlock = function() {
   var hclen = this.readBits(4) + 4;
   /** @type {!(Uint8Array|Array.<number>)} code lengths. */
   var codeLengths =
-    new ( Uint8Array )(Zlib.RawInflate.Order.length);
+    new (USE_TYPEDARRAY ? Uint8Array : Array)(Zlib.RawInflate.Order.length);
   /** @type {!Array} code lengths table. */
   var codeLengthsTable;
   /** @type {!(Uint8Array|Array.<number>)} literal and length code table. */
@@ -1152,10 +1189,15 @@ Zlib.RawInflate.prototype.parseDynamicHuffmanBlock = function() {
   for (i = 0; i < hclen; ++i) {
     codeLengths[Zlib.RawInflate.Order[i]] = this.readBits(3);
   }
+  if (!USE_TYPEDARRAY) {
+    for (i = hclen, hclen = codeLengths.length; i < hclen; ++i) {
+      codeLengths[Zlib.RawInflate.Order[i]] = 0;
+    }
+  }
 
   // decode length table
   codeLengthsTable = buildHuffmanTable(codeLengths);
-  lengthTable = new ( Uint8Array )(hlit + hdist);
+  lengthTable = new (USE_TYPEDARRAY ? Uint8Array : Array)(hlit + hdist);
   for (i = 0, il = hlit + hdist; i < il;) {
     code = this.readCodeByTable(codeLengthsTable);
     switch (code) {
@@ -1180,10 +1222,12 @@ Zlib.RawInflate.prototype.parseDynamicHuffmanBlock = function() {
     }
   }
 
-  litlenTable =  buildHuffmanTable(lengthTable.subarray(0, hlit))
-    ;
-  distTable =  buildHuffmanTable(lengthTable.subarray(hlit))
-    ;
+  litlenTable = USE_TYPEDARRAY
+    ? buildHuffmanTable(lengthTable.subarray(0, hlit))
+    : buildHuffmanTable(lengthTable.slice(0, hlit));
+  distTable = USE_TYPEDARRAY
+    ? buildHuffmanTable(lengthTable.subarray(hlit))
+    : buildHuffmanTable(lengthTable.slice(hlit));
 
   switch (this.bufferType) {
     case Zlib.RawInflate.BufferType.ADAPTIVE:
@@ -1347,27 +1391,39 @@ Zlib.RawInflate.prototype.decodeHuffmanAdaptive = function(litlen, dist) {
 Zlib.RawInflate.prototype.expandBufferBlock = function(opt_param) {
   /** @type {!(Array.<number>|Uint8Array)} store buffer. */
   var buffer =
-    new ( Uint8Array )(
+    new (USE_TYPEDARRAY ? Uint8Array : Array)(
         this.op - Zlib.RawInflate.MaxBackwardLength
     );
   /** @type {number} backward base point */
   var backward = this.op - Zlib.RawInflate.MaxBackwardLength;
+  /** @type {number} copy index. */
+  var i;
+  /** @type {number} copy limit */
+  var il;
 
   var output = this.output;
 
   // copy to output buffer
-  {
+  if (USE_TYPEDARRAY) {
     buffer.set(output.subarray(Zlib.RawInflate.MaxBackwardLength, buffer.length));
+  } else {
+    for (i = 0, il = buffer.length; i < il; ++i) {
+      buffer[i] = output[i + Zlib.RawInflate.MaxBackwardLength];
+    }
   }
 
   this.blocks.push(buffer);
   this.totalpos += buffer.length;
 
   // copy to backward buffer
-  {
+  if (USE_TYPEDARRAY) {
     output.set(
       output.subarray(backward, backward + Zlib.RawInflate.MaxBackwardLength)
     );
+  } else {
+    for (i = 0; i < Zlib.RawInflate.MaxBackwardLength; ++i) {
+      output[i] = output[backward + i];
+    }
   }
 
   this.op = Zlib.RawInflate.MaxBackwardLength;
@@ -1417,9 +1473,11 @@ Zlib.RawInflate.prototype.expandBufferAdaptive = function(opt_param) {
   }
 
   // buffer expantion
-  {
+  if (USE_TYPEDARRAY) {
     buffer = new Uint8Array(newSize);
     buffer.set(output);
+  } else {
+    buffer = output;
   }
 
   this.output = buffer;
@@ -1443,7 +1501,7 @@ Zlib.RawInflate.prototype.concatBufferBlock = function() {
   /** @type {!(Array.<number>|Uint8Array)} output block array. */
   var block;
   /** @type {!(Array.<number>|Uint8Array)} output buffer. */
-  var buffer = new ( Uint8Array )(limit);
+  var buffer = new (USE_TYPEDARRAY ? Uint8Array : Array)(limit);
   /** @type {number} loop counter. */
   var i;
   /** @type {number} loop limiter. */
@@ -1455,7 +1513,9 @@ Zlib.RawInflate.prototype.concatBufferBlock = function() {
 
   // single buffer
   if (blocks.length === 0) {
-    return       this.output.subarray(Zlib.RawInflate.MaxBackwardLength, this.op) ;
+    return USE_TYPEDARRAY ?
+      this.output.subarray(Zlib.RawInflate.MaxBackwardLength, this.op) :
+      this.output.slice(Zlib.RawInflate.MaxBackwardLength, this.op);
   }
 
   // copy to buffer
@@ -1486,13 +1546,18 @@ Zlib.RawInflate.prototype.concatBufferDynamic = function() {
   var buffer;
   var op = this.op;
 
-  {
+  if (USE_TYPEDARRAY) {
     if (this.resize) {
       buffer = new Uint8Array(op);
       buffer.set(this.output.subarray(0, op));
     } else {
       buffer = this.output.subarray(0, op);
     }
+  } else {
+    if (this.output.length > op) {
+      this.output.length = op;
+    }
+    buffer = this.output;
   }
 
   this.buffer = buffer;
@@ -1526,9 +1591,9 @@ Zlib.RawInflateStream = function(input, ip, opt_buffersize) {
   /** @type {!number} bit stream reader buffer size. */
   this.bitsbuflen = 0;
   /** @type {!(Array|Uint8Array)} input buffer. */
-  this.input =  new Uint8Array(input) ;
+  this.input = USE_TYPEDARRAY ? new Uint8Array(input) : input;
   /** @type {!(Uint8Array|Array)} output buffer. */
-  this.output = new ( Uint8Array )(this.bufferSize);
+  this.output = new (USE_TYPEDARRAY ? Uint8Array : Array)(this.bufferSize);
   /** @type {!number} output buffer pointer. */
   this.op = 0;
   /** @type {boolean} is final block flag. */
@@ -1674,7 +1739,7 @@ Zlib.RawInflateStream.MaxCopyLength = 258;
  * @type {!(Array.<number>|Uint8Array)}
  */
 Zlib.RawInflateStream.Order = (function(table) {
-  return  new Uint16Array(table) ;
+  return USE_TYPEDARRAY ? new Uint16Array(table) : table;
 })([16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15]);
 
 /**
@@ -1683,7 +1748,7 @@ Zlib.RawInflateStream.Order = (function(table) {
  * @type {!(Array.<number>|Uint16Array)}
  */
 Zlib.RawInflateStream.LengthCodeTable = (function(table) {
-  return  new Uint16Array(table) ;
+  return USE_TYPEDARRAY ? new Uint16Array(table) : table;
 })([
   0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x000a, 0x000b,
   0x000d, 0x000f, 0x0011, 0x0013, 0x0017, 0x001b, 0x001f, 0x0023, 0x002b,
@@ -1697,7 +1762,7 @@ Zlib.RawInflateStream.LengthCodeTable = (function(table) {
  * @type {!(Array.<number>|Uint8Array)}
  */
 Zlib.RawInflateStream.LengthExtraTable = (function(table) {
-  return  new Uint8Array(table) ;
+  return USE_TYPEDARRAY ? new Uint8Array(table) : table;
 })([
   0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5,
   5, 5, 0, 0, 0
@@ -1709,7 +1774,7 @@ Zlib.RawInflateStream.LengthExtraTable = (function(table) {
  * @type {!(Array.<number>|Uint16Array)}
  */
 Zlib.RawInflateStream.DistCodeTable = (function(table) {
-  return  new Uint16Array(table) ;
+  return USE_TYPEDARRAY ? new Uint16Array(table) : table;
 })([
   0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0007, 0x0009, 0x000d, 0x0011,
   0x0019, 0x0021, 0x0031, 0x0041, 0x0061, 0x0081, 0x00c1, 0x0101, 0x0181,
@@ -1723,7 +1788,7 @@ Zlib.RawInflateStream.DistCodeTable = (function(table) {
  * @type {!(Array.<number>|Uint8Array)}
  */
 Zlib.RawInflateStream.DistExtraTable = (function(table) {
-  return  new Uint8Array(table) ;
+  return USE_TYPEDARRAY ? new Uint8Array(table) : table;
 })([
   0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11,
   11, 12, 12, 13, 13
@@ -1737,7 +1802,7 @@ Zlib.RawInflateStream.DistExtraTable = (function(table) {
 Zlib.RawInflateStream.FixedLiteralLengthTable = (function(table) {
   return table;
 })((function() {
-  var lengths = new ( Uint8Array )(288);
+  var lengths = new (USE_TYPEDARRAY ? Uint8Array : Array)(288);
   var i, il;
 
   for (i = 0, il = lengths.length; i < il; ++i) {
@@ -1759,7 +1824,7 @@ Zlib.RawInflateStream.FixedLiteralLengthTable = (function(table) {
 Zlib.RawInflateStream.FixedDistanceTable = (function(table) {
   return table;
 })((function() {
-  var lengths = new ( Uint8Array )(30);
+  var lengths = new (USE_TYPEDARRAY ? Uint8Array : Array)(30);
   var i, il;
 
   for (i = 0, il = lengths.length; i < il; ++i) {
@@ -2015,9 +2080,13 @@ Zlib.RawInflateStream.prototype.parseDynamicHuffmanBlock = function() {
   var hclen;
   /** @type {!(Uint8Array|Array)} code lengths. */
   var codeLengths =
-    new ( Uint8Array )(Zlib.RawInflateStream.Order.length);
+    new (USE_TYPEDARRAY ? Uint8Array : Array)(Zlib.RawInflateStream.Order.length);
   /** @type {!Array} code lengths table. */
   var codeLengthsTable;
+  /** @type {!(Uint32Array|Array)} literal and length code lengths. */
+  var litlenLengths;
+  /** @type {!(Uint32Array|Array)} distance code lengths. */
+  var distLengths;
 
   this.status = Zlib.RawInflateStream.Status.BLOCK_BODY_START;
 
@@ -2060,7 +2129,7 @@ Zlib.RawInflateStream.prototype.parseDynamicHuffmanBlock = function() {
 
     // decode length table
     codeLengthsTable = buildHuffmanTable(codeLengths);
-    lengthTable = new ( Uint8Array )(hlit + hdist);
+    lengthTable = new (USE_TYPEDARRAY ? Uint8Array : Array)(hlit + hdist);
     for (i = 0, il = hlit + hdist; i < il;) {
       code = this.readCodeByTable(codeLengthsTable);
       if (code < 0) {
@@ -2097,10 +2166,18 @@ Zlib.RawInflateStream.prototype.parseDynamicHuffmanBlock = function() {
       }
     }
 
-    this.litlenTable =  buildHuffmanTable(lengthTable.subarray(0, hlit))
-      ;
-    this.distTable =  buildHuffmanTable(lengthTable.subarray(hlit))
-      ;
+    // literal and length code
+    litlenLengths = new (USE_TYPEDARRAY ? Uint8Array : Array)(hlit);
+
+    // distance code
+    distLengths = new (USE_TYPEDARRAY ? Uint8Array : Array)(hdist);
+
+    this.litlenTable = USE_TYPEDARRAY
+      ? buildHuffmanTable(lengthTable.subarray(0, hlit))
+      : buildHuffmanTable(lengthTable.slice(0, hlit));
+    this.distTable = USE_TYPEDARRAY
+      ? buildHuffmanTable(lengthTable.subarray(hlit))
+      : buildHuffmanTable(lengthTable.slice(hlit));
   }
 
   this.status = Zlib.RawInflateStream.Status.BLOCK_BODY_END;
@@ -2257,9 +2334,11 @@ Zlib.RawInflateStream.prototype.expandBuffer = function(opt_param) {
   }
 
   // buffer expantion
-  {
+  if (USE_TYPEDARRAY) {
     buffer = new Uint8Array(newSize);
     buffer.set(output);
+  } else {
+    buffer = output;
   }
 
   this.output = buffer;
@@ -2280,12 +2359,14 @@ Zlib.RawInflateStream.prototype.concatBuffer = function() {
   var tmp;
 
   if (this.resize) {
-    {
+    if (USE_TYPEDARRAY) {
       buffer = new Uint8Array(this.output.subarray(this.sp, op));
+    } else {
+      buffer = this.output.slice(this.sp, op);
     }
   } else {
     buffer =
-       this.output.subarray(this.sp, op) ;
+      USE_TYPEDARRAY ? this.output.subarray(this.sp, op) : this.output.slice(this.sp, op);
   }
 
   this.sp = op;
@@ -2293,10 +2374,12 @@ Zlib.RawInflateStream.prototype.concatBuffer = function() {
   // compaction
   if (op > Zlib.RawInflateStream.MaxBackwardLength + this.bufferSize) {
     this.op = this.sp = Zlib.RawInflateStream.MaxBackwardLength;
-    {
+    if (USE_TYPEDARRAY) {
       tmp = /** @type {Uint8Array} */(this.output);
       this.output = new Uint8Array(this.bufferSize + Zlib.RawInflateStream.MaxBackwardLength);
       this.output.set(tmp.subarray(op - Zlib.RawInflateStream.MaxBackwardLength, op));
+    } else {
+      this.output = this.output.slice(op - Zlib.RawInflateStream.MaxBackwardLength);
     }
   }
 
@@ -2317,6 +2400,10 @@ Zlib.RawInflateStream.prototype.concatBuffer = function() {
  *       Zlib.Inflate.BufferType は Zlib.RawInflate.BufferType のエイリアス.
  */
 Zlib.Inflate = function(input, opt_params) {
+  /** @type {number} */
+  var bufferSize;
+  /** @type {Zlib.Inflate.BufferType} */
+  var bufferType;
   /** @type {number} */
   var cmf;
   /** @type {number} */
@@ -2371,7 +2458,7 @@ Zlib.Inflate = function(input, opt_params) {
     'bufferType': opt_params['bufferType'],
     'resize': opt_params['resize']
   });
-};
+}
 
 /**
  * @enum {number}
@@ -2418,7 +2505,7 @@ Zlib.Inflate.prototype.decompress = function() {
  */
 Zlib.InflateStream = function(input) {
   /** @type {!(Uint8Array|Array)} */
-  this.input = input === void 0 ? new ( Uint8Array )() : input;
+  this.input = input === void 0 ? new (USE_TYPEDARRAY ? Uint8Array : Array)() : input;
   /** @type {number} */
   this.ip = 0;
   /** @type {Zlib.RawInflateStream} */
@@ -2436,28 +2523,33 @@ Zlib.InflateStream = function(input) {
 Zlib.InflateStream.prototype.decompress = function(input) {
   /** @type {!(Uint8Array|Array)} inflated buffer. */
   var buffer;
+  /** @type {number} adler-32 checksum */
+  var adler32;
 
   // 新しい入力を入力バッファに結合する
   // XXX Array, Uint8Array のチェックを行うか確認する
   if (input !== void 0) {
-    {
+    if (USE_TYPEDARRAY) {
       var tmp = new Uint8Array(this.input.length + input.length);
       tmp.set(this.input, 0);
       tmp.set(input, this.input.length);
       this.input = tmp;
+    } else {
+      this.input = this.input.concat(input);
     }
   }
 
   if (this.method === void 0) {
     if(this.readHeader() < 0) {
-      return new ( Uint8Array )();
+      return new (USE_TYPEDARRAY ? Uint8Array : Array)();
     }
   }
 
   buffer = this.rawinflate.decompress(this.input, this.ip);
   if (this.rawinflate.ip !== 0) {
-    this.input = 
-      this.input.subarray(this.rawinflate.ip) ;
+    this.input = USE_TYPEDARRAY ?
+      this.input.subarray(this.rawinflate.ip) :
+      this.input.slice(this.rawinflate.ip);
     this.ip = 0;
   }
 
@@ -2722,12 +2814,18 @@ Zlib.Gunzip.prototype.concatMember = function() {
     size += member[i].data.length;
   }
 
-  {
+  if (USE_TYPEDARRAY) {
     buffer = new Uint8Array(size);
     for (i = 0; i < il; ++i) {
       buffer.set(member[i].data, p);
       p += member[i].data.length;
     }
+  } else {
+    buffer = [];
+    for (i = 0; i < il; ++i) {
+      buffer[i] = member[i].data;
+    }
+    buffer = Array.prototype.concat.apply([], buffer);
   }
 
   return buffer;
@@ -2779,7 +2877,7 @@ Zlib.GunzipMember.prototype.getData = function() {
 
 Zlib.GunzipMember.prototype.getMtime = function() {
   return this.mtime;
-};
+}
 
 /**
  * @fileoverview GZIP (RFC1952) 実装.
@@ -2858,7 +2956,7 @@ Zlib.Gzip.prototype.compress = function() {
   var il;
   /** @type {!(Array|Uint8Array)} output buffer. */
   var output =
-    new ( Uint8Array )(Zlib.Gzip.DefaultBufferSize);
+    new (USE_TYPEDARRAY ? Uint8Array : Array)(Zlib.Gzip.DefaultBufferSize);
   /** @type {number} output buffer pointer. */
   var op = 0;
 
@@ -2936,7 +3034,7 @@ Zlib.Gzip.prototype.compress = function() {
   op = rawdeflate.op;
 
   // expand buffer
-  {
+  if (USE_TYPEDARRAY) {
     if (op + 8 > output.buffer.byteLength) {
       this.output = new Uint8Array(op + 8);
       this.output.set(new Uint8Array(output.buffer));
@@ -2962,7 +3060,7 @@ Zlib.Gzip.prototype.compress = function() {
 
   this.ip = ip;
 
-  if ( op < output.length) {
+  if (USE_TYPEDARRAY && op < output.length) {
     this.output = output = output.subarray(0, op);
   }
 
@@ -3008,7 +3106,7 @@ Zlib.Gzip.FlagsMask = {
  * @constructor
  */
 Zlib.Heap = function(length) {
-  this.buffer = new ( Uint16Array )(length * 2);
+  this.buffer = new (USE_TYPEDARRAY ? Uint16Array : Array)(length * 2);
   this.length = 0;
 };
 
@@ -3153,7 +3251,7 @@ Zlib.RawDeflate = function(input, opt_params) {
   this.freqsDist;
   /** @type {!(Array.<number>|Uint8Array)} */
   this.input =
-    ( input instanceof Array) ? new Uint8Array(input) : input;
+    (USE_TYPEDARRAY && input instanceof Array) ? new Uint8Array(input) : input;
   /** @type {!(Array.<number>|Uint8Array)} output output buffer. */
   this.output;
   /** @type {number} pos output buffer position. */
@@ -3169,7 +3267,7 @@ Zlib.RawDeflate = function(input, opt_params) {
     }
     if (opt_params['outputBuffer']) {
       this.output =
-        ( opt_params['outputBuffer'] instanceof Array) ?
+        (USE_TYPEDARRAY && opt_params['outputBuffer'] instanceof Array) ?
         new Uint8Array(opt_params['outputBuffer']) : opt_params['outputBuffer'];
     }
     if (typeof opt_params['outputIndex'] === 'number') {
@@ -3178,7 +3276,7 @@ Zlib.RawDeflate = function(input, opt_params) {
   }
 
   if (!this.output) {
-    this.output = new ( Uint8Array )(0x8000);
+    this.output = new (USE_TYPEDARRAY ? Uint8Array : Array)(0x8000);
   }
 };
 
@@ -3269,8 +3367,9 @@ Zlib.RawDeflate.prototype.compress = function() {
     case Zlib.RawDeflate.CompressionType.NONE:
       // each 65535-Byte (length header: 16-bit)
       for (position = 0, length = input.length; position < length;) {
-        blockArray = 
-          input.subarray(position, position + 0xffff) ;
+        blockArray = USE_TYPEDARRAY ?
+          input.subarray(position, position + 0xffff) :
+          input.slice(position, position + 0xffff);
         position += blockArray.length;
         this.makeNocompressBlock(blockArray, (position === length));
       }
@@ -3306,12 +3405,16 @@ function(blockArray, isFinalBlock) {
   var len;
   /** @type {number} */
   var nlen;
+  /** @type {number} */
+  var i;
+  /** @type {number} */
+  var il;
 
   var output = this.output;
   var op = this.op;
 
   // expand buffer
-  {
+  if (USE_TYPEDARRAY) {
     output = new Uint8Array(this.output.buffer);
     while (output.length <= op + blockArray.length + 5) {
       output = new Uint8Array(output.length << 1);
@@ -3333,10 +3436,15 @@ function(blockArray, isFinalBlock) {
   output[op++] = (nlen >>> 8) & 0xff;
 
   // copy buffer
-  {
+  if (USE_TYPEDARRAY) {
      output.set(blockArray, op);
      op += blockArray.length;
      output = output.subarray(0, op);
+  } else {
+    for (i = 0, il = blockArray.length; i < il; ++i) {
+      output[op++] = blockArray[i];
+    }
+    output.length = op;
   }
 
   this.op = op;
@@ -3354,8 +3462,8 @@ function(blockArray, isFinalBlock) {
 Zlib.RawDeflate.prototype.makeFixedHuffmanBlock =
 function(blockArray, isFinalBlock) {
   /** @type {Zlib.BitStream} */
-  var stream = new Zlib.BitStream(
-    new Uint8Array(this.output.buffer) , this.op);
+  var stream = new Zlib.BitStream(USE_TYPEDARRAY ?
+    new Uint8Array(this.output.buffer) : this.output, this.op);
   /** @type {number} */
   var bfinal;
   /** @type {Zlib.RawDeflate.CompressionType} */
@@ -3385,8 +3493,8 @@ function(blockArray, isFinalBlock) {
 Zlib.RawDeflate.prototype.makeDynamicHuffmanBlock =
 function(blockArray, isFinalBlock) {
   /** @type {Zlib.BitStream} */
-  var stream = new Zlib.BitStream(
-    new Uint8Array(this.output.buffer) , this.op);
+  var stream = new Zlib.BitStream(USE_TYPEDARRAY ?
+    new Uint8Array(this.output.buffer) : this.output, this.op);
   /** @type {number} */
   var bfinal;
   /** @type {Zlib.RawDeflate.CompressionType} */
@@ -3616,7 +3724,7 @@ Zlib.RawDeflate.Lz77Match = function(length, backwardDistance) {
  * @type {!(Array.<number>|Uint32Array)}
  */
 Zlib.RawDeflate.Lz77Match.LengthCodeTable = (function(table) {
-  return  new Uint32Array(table) ;
+  return USE_TYPEDARRAY ? new Uint32Array(table) : table;
 })((function() {
   /** @type {!Array} */
   var table = [];
@@ -3779,20 +3887,26 @@ Zlib.RawDeflate.prototype.lz77 = function(dataArray) {
   /** @type {Zlib.RawDeflate.Lz77Match} previous longest match */
   var prevMatch;
   /** @type {!(Array.<number>|Uint16Array)} lz77 buffer */
-  var lz77buf = 
-    new Uint16Array(dataArray.length * 2) ;
+  var lz77buf = USE_TYPEDARRAY ?
+    new Uint16Array(dataArray.length * 2) : [];
   /** @type {number} lz77 output buffer pointer */
   var pos = 0;
   /** @type {number} lz77 skip length */
   var skipLength = 0;
   /** @type {!(Array.<number>|Uint32Array)} */
-  var freqsLitLen = new ( Uint32Array )(286);
+  var freqsLitLen = new (USE_TYPEDARRAY ? Uint32Array : Array)(286);
   /** @type {!(Array.<number>|Uint32Array)} */
-  var freqsDist = new ( Uint32Array )(30);
+  var freqsDist = new (USE_TYPEDARRAY ? Uint32Array : Array)(30);
   /** @type {number} */
   var lazy = this.lazy;
   /** @type {*} temporary variable */
   var tmp;
+
+  // 初期化
+  if (!USE_TYPEDARRAY) {
+    for (i = 0; i <= 285;) { freqsLitLen[i++] = 0; }
+    for (i = 0; i <= 29;) { freqsDist[i++] = 0; }
+  }
   freqsLitLen[256] = 1; // EOB の最低出現回数は 1
 
   /**
@@ -3899,7 +4013,7 @@ Zlib.RawDeflate.prototype.lz77 = function(dataArray) {
   this.freqsDist = freqsDist;
 
   return /** @type {!(Uint16Array|Array.<number>)} */ (
-      lz77buf.subarray(0, pos) 
+    USE_TYPEDARRAY ?  lz77buf.subarray(0, pos) : lz77buf
   );
 };
 
@@ -3970,12 +4084,12 @@ function(data, position, matchList) {
  */
 Zlib.RawDeflate.prototype.getTreeSymbols_ =
 function(hlit, litlenLengths, hdist, distLengths) {
-  var src = new ( Uint32Array )(hlit + hdist),
+  var src = new (USE_TYPEDARRAY ? Uint32Array : Array)(hlit + hdist),
       i, j, runLength, l,
-      result = new ( Uint32Array )(286 + 30),
+      result = new (USE_TYPEDARRAY ? Uint32Array : Array)(286 + 30),
       nResult,
       rpt,
-      freqs = new ( Uint8Array )(19);
+      freqs = new (USE_TYPEDARRAY ? Uint8Array : Array)(19);
 
   j = 0;
   for (i = 0; i < hlit; i++) {
@@ -3983,6 +4097,13 @@ function(hlit, litlenLengths, hdist, distLengths) {
   }
   for (i = 0; i < hdist; i++) {
     src[j++] = distLengths[i];
+  }
+
+  // 初期化
+  if (!USE_TYPEDARRAY) {
+    for (i = 0, l = freqs.length; i < l; ++i) {
+      freqs[i] = 0;
+    }
   }
 
   // 符号化
@@ -4057,7 +4178,7 @@ function(hlit, litlenLengths, hdist, distLengths) {
 
   return {
     codes:
-       result.subarray(0, nResult) ,
+      USE_TYPEDARRAY ? result.subarray(0, nResult) : result.slice(0, nResult),
     freqs: freqs
   };
 };
@@ -4075,7 +4196,7 @@ Zlib.RawDeflate.prototype.getLengths_ = function(freqs, limit) {
   /** @type {Zlib.Heap} */
   var heap = new Zlib.Heap(2 * Zlib.RawDeflate.HUFMAX);
   /** @type {!(Array.<number>|Uint8Array)} */
-  var length = new ( Uint8Array )(nSymbols);
+  var length = new (USE_TYPEDARRAY ? Uint8Array : Array)(nSymbols);
   /** @type {Array} */
   var nodes;
   /** @type {!(Array.<number>|Uint32Array)} */
@@ -4087,6 +4208,13 @@ Zlib.RawDeflate.prototype.getLengths_ = function(freqs, limit) {
   /** @type {number} */
   var il;
 
+  // 配列の初期化
+  if (!USE_TYPEDARRAY) {
+    for (i = 0; i < nSymbols; i++) {
+      length[i] = 0;
+    }
+  }
+
   // ヒープの構築
   for (i = 0; i < nSymbols; ++i) {
     if (freqs[i] > 0) {
@@ -4094,7 +4222,7 @@ Zlib.RawDeflate.prototype.getLengths_ = function(freqs, limit) {
     }
   }
   nodes = new Array(heap.length / 2);
-  values = new ( Uint32Array )(heap.length / 2);
+  values = new (USE_TYPEDARRAY ? Uint32Array : Array)(heap.length / 2);
 
   // 非 0 の要素が一つだけだった場合は、そのシンボルに符号長 1 を割り当てて終了
   if (nodes.length === 1) {
@@ -4125,11 +4253,11 @@ Zlib.RawDeflate.prototype.getLengths_ = function(freqs, limit) {
  */
 Zlib.RawDeflate.prototype.reversePackageMerge_ = function(freqs, symbols, limit) {
   /** @type {!(Array.<number>|Uint16Array)} */
-  var minimumCost = new ( Uint16Array )(limit);
+  var minimumCost = new (USE_TYPEDARRAY ? Uint16Array : Array)(limit);
   /** @type {!(Array.<number>|Uint8Array)} */
-  var flag = new ( Uint8Array )(limit);
+  var flag = new (USE_TYPEDARRAY ? Uint8Array : Array)(limit);
   /** @type {!(Array.<number>|Uint8Array)} */
-  var codeLength = new ( Uint8Array )(symbols);
+  var codeLength = new (USE_TYPEDARRAY ? Uint8Array : Array)(symbols);
   /** @type {Array} */
   var value = new Array(limit);
   /** @type {Array} */
@@ -4245,7 +4373,7 @@ Zlib.RawDeflate.prototype.reversePackageMerge_ = function(freqs, symbols, limit)
  * @private
  */
 Zlib.RawDeflate.prototype.getCodesFromLengths_ = function(lengths) {
-  var codes = new ( Uint16Array )(lengths.length),
+  var codes = new (USE_TYPEDARRAY ? Uint16Array : Array)(lengths.length),
       count = [],
       startCode = [],
       code = 0, i, il, j, m;
@@ -4287,7 +4415,7 @@ Zlib.Unzip = function(input, opt_params) {
   opt_params = opt_params || {};
   /** @type {!(Array.<number>|Uint8Array)} */
   this.input =
-    ( (input instanceof Array)) ?
+    (USE_TYPEDARRAY && (input instanceof Array)) ?
     new Uint8Array(input) : input;
   /** @type {number} */
   this.ip = 0;
@@ -4471,17 +4599,20 @@ Zlib.Unzip.FileHeader.prototype.parse = function() {
   ) >>> 0;
 
   // file name
-  this.filename = String.fromCharCode.apply(null, 
-    input.subarray(ip, ip += this.fileNameLength) 
+  this.filename = String.fromCharCode.apply(null, USE_TYPEDARRAY ?
+    input.subarray(ip, ip += this.fileNameLength) :
+    input.slice(ip, ip += this.fileNameLength)
   );
 
   // extra field
-  this.extraField = 
-    input.subarray(ip, ip += this.extraFieldLength) ;
+  this.extraField = USE_TYPEDARRAY ?
+    input.subarray(ip, ip += this.extraFieldLength) :
+    input.slice(ip, ip += this.extraFieldLength);
 
   // file comment
-  this.comment = 
-    input.subarray(ip, ip + this.fileCommentLength) ;
+  this.comment = USE_TYPEDARRAY ?
+    input.subarray(ip, ip + this.fileCommentLength) :
+    input.slice(ip, ip + this.fileCommentLength);
 
   this.length = ip - this.offset;
 };
@@ -4580,13 +4711,15 @@ Zlib.Unzip.LocalFileHeader.prototype.parse = function() {
   this.extraFieldLength = input[ip++] | (input[ip++] << 8);
 
   // file name
-  this.filename = String.fromCharCode.apply(null, 
-    input.subarray(ip, ip += this.fileNameLength) 
+  this.filename = String.fromCharCode.apply(null, USE_TYPEDARRAY ?
+    input.subarray(ip, ip += this.fileNameLength) :
+    input.slice(ip, ip += this.fileNameLength)
   );
 
   // extra field
-  this.extraField = 
-    input.subarray(ip, ip += this.extraFieldLength) ;
+  this.extraField = USE_TYPEDARRAY ?
+    input.subarray(ip, ip += this.extraFieldLength) :
+    input.slice(ip, ip += this.extraFieldLength);
 
   this.length = ip - this.offset;
 };
@@ -4658,8 +4791,9 @@ Zlib.Unzip.prototype.parseEndOfCentralDirectoryRecord = function() {
   this.commentLength = input[ip++] | (input[ip++] << 8);
 
   // .ZIP file comment
-  this.comment = 
-    input.subarray(ip, ip + this.commentLength) ;
+  this.comment = USE_TYPEDARRAY ?
+    input.subarray(ip, ip + this.commentLength) :
+    input.slice(ip, ip + this.commentLength);
 };
 
 Zlib.Unzip.prototype.parseFileHeader = function() {
@@ -4765,8 +4899,9 @@ Zlib.Unzip.prototype.getFileData = function(index, opt_params) {
 
   switch (localFileHeader.compression) {
     case Zlib.Unzip.CompressionMethod.STORE:
-      buffer = 
-        this.input.subarray(offset, offset + length) ;
+      buffer = USE_TYPEDARRAY ?
+        this.input.subarray(offset, offset + length) :
+        this.input.slice(offset, offset + length);
       break;
     case Zlib.Unzip.CompressionMethod.DEFLATE:
       buffer = new Zlib.RawInflate(this.input, {
@@ -4961,9 +5096,9 @@ Zlib.BitStream = function(buffer, bufferPosition) {
   /** @type {number} bit index. */
   this.bitindex = 0;
   /** @type {!(Array|Uint8Array)} bit-stream output buffer. */
-  this.buffer = buffer instanceof ( Uint8Array ) ?
+  this.buffer = buffer instanceof (USE_TYPEDARRAY ? Uint8Array : Array) ?
     buffer :
-    new ( Uint8Array )(Zlib.BitStream.DefaultBlockSize);
+    new (USE_TYPEDARRAY ? Uint8Array : Array)(Zlib.BitStream.DefaultBlockSize);
 
   // 入力された index が足りなかったら拡張するが、倍にしてもダメなら不正とする
   if (this.buffer.length * 2 <= this.index) {
@@ -4987,15 +5122,22 @@ Zlib.BitStream.DefaultBlockSize = 0x8000;
 Zlib.BitStream.prototype.expandBuffer = function() {
   /** @type {!(Array|Uint8Array)} old buffer. */
   var oldbuf = this.buffer;
+  /** @type {number} loop counter. */
+  var i;
   /** @type {number} loop limiter. */
   var il = oldbuf.length;
   /** @type {!(Array|Uint8Array)} new buffer. */
   var buffer =
-    new ( Uint8Array )(il << 1);
+    new (USE_TYPEDARRAY ? Uint8Array : Array)(il << 1);
 
   // copy buffer
-  {
+  if (USE_TYPEDARRAY) {
     buffer.set(oldbuf);
+  } else {
+    // XXX: loop unrolling
+    for (i = 0; i < il; ++i) {
+      buffer[i] = oldbuf[i];
+    }
   }
 
   return (this.buffer = buffer);
@@ -5086,8 +5228,11 @@ Zlib.BitStream.prototype.finish = function() {
   }
 
   // array truncation
-  {
+  if (USE_TYPEDARRAY) {
     output = buffer.subarray(0, index);
+  } else {
+    buffer.length = index;
+    output = buffer;
   }
 
   return output;
@@ -5102,7 +5247,7 @@ Zlib.BitStream.ReverseTable = (function(table) {
   return table;
 })((function() {
   /** @type {!(Array|Uint8Array)} reverse table. */
-  var table = new ( Uint8Array )(256);
+  var table = new (USE_TYPEDARRAY ? Uint8Array : Array)(256);
   /** @type {number} loop counter. */
   var i;
 
@@ -5124,6 +5269,15 @@ Zlib.BitStream.ReverseTable = (function(table) {
 
   return table;
 })());
+
+
+/**
+ * @fileoverview CRC32 実装.
+ */
+
+
+/** @define {boolean} */
+var ZLIB_CRC32_COMPACT = false;
 
 /**
  * CRC32 ハッシュ値を取得
@@ -5233,7 +5387,26 @@ Zlib.CRC32.Table_ = [
  * @type {!(Array.<number>|Uint32Array)} CRC-32 Table.
  * @const
  */
-Zlib.CRC32.Table =   new Uint32Array(Zlib.CRC32.Table_) ;
+Zlib.CRC32.Table = ZLIB_CRC32_COMPACT ? (function() {
+  /** @type {!(Array.<number>|Uint32Array)} */
+  var table = new (USE_TYPEDARRAY ? Uint32Array : Array)(256);
+  /** @type {number} */
+  var c;
+  /** @type {number} */
+  var i;
+  /** @type {number} */
+  var j;
+
+  for (i = 0; i < 256; ++i) {
+    c = i;
+    for (j = 0; j < 8; ++j) {
+      c = (c & 1) ? (0xedB88320 ^ (c >>> 1)) : (c >>> 1);
+    }
+    table[i] = c >>> 0;
+  }
+
+  return table;
+})() : USE_TYPEDARRAY ? new Uint32Array(Zlib.CRC32.Table_) : Zlib.CRC32.Table_;
 
 /**
  * @fileoverview Deflate (RFC1951) 実装.
@@ -5251,7 +5424,7 @@ Zlib.Deflate = function(input, opt_params) {
   this.input = input;
   /** @type {!(Array|Uint8Array)} */
   this.output =
-    new ( Uint8Array )(Zlib.Deflate.DefaultBufferSize);
+    new (USE_TYPEDARRAY ? Uint8Array : Array)(Zlib.Deflate.DefaultBufferSize);
   /** @type {Zlib.Deflate.CompressionType} */
   this.compressionType = Zlib.Deflate.CompressionType.DYNAMIC;
   /** @type {Zlib.RawDeflate} */
@@ -5320,7 +5493,11 @@ Zlib.Deflate.prototype.compress = function() {
   /** @type {number} */
   var flevel;
   /** @type {number} */
+  var clevel;
+  /** @type {number} */
   var adler;
+  /** @type {boolean} */
+  var error = false;
   /** @type {!(Array|Uint8Array)} */
   var output;
   /** @type {number} */
@@ -5366,7 +5543,7 @@ Zlib.Deflate.prototype.compress = function() {
   output = this.rawDeflate.compress();
   pos = output.length;
 
-  {
+  if (USE_TYPEDARRAY) {
     // subarray 分を元にもどす
     output = new Uint8Array(output.buffer);
     // expand buffer
@@ -5387,1586 +5564,5 @@ Zlib.Deflate.prototype.compress = function() {
   return output;
 };
 
-const isNode =
-    typeof process !== 'undefined' &&
-    process.versions != null &&
-    process.versions.node != null;
+export default Zlib;
 
-
-const crossFetch = isNode ? require("node-fetch") : fetch;
-
-class BrowserLocalFile {
-
-    constructor(blob) {
-        this.file = blob;
-    }
-
-    async read(position, length) {
-
-        const file = this.file;
-
-        return new Promise(function (fullfill, reject) {
-
-            const fileReader = new FileReader();
-
-            fileReader.onload = function (e) {
-                fullfill(fileReader.result);
-            };
-
-            fileReader.onerror = function (e) {
-                console.err("Error reading local file " + file.name);
-                reject(null, fileReader);
-            };
-
-            if (position !== undefined) {
-                const blob = file.slice(position, position + length);
-                fileReader.readAsArrayBuffer(blob);
-
-            } else {
-                fileReader.readAsArrayBuffer(file);
-
-            }
-
-        });
-    }
-}
-
-const  isNode$1 = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
-
-class RemoteFile {
-
-    constructor(args) {
-        this.config = args;
-        this.url = mapUrl(args.path || args.url);
-    }
-
-
-    async read(position, length) {
-
-        const headers = this.config.headers || {};
-
-        const rangeString = "bytes=" + position + "-" + (position + length - 1);
-        headers['Range'] = rangeString;
-
-        let url = this.url.slice();    // slice => copy
-        if (isNode$1) {
-            headers['User-Agent'] = 'straw';
-        } else {
-            if (this.config.oauthToken) {
-                const token = resolveToken(this.config.oauthToken);
-                headers['Authorization'] = `Bearer ${token}`;
-            }
-            const isSafari = navigator.vendor.indexOf("Apple") == 0 && /\sSafari\//.test(navigator.userAgent);
-            const isChrome = navigator.userAgent.indexOf('Chrome') > -1;
-            const isAmazonV4Signed = this.url.indexOf("X-Amz-Signature") > -1;
-
-            if (isChrome && !isAmazonV4Signed) {
-                url = addParameter(url, "randomSeed", Math.random().toString(36));
-            }
-        }
-
-        if (this.config.apiKey) {
-            url = addParameter(url, "key", this.config.apiKey);
-        }
-
-        const response = await crossFetch(url, {
-            method: 'GET',
-            headers: headers,
-            redirect: 'follow',
-            mode: 'cors',
-
-        });
-
-        const status = response.status;
-
-        if (status >= 400) {
-            const err = Error(response.statusText);
-            err.code = status;
-            throw err
-        } else {
-            return response.arrayBuffer();
-        }
-
-        /**
-         * token can be a string, a function that returns a string, or a function that returns a Promise for a string
-         * @param token
-         * @returns {Promise<*>}
-         */
-        async function resolveToken(token) {
-            if (typeof token === 'function') {
-                return await Promise.resolve(token())    // Normalize the result to a promise, since we don't know what the function returns
-            } else {
-                return token
-            }
-        }
-
-    }
-}
-
-
-function mapUrl(url) {
-
-    if (url.includes("//www.dropbox.com")) {
-        return url.replace("//www.dropbox.com", "//dl.dropboxusercontent.com");
-    } else if (url.startsWith("ftp://ftp.ncbi.nlm.nih.gov")) {
-        return url.replace("ftp://", "https://")
-    } else {
-        return url
-    }
-}
-
-
-function addParameter(url, name, value) {
-    const paramSeparator = url.includes("?") ? "&" : "?";
-    return url + paramSeparator + name + "=" + value;
-}
-
-class ThrottledFile {
-
-    constructor(file, rateLimiter) {
-        this.file = file;
-        this.rateLimiter = rateLimiter;
-    }
-
-
-    async read(position, length) {
-
-        const file = this.file;
-        const rateLimiter = this.rateLimiter;
-
-        return new Promise(function (fulfill, reject) {
-            rateLimiter.limiter(async function (f) {
-                try {
-                    const result = await f.read(position, length);
-                    fulfill(result);
-                } catch (e) {
-                    reject(e);
-                }
-            })(file);
-        })
-    }
-}
-
-class RateLimiter {
-
-    constructor(wait) {
-        this.wait = wait === undefined ? 100 : wait;
-
-        this.isCalled = false;
-        this.calls = [];
-    }
-
-
-    limiter(fn) {
-
-        const self = this;
-
-        let caller = function () {
-
-            if (self.calls.length && !self.isCalled) {
-                self.isCalled = true;
-                self.calls.shift().call();
-                setTimeout(function () {
-                    self.isCalled = false;
-                    caller();
-                }, self.wait);
-            }
-        };
-
-        return function () {
-            self.calls.push(fn.bind(this, ...arguments));
-            caller();
-        };
-    }
-
-}
-
-class BufferedFile {
-
-    constructor(args) {
-        this.file = args.file;
-        this.size = args.size || 64000;
-        this.position = 0;
-        this.bufferStart = 0;
-        this.bufferLength = 0;
-        this.buffer = undefined;
-    }
-
-
-    async read(position, length) {
-
-        const start = position;
-        const end = position + length;
-        const bufferStart = this.bufferStart;
-        const bufferEnd = this.bufferStart + this.bufferLength;
-
-
-        if (length > this.size) {
-            // Request larger than max buffer size,  pass through to underlying file
-            //console.log("0")
-            this.buffer = undefined;
-            this.bufferStart = 0;
-            this.bufferLength = 0;
-            return this.file.read(position, length)
-        }
-
-        if (start >= bufferStart && end <= bufferEnd) {
-            // Request within buffer bounds
-            //console.log("1")
-            const sliceStart = start - bufferStart;
-            const sliceEnd = sliceStart + length;
-            return this.buffer.slice(sliceStart, sliceEnd)
-        }
-
-        else if (start < bufferStart && end > bufferStart) {
-            // Overlap left, here for completness but this is an unexpected case in straw.  We don't adjust the buffer.
-            //console.log("2")
-            const l1 = bufferStart - start;
-            const a1 = await this.file.read(position, l1);
-            const l2 = length - l1;
-            if (l2 > 0) {
-                //this.buffer = await this.file.read(bufferStart, this.size)
-                const a2 = this.buffer.slice(0, l2);
-                return concatBuffers(a1, a2)
-            } else {
-                return a1
-            }
-
-        }
-
-        else if (start < bufferEnd && end > bufferEnd) {
-            // Overlap right
-            // console.log("3")
-            const l1 = bufferEnd - start;
-            const sliceStart = this.bufferLength - l1;
-            const a1 = this.buffer.slice(sliceStart, this.bufferLength);
-
-            const l2 = length - l1;
-            if (l2 > 0) {
-                try {
-                    this.buffer = await this.file.read(bufferEnd, this.size);
-                    this.bufferStart = bufferEnd;
-                    this.bufferLength = this.buffer.byteLength;
-                    const a2 = this.buffer.slice(0, l2);
-                    return concatBuffers(a1, a2)
-                } catch (e) {
-                    // A "unsatisfiable range" error is expected here if we overlap past the end of file
-                    if (e.code && e.code === 416) {
-                        return a1
-                    }
-                    else {
-                        throw e
-                    }
-                }
-
-            } else {
-                return a1
-            }
-
-        }
-
-        else {
-            // No overlap with buffer
-            // console.log("4")
-            this.buffer = await this.file.read(position, this.size);
-            this.bufferStart = position;
-            this.bufferLength = this.buffer.byteLength;
-            return this.buffer.slice(0, length)
-        }
-
-    }
-
-}
-
-/**
- * concatenates 2 array buffers.
- * Credit: https://gist.github.com/72lions/4528834
- *
- * @private
- * @param {ArrayBuffers} buffer1 The first buffer.
- * @param {ArrayBuffers} buffer2 The second buffer.
- * @return {ArrayBuffers} The new ArrayBuffer created out of the two.
- */
-var concatBuffers = function (buffer1, buffer2) {
-    var tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
-    tmp.set(new Uint8Array(buffer1), 0);
-    tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
-    return tmp.buffer;
-};
-
-// TODO -- big endian
-
-const BinaryParser = function (dataView, littleEndian) {
-
-    this.littleEndian = littleEndian !== undefined ? littleEndian : true;
-    this.position = 0;
-    this.view = dataView;
-    this.length = dataView.byteLength;
-};
-
-BinaryParser.prototype.available = function () {
-    return this.length - this.position;
-};
-
-BinaryParser.prototype.remLength = function () {
-    return this.length - this.position;
-};
-
-BinaryParser.prototype.hasNext = function () {
-    return this.position < this.length - 1;
-};
-
-BinaryParser.prototype.getByte = function () {
-    var retValue = this.view.getUint8(this.position, this.littleEndian);
-    this.position++;
-    return retValue;
-};
-
-BinaryParser.prototype.getShort = function () {
-
-    var retValue = this.view.getInt16(this.position, this.littleEndian);
-    this.position += 2;
-    return retValue;
-};
-
-BinaryParser.prototype.getUShort = function () {
-
-    // var byte1 = this.getByte(),
-    //     byte2 = this.getByte(),
-    //     retValue = ((byte2 << 24 >>> 16) + (byte1 << 24 >>> 24));
-    //     return retValue;
-
-    //
-    var retValue = this.view.getUint16(this.position, this.littleEndian);
-    this.position += 2;
-    return retValue;
-};
-
-
-BinaryParser.prototype.getInt = function () {
-
-    var retValue = this.view.getInt32(this.position, this.littleEndian);
-    this.position += 4;
-    return retValue;
-};
-
-
-BinaryParser.prototype.getUInt = function () {
-    var retValue = this.view.getUint32(this.position, this.littleEndian);
-    this.position += 4;
-    return retValue;
-};
-
-BinaryParser.prototype.getLong = function () {
-
-    // DataView doesn't support long. So we'll try manually
-
-    var b = [];
-    b[0] = this.view.getUint8(this.position);
-    b[1] = this.view.getUint8(this.position + 1);
-    b[2] = this.view.getUint8(this.position + 2);
-    b[3] = this.view.getUint8(this.position + 3);
-    b[4] = this.view.getUint8(this.position + 4);
-    b[5] = this.view.getUint8(this.position + 5);
-    b[6] = this.view.getUint8(this.position + 6);
-    b[7] = this.view.getUint8(this.position + 7);
-
-    var value = 0;
-    if (this.littleEndian) {
-        for (var i = b.length - 1; i >= 0; i--) {
-            value = (value * 256) + b[i];
-        }
-    } else {
-        for (var i = 0; i < b.length; i++) {
-            value = (value * 256) + b[i];
-        }
-    }
-
-
-    this.position += 8;
-    return value;
-};
-
-BinaryParser.prototype.getString = function (len) {
-
-    var s = "";
-    var c;
-    while ((c = this.view.getUint8(this.position++)) != 0) {
-        s += String.fromCharCode(c);
-        if (len && s.length == len) break;
-    }
-    return s;
-};
-
-BinaryParser.prototype.getFixedLengthString = function (len) {
-
-    var s = "";
-    var i;
-    var c;
-    for (i = 0; i < len; i++) {
-        c = this.view.getUint8(this.position++);
-        if (c > 0) {
-            s += String.fromCharCode(c);
-        }
-    }
-    return s;
-};
-
-BinaryParser.prototype.getFixedLengthTrimmedString = function (len) {
-
-    var s = "";
-    var i;
-    var c;
-    for (i = 0; i < len; i++) {
-        c = this.view.getUint8(this.position++);
-        if (c > 32) {
-            s += String.fromCharCode(c);
-        }
-    }
-    return s;
-};
-
-BinaryParser.prototype.getFloat = function () {
-
-    var retValue = this.view.getFloat32(this.position, this.littleEndian);
-    this.position += 4;
-    return retValue;
-
-
-};
-
-BinaryParser.prototype.getDouble = function () {
-
-    var retValue = this.view.getFloat64(this.position, this.littleEndian);
-    this.position += 8;
-    return retValue;
-};
-
-BinaryParser.prototype.skip = function (n) {
-
-    this.position += n;
-    return this.position;
-};
-
-
-/**
- * Return a bgzip (bam and tabix) virtual pointer
- * TODO -- why isn't 8th byte used ?
- * @returns {*}
- */
-BinaryParser.prototype.getVPointer = function () {
-
-    var position = this.position,
-        offset = (this.view.getUint8(position + 1) << 8) | (this.view.getUint8(position)),
-        byte6 = ((this.view.getUint8(position + 6) & 0xff) * 0x100000000),
-        byte5 = ((this.view.getUint8(position + 5) & 0xff) * 0x1000000),
-        byte4 = ((this.view.getUint8(position + 4) & 0xff) * 0x10000),
-        byte3 = ((this.view.getUint8(position + 3) & 0xff) * 0x100),
-        byte2 = ((this.view.getUint8(position + 2) & 0xff)),
-        block = byte6 + byte5 + byte4 + byte3 + byte2;
-    this.position += 8;
-
-    //       if (block == 0 && offset == 0) {
-    //           return null;
-    //       } else {
-    return new VPointer(block, offset);
-    //       }
-};
-
-
-function VPointer(block, offset) {
-    this.block = block;
-    this.offset = offset;
-}
-
-VPointer.prototype.isLessThan = function (vp) {
-    return this.block < vp.block ||
-        (this.block === vp.block && this.offset < vp.offset);
-};
-
-VPointer.prototype.isGreaterThan = function (vp) {
-    return this.block > vp.block ||
-        (this.block === vp.block && this.offset > vp.offset);
-};
-
-VPointer.prototype.print = function () {
-    return "" + this.block + ":" + this.offset;
-};
-
-class Matrix {
-  
-    constructor(chr1, chr2, zoomDataList) {
-
-        const self = this;
-
-        this.chr1 = chr1;
-        this.chr2 = chr2;
-        this.bpZoomData = [];
-        this.fragZoomData = [];
-        
-        zoomDataList.forEach(function (zd) {
-            if (zd.zoom.unit === "BP") {
-                self.bpZoomData.push(zd);
-            } else {
-                self.fragZoomData.push(zd);
-            }
-        });
-    }
-
-    getZoomDataByIndex(index, unit) {
-        const zdArray = "FRAG" === unit ? this.fragZoomData : this.bpZoomData;
-        return zdArray[index]
-    }
-
-
-    findZoomForResolution(binSize, unit) {
-
-        const  zdArray = "FRAG" === unit ? this.fragZoomData : this.bpZoomData;
-
-        for (let i = 1; i < zdArray.length; i++) {
-            var zd = zdArray[i];
-            if (zd.zoom.binSize < binSize) {
-                return i - 1
-            }
-        }
-        return zdArray.length - 1
-
-    }
-
-
-    // Legacy implementation, used only in tests.
-    getZoomData(zoom) {
-
-        const zdArray = zoom.unit === "BP" ? this.bpZoomData : this.fragZoomData;
-
-        for (let i = 0; i < zdArray.length; i++) {
-            var zd = zdArray[i];
-            if (zoom.binSize === zd.zoom.binSize) {
-                return zd
-            }
-        }
-
-        return undefined
-    }
-}
-
-class MatrixZoomData {
-
-    constructor(chr1, chr2, zoom, blockBinCount, blockColumnCount, chr1Sites, chr2Sites) {
-
-        this.chr1 = chr1;    // chromosome index
-        this.chr2 = chr2;
-        this.zoom = zoom;
-        this.blockBinCount = blockBinCount;
-        this.blockColumnCount = blockColumnCount;
-        this.chr1Sites = chr1Sites;
-        this.chr2Sites = chr2Sites;
-    }
-
-    getKey () {
-        return this.chr1.name + "_" + this.chr2.name + "_" + this.zoom.unit + "_" + this.zoom.binSize;
-    }
-}
-
-/*
- *  The MIT License (MIT)
- *
- * Copyright (c) 2016-2017 The Regents of the University of California
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
- * associated documentation files (the "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the
- * following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or substantial
- * portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,  FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
- * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
- * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- */
-
-
-/**
- * @author Jim Robinson
- */
-
-class NormalizationVector {
-
-    constructor(type, chrIdx, unit, resolution, values) {
-
-        var avg = mean(values), i;
-        if (avg > 0) {
-            for (i = 0; i < values.length; i++) {
-                values[i] /= avg;
-            }
-        }
-
-        this.type = type;
-        this.chrIdx = chrIdx;
-        this.unit = unit;
-        this.resolution = resolution;
-        this.data = values;
-    }
-
-    getKey() {
-        return NormalizationVector.getKey(this.type, this.chrIdx, this.unit, this.resolution);
-    }
-
-
-    static getNormalizationVectorKey(type, chrIdx, unit, resolution) {
-        return type + "_" + chrIdx + "_" + unit + "_" + resolution;
-    }
-
-}
-
-function mean (array) {
-
-    var t = 0, n = 0,
-        i;
-    for (i = 0; i < array.length; i++) {
-        if (!isNaN(array[i])) {
-            t += array[i];
-            n++;
-        }
-    }
-    return n > 0 ? t / n : 0;
-}
-
-class ContactRecord {
-
-    constructor(bin1, bin2, counts) {
-        this.bin1 = bin1;
-        this.bin2 = bin2;
-        this.counts = counts;
-    };
-
-    getKey() {
-        return "" + this.bin1 + "_" + this.bin2;
-    }
-}
-
-const Short_MIN_VALUE = -32768;
-
-const googleRateLimiter = new RateLimiter(100);
-
-class Block {
-    constructor(blockNumber, zoomData, records, idx) {
-        this.blockNumber = blockNumber;
-        this.zoomData = zoomData;
-        this.records = records;
-        this.idx = idx;
-    }
-}
-
-class HicFile {
-
-    constructor(args) {
-
-        this.config = args;
-
-        this.loadFragData = args.loadFragData;
-
-        this.fragmentSitesCache = {};
-        this.normVectorCache = {};
-        this.normalizationTypes = ['NONE'];
-
-        // args may specify an io.File object, a local path (Node only), or a url
-        if (args.file) {
-            this.file = args.file;
-        } else if (args.blob) {
-            this.file = new BrowserLocalFile(args.blob);
-        }  else {
-            this.url = args.path || args.url;
-
-            if (this.url.startsWith("http://") || this.url.startsWith("https://")) {
-                this.remote = true;
-
-                // Google drive must be rate limited.  Perhaps all
-                const remoteFile = new RemoteFile(args);
-                if(isGoogleDrive(this.url)) {
-                    this.file = new ThrottledFile(remoteFile, googleRateLimiter);
-                } else {
-                    this.file = remoteFile;
-                }
-
-            } else {
-                throw Error("Arguments must include file, blob, or url")
-            }
-        }
-    };
-
-    async init() {
-
-        if (this.initialized) {
-            return;
-        } else {
-            await this.readHeader();
-            await this.readFooter();
-            this.initialized = true;
-        }
-    }
-
-    async getMetaData() {
-        await this.init();
-        return this.meta
-    }
-
-    async readHeader() {
-
-        const data = await this.file.read(0, 64000);
-
-        if (!data) {
-            return undefined;
-        }
-
-        const binaryParser = new BinaryParser(new DataView(data));
-
-        this.magic = binaryParser.getString();
-        this.version = binaryParser.getInt();
-        this.masterIndexPos = binaryParser.getLong();
-        this.genomeId = binaryParser.getString();
-
-        this.attributes = {};
-        let nAttributes = binaryParser.getInt();
-        while (nAttributes-- > 0) {
-            this.attributes[binaryParser.getString()] = binaryParser.getString();
-        }
-
-        this.chromosomes = [];
-        this.chromosomeIndexMap = {};
-        let nChrs = binaryParser.getInt();
-        let i = 0;
-        while (nChrs-- > 0) {
-            const chr = {
-                index: i,
-                name: binaryParser.getString(),
-                size: binaryParser.getInt()
-            };
-            if (chr.name.toLowerCase() === "all") {
-                this.wholeGenomeChromosome = chr;
-                this.wholeGenomeResolution = Math.round(chr.size * (1000 / 500));    // Hardcoded in juicer
-            }
-            this.chromosomes.push(chr);
-            this.chromosomeIndexMap[chr.name] = chr.index;
-            i++;
-        }
-
-        this.bpResolutions = [];
-        let nBpResolutions = binaryParser.getInt();
-        while (nBpResolutions-- > 0) {
-            this.bpResolutions.push(binaryParser.getInt());
-        }
-
-        if (this.loadFragData) {
-            this.fragResolutions = [];
-            let nFragResolutions = binaryParser.getInt();
-            while (nFragResolutions-- > 0) {
-                this.fragResolutions.push(binaryParser.getInt());
-            }
-
-            if (nFragResolutions > 0) {
-                this.sites = [];
-                let nSites = binaryParser.getInt();
-                while (nSites-- > 0) {
-                    this.sites.push(binaryParser.getInt());
-                }
-            }
-        }
-
-        // Build lookup table for well-known chr aliases
-        this.chrAliasTable = {};
-        for (let chrName of Object.keys(this.chromosomeIndexMap)) {
-
-            if (chrName.startsWith("chr")) {
-                this.chrAliasTable[chrName.substr(3)] = chrName;
-            } else if (chrName === "MT") {
-                this.chrAliasTable["chrM"] = chrName;
-            } else {
-                this.chrAliasTable["chr" + chrName] = chrName;
-            }
-        }
-
-
-        // Meta data for the API
-        this.meta = {
-            "version": this.version,
-            "genome": this.genomeId,
-            "chromosomes": this.chromosomes,
-            "resolutions": this.bpResolutions,
-        };
-
-
-    }
-
-    async readFooter() {
-
-
-        let data = await this.file.read(this.masterIndexPos, 8);
-        if (!data) {
-            return null;
-        }
-
-        let binaryParser = new BinaryParser(new DataView(data));
-        const nBytes = binaryParser.getInt();   // Total size, master index + expected values
-        let nEntries = binaryParser.getInt();
-
-        // Estimate the size of the master index. String length of key is unknown, be conservative (100 bytes)
-        const miSize = nEntries * (100 + 64 + 32);
-        let range = {start: this.masterIndexPos + 8, size: Math.min(miSize, nBytes - 4)};
-        data = await this.file.read(this.masterIndexPos + 8, Math.min(miSize, nBytes - 4));
-        binaryParser = new BinaryParser(new DataView(data));
-
-        this.masterIndex = {};
-        while (nEntries-- > 0) {
-            const key = binaryParser.getString();
-            const pos = binaryParser.getLong();
-            const size = binaryParser.getInt();
-            this.masterIndex[key] = {start: pos, size: size};
-        }
-
-        this.expectedValueVectors = {};
-
-        nEntries = binaryParser.getInt();
-
-        // Expected values
-        // while (nEntries-- > 0) {
-        //     type = "NONE";
-        //     unit = binaryParser.getString();
-        //     binSize = binaryParser.getInt();
-        //     nValues = binaryParser.getInt();
-        //     values = [];
-        //     while (nValues-- > 0) {
-        //         values.push(binaryParser.getDouble());
-        //     }
-        //
-        //     nChrScaleFactors = binaryParser.getInt();
-        //     normFactors = {};
-        //     while (nChrScaleFactors-- > 0) {
-        //         normFactors[binaryParser.getInt()] = binaryParser.getDouble();
-        //     }
-        //
-        //     // key = unit + "_" + binSize + "_" + type;
-        //     //  NOT USED YET SO DON'T STORE
-        //     //  dataset.expectedValueVectors[key] =
-        //     //      new ExpectedValueFunction(type, unit, binSize, values, normFactors);
-        // }
-
-        this.normExpectedValueVectorsPosition = this.masterIndexPos + 4 + nBytes;
-
-        return this;
-    };
-
-    async readMatrix(chrIdx1, chrIdx2) {
-
-        await this.init();
-
-        if (chrIdx1 > chrIdx2) {
-            const tmp = chrIdx1;
-            chrIdx1 = chrIdx2;
-            chrIdx2 = tmp;
-        }
-
-        const key = "" + chrIdx1 + "_" + chrIdx2;
-
-        const idx = this.masterIndex[key];
-        if (!idx) {
-            return undefined
-        }
-
-        const data = await this.file.read(idx.start, idx.size);
-        if (!data) {
-            return undefined
-        }
-
-        const dis = new BinaryParser(new DataView(data));
-        const c1 = dis.getInt();     // Should equal chrIdx1
-        const c2 = dis.getInt();     // Should equal chrIdx2
-
-        // TODO validate this
-        const chr1 = this.chromosomes[c1];
-        const chr2 = this.chromosomes[c2];
-
-        // # of resolution levels (bp and frags)
-        let nResolutions = dis.getInt();
-        const zdList = [];
-
-        const sites1 = await this.getSites.call(this, chr1.name);
-        const sites2 = await this.getSites.call(this, chr2.name);
-
-        let bytesAvailable = dis.available();
-        let filePosition = idx.start;
-        while (nResolutions-- > 0) {
-
-            const zd = parseMatixZoomData(chr1, chr2, sites1, sites2, dis);
-            const bytesUsed = bytesAvailable - dis.available();
-            zd.idx = {
-                start: filePosition,
-                size: bytesUsed
-            };
-            bytesAvailable = dis.available();
-            zdList.push(zd);
-            //console.log(`zd${z++}: ${bytesUsed}`)
-        }
-        return new Matrix(chrIdx1, chrIdx2, zdList);
-
-    }
-
-    /***
-     * Return the raw data for the block.  Function provided for testing and development
-     * @param blockNumber
-     * @param zd
-     * @returns {Promise<void>}
-     */
-    async readBlockData(blockNumber, zd) {
-
-        var idx = null;
-
-        var blockIndex = zd.blockIndexMap;
-        if (blockIndex) {
-            var idx = blockIndex[blockNumber];
-        }
-        if (!idx) {
-            return undefined
-        }
-        else {
-
-            return this.file.read(idx.filePosition, idx.size)
-        }
-    }
-
-    async readBlock(blockNumber, zd) {
-
-        var self = this,
-            idx = null,
-            i, j;
-
-        var blockIndex = zd.blockIndexMap;
-        if (blockIndex) {
-            var idx = blockIndex[blockNumber];
-        }
-        if (!idx) {
-            return undefined
-        }
-        else {
-
-            let data = await this.file.read(idx.filePosition, idx.size);
-
-            if (!data) {
-                return undefined;
-            }
-
-            const inflate = new Zlib.Inflate(new Uint8Array(data));
-            const plain = inflate.decompress();
-            //var plain = zlib.inflateSync(Buffer.from(data))   //.decompress();
-            data = plain.buffer;
-
-
-            var parser = new BinaryParser(new DataView(data));
-            var nRecords = parser.getInt();
-            var records = [];
-
-            if (self.version < 7) {
-                for (i = 0; i < nRecords; i++) {
-                    var binX = parser.getInt();
-                    var binY = parser.getInt();
-                    var counts = parser.getFloat();
-                    records.push(new ContactRecord(binX, binY, counts));
-                }
-            } else {
-
-                var binXOffset = parser.getInt();
-                var binYOffset = parser.getInt();
-
-                var useShort = parser.getByte() == 0;
-                var type = parser.getByte();
-
-                if (type === 1) {
-                    // List-of-rows representation
-                    var rowCount = parser.getShort();
-
-                    for (i = 0; i < rowCount; i++) {
-
-                        binY = binYOffset + parser.getShort();
-                        var colCount = parser.getShort();
-
-                        for (j = 0; j < colCount; j++) {
-
-                            binX = binXOffset + parser.getShort();
-                            counts = useShort ? parser.getShort() : parser.getFloat();
-                            records.push(new ContactRecord(binX, binY, counts));
-                        }
-                    }
-                } else if (type == 2) {
-
-                    var nPts = parser.getInt();
-                    var w = parser.getShort();
-
-                    for (i = 0; i < nPts; i++) {
-                        //int idx = (p.y - binOffset2) * w + (p.x - binOffset1);
-                        var row = Math.floor(i / w);
-                        var col = i - row * w;
-                        var bin1 = binXOffset + col;
-                        var bin2 = binYOffset + row;
-
-                        if (useShort) {
-                            counts = parser.getShort();
-                            if (counts != Short_MIN_VALUE) {
-                                records.push(new ContactRecord(bin1, bin2, counts));
-                            }
-                        } else {
-                            counts = parser.getFloat();
-                            if (!isNaN(counts)) {
-                                records.push(new ContactRecord(bin1, bin2, counts));
-                            }
-                        }
-
-                    }
-
-                } else {
-                    throw new Error("Unknown block type: " + type);
-                }
-
-            }
-
-            return new Block(blockNumber, zd, records, idx);
-
-
-        }
-    };
-
-    async getSites(chrName) {
-
-        return undefined
-
-        // var self = this;
-        // var sites, entry;
-        //
-        // sites = self.fragmentSitesCache[chrName];
-        //
-        // if (sites) {
-        //     return Promise.resolve(sites);
-        //
-        // } else if (self.fragmentSitesIndex) {
-        //
-        //     entry = self.fragmentSitesIndex[chrName];
-        //
-        //     if (entry !== undefined && entry.nSites > 0) {
-        //
-        //         return readSites(entry.position, entry.nSites)
-        //             .then(function (sites) {
-        //                 self.fragmentSitesCache[chrName] = sites;
-        //                 return sites;
-        //
-        //             })
-        //     }
-        // }
-        // else {
-        //     return Promise.resolve(undefined);
-        // }
-
-    }
-
-    async getNormalizationVector(type, chr, unit, binSize) {
-
-        await this.init();
-
-        let chrIdx;
-        if (Number.isInteger(chr)) {
-            chrIdx = chr;
-        } else {
-            const canonicalName = this.getFileChrName(chr);
-            chrIdx = this.chromosomeIndexMap[canonicalName];
-        }
-
-
-        const key = getNormalizationVectorKey(type, chrIdx, unit.toString(), binSize);
-
-        if (this.normVectorCache.hasOwnProperty(key)) {
-            return Promise.resolve(this.normVectorCache[key]);
-        }
-
-        const normVectorIndex = await this.getNormVectorIndex();
-
-        if (!normVectorIndex) {
-            return undefined
-        }
-
-        const idx = normVectorIndex[key];
-        if (!idx) {
-            // TODO -- alert in browsers
-            return undefined;
-        }
-
-        const data = await this.file.read(idx.filePosition, idx.size);
-
-        if (!data) {
-            return undefined;
-        }
-
-        const parser = new BinaryParser(new DataView(data));
-        const nValues = parser.getInt();
-        const values = [];
-        let allNaN = true;
-        for (let i = 0; i < nValues; i++) {
-            values[i] = parser.getDouble();
-            if (!isNaN(values[i])) {
-                allNaN = false;
-            }
-        }
-        if (allNaN) {
-            return undefined;
-        } else {
-            return new NormalizationVector(type, chrIdx, unit, binSize, values);
-        }
-
-    }
-
-    async getNormVectorIndex() {
-
-        if (!this.normVectorIndex) {
-
-            // If nvi is not supplied, try reading from remote lambda service
-            if (!this.config.nvi && this.remote && this.url) {
-                const url = new URL(this.url);
-                const key = encodeURIComponent(url.hostname + url.pathname);
-                const nviResponse = await crossFetch('https://t5dvc6kn3f.execute-api.us-east-1.amazonaws.com/dev/nvi/' + key);
-                if (nviResponse.status === 200) {
-                    const nvi = await nviResponse.text();
-                    if (nvi) {
-                        this.config.nvi = nvi;
-                    }
-                }
-            }
-
-            if (this.config.nvi) {
-                const nviArray = decodeURIComponent(this.config.nvi).split(",");
-                const range = {start: parseInt(nviArray[0]), size: parseInt(nviArray[1])};
-                return this.readNormVectorIndex(range)
-            }
-            else {
-                try {
-                    await this.readNormExpectedValuesAndNormVectorIndex();
-                    return this.normVectorIndex
-                } catch (e) {
-                    if (e.code === "416" || e.code === 416) {
-                        // This is expected if file does not contain norm vectors
-                        this.normExpectedValueVectorsPosition = undefined;
-                    } else {
-                        console.error(e);
-                    }
-                }
-            }
-        }
-
-        return this.normVectorIndex
-    }
-
-    async getNormalizationOptions() {
-        // Normalization options are computed as a side effect of loading the index.  A bit
-        // ugly but alternatives are worse.
-        await this.getNormVectorIndex();
-        return this.normalizationTypes;
-    }
-
-    /**
-     * Return a promise to load the normalization vector index
-     *
-     * @param dataset
-     * @param range  -- file range {position, size}
-     * @returns Promise for the normalization vector index
-     */
-    async readNormVectorIndex(range) {
-
-        await this.init();
-
-        this.normalizationVectorIndexRange = range;
-
-        const data = await this.file.read(range.start, range.size);
-
-        const binaryParser = new BinaryParser(new DataView(data));
-
-        this.normVectorIndex = {};
-
-        let nEntries = binaryParser.getInt();
-        while (nEntries-- > 0) {
-            this.parseNormVectorEntry(binaryParser);
-        }
-
-        return this.normVectorIndex;
-
-    }
-
-    /**
-     * This function is used when the position of the norm vector index is unknown.  We must read through the expected
-     * values to find the index
-     *
-     * @param dataset
-     * @returns {Promise}
-     */
-    async readNormExpectedValuesAndNormVectorIndex() {
-
-        await this.init();
-
-        if (this.normExpectedValueVectorsPosition === undefined) {
-            return;
-        }
-
-        const nviStart = await this.skipExpectedValues(this.normExpectedValueVectorsPosition);
-        let byteCount = 4;
-
-        let data = await this.file.read(nviStart, 4);
-        const binaryParser = new BinaryParser(new DataView(data));
-        const nEntries = binaryParser.getInt();
-        const sizeEstimate = nEntries * 30;
-        const range = {start: nviStart + byteCount, size: sizeEstimate};
-
-        data = await this.file.read(range.start, range.size);
-        this.normalizedExpectedValueVectors = {};
-        this.normVectorIndex = {};
-
-        // Recursively process entries
-        await processEntries.call(this, nEntries, data);
-
-        this.config.nvi = nviStart.toString() + "," + byteCount;
-
-        async function processEntries(nEntries, data) {
-
-            const binaryParser = new BinaryParser(new DataView(data));
-
-            while (nEntries-- > 0) {
-
-                if (binaryParser.available() < 100) {
-
-                    nEntries++;   // Reset counter as entry is not processed
-
-                    byteCount += binaryParser.position;
-                    const sizeEstimate = Math.max(1000, nEntries * 30);
-                    const range = {start: nviStart + byteCount, size: sizeEstimate};
-                    const data = await this.file.read(range.start, range.size);
-                    return processEntries.call(this, nEntries, data);
-                }
-
-                this.parseNormVectorEntry(binaryParser);
-
-            }
-            byteCount += binaryParser.position;
-        }
-    }
-
-    /**
-     * This function is used when the position of the norm vector index is unknown.  We must read through the expected
-     * values to find the index
-     *
-     * @param dataset
-     * @returns {Promise}
-     */
-    async skipExpectedValues(start) {
-
-        const file = new BufferedFile({file: this.file, size: 256000});
-        const range = {start: start, size: 4};
-        const data = await file.read(range.start, range.size);
-        const binaryParser = new BinaryParser(new DataView(data));
-        const nEntries = binaryParser.getInt();   // Total # of expected value chunks
-        if (nEntries === 0) {
-            return range.start + range.size;
-        }
-        else {
-            return parseNext(start + 4, nEntries);
-        }     // Skip 4 bytes for int
-
-
-        async function parseNext(start, nEntries) {
-
-            let range = {start: start, size: 500};
-            let chunkSize = 0;
-            let p0 = start;
-
-            let data = await file.read(range.start, range.size);
-            let binaryParser = new BinaryParser(new DataView(data));
-            binaryParser.getString(); // type
-            binaryParser.getString(); // unit
-            binaryParser.getInt(); // binSize
-            const nValues = binaryParser.getInt();
-            chunkSize += binaryParser.position + nValues * 8;
-
-            range = {start: start + chunkSize, size: 4};
-            data = await file.read(range.start, range.size);
-            binaryParser = new BinaryParser(new DataView(data));
-            const nChrScaleFactors = binaryParser.getInt();
-            chunkSize += (4 + nChrScaleFactors * (4 + 8));
-
-            nEntries--;
-            if (nEntries === 0) {
-                return Promise.resolve(p0 + chunkSize);
-            }
-            else {
-                return parseNext(p0 + chunkSize, nEntries);
-            }
-        }
-    }
-
-    getZoomIndexForBinSize(binSize, unit) {
-
-        unit = unit || "BP";
-
-        let resolutionArray;
-        if (unit === "BP") {
-            resolutionArray = this.bpResolutions;
-        }
-        else if (unit === "FRAG") {
-            resolutionArray = this.fragResolutions;
-        } else {
-            throw new Error("Invalid unit: " + unit);
-        }
-
-        for (let i = 0; i < resolutionArray.length; i++) {
-            if (resolutionArray[i] === binSize) return i;
-        }
-
-        return -1;
-    }
-
-    parseNormVectorEntry(binaryParser) {
-        const type = binaryParser.getString();      //15
-        const chrIdx = binaryParser.getInt();       //4
-        const unit = binaryParser.getString();      //3
-        const binSize = binaryParser.getInt();      //4
-        const filePosition = binaryParser.getLong();  //8
-        const sizeInBytes = binaryParser.getInt();     //4
-        const key = type + "_" + chrIdx + "_" + unit + "_" + binSize;
-        // TODO -- why does this not work?  NormalizationVector.getNormalizationVectorKey(type, chrIdx, unit, binSize);
-
-        if (!this.normalizationTypes.includes(type)) {
-            this.normalizationTypes.push(type);
-        }
-        this.normVectorIndex[key] = {filePosition: filePosition, size: sizeInBytes};
-    }
-
-    getFileChrName(chrAlias) {
-        if (this.chrAliasTable.hasOwnProperty(chrAlias)) {
-            return this.chrAliasTable[chrAlias]
-        }
-        else {
-            return chrAlias
-        }
-    }
-}
-
-
-function parseMatixZoomData(chr1, chr2, chr1Sites, chr2Sites, dis) {
-
-    var unit, sumCounts, occupiedCellCount, stdDev, percent95, binSize, zoom, blockBinCount,
-        blockColumnCount, zd, nBlocks, blockIndex, nBins1, nBins2, avgCount, blockNumber,
-        filePosition, blockSizeInBytes;
-
-    unit = dis.getString();
-
-    dis.getInt();                // Old "zoom" index -- not used, must be read
-
-    // Stats.  Not used yet, but we need to read them anyway
-    sumCounts = dis.getFloat();
-    occupiedCellCount = dis.getFloat();
-    stdDev = dis.getFloat();
-    percent95 = dis.getFloat();
-
-    binSize = dis.getInt();
-    zoom = {unit: unit, binSize: binSize};
-
-    blockBinCount = dis.getInt();
-    blockColumnCount = dis.getInt();
-
-    zd = new MatrixZoomData(chr1, chr2, zoom, blockBinCount, blockColumnCount, chr1Sites, chr2Sites);
-
-    nBlocks = dis.getInt();
-    blockIndex = {};
-
-    while (nBlocks-- > 0) {
-        blockNumber = dis.getInt();
-        filePosition = dis.getLong();
-        blockSizeInBytes = dis.getInt();
-        blockIndex[blockNumber] = {filePosition: filePosition, size: blockSizeInBytes};
-    }
-    zd.blockIndexMap = blockIndex;
-
-    nBins1 = (chr1.size / binSize);
-    nBins2 = (chr2.size / binSize);
-    avgCount = (sumCounts / nBins1) / nBins2;   // <= trying to avoid overflows
-
-    zd.averageCount = avgCount;
-    zd.sumCounts = sumCounts;
-    zd.stdDev = stdDev;
-    zd.occupiedCellCount = occupiedCellCount;
-    zd.percent95 = percent95;
-
-    return zd;
-}
-
-function getNormalizationVectorKey(type, chrIdx, unit, resolution) {
-    return type + "_" + chrIdx + "_" + unit + "_" + resolution;
-}
-
-function isGoogleDrive(url) {
-    return url.indexOf("drive.google.com") >= 0 || url.indexOf("www.googleapis.com/drive") > 0
-}
-
-class Straw {
-
-    constructor(config) {
-
-        this.config = config;
-        this.hicFile = new HicFile(config);
-
-    }
-
-    async getMetaData() {
-        return await this.hicFile.getMetaData()
-    }
-
-    async getBlocks(region1, region2, units, binsize) {
-
-        await this.hicFile.init();
-
-        const chr1 = this.hicFile.getFileChrName(region1.chr);
-        const chr2 = this.hicFile.getFileChrName(region2.chr);
-        const idx1 = this.hicFile.chromosomeIndexMap[chr1];
-        const idx2 = this.hicFile.chromosomeIndexMap[chr2];
-
-        if(idx1 === undefined) {
-            return []
-        }
-        if(idx2 === undefined) {
-            return []
-        }
-
-        const x1 = (region1.start === undefined) ? undefined : region1.start / binsize;
-        const x2 = (region1.end === undefined) ? undefined : region1.end / binsize;
-        const y1 = (region2.start === undefined) ? undefined : region2.start / binsize;
-        const y2 = (region2.end === undefined) ? undefined : region2.end / binsize;
-
-        const matrix = await this.hicFile.readMatrix(idx1, idx2);
-        if(!matrix) {
-            return []
-        }
-
-        // Find the requested resolution
-        const z = undefined === binsize ? 0 : this.hicFile.getZoomIndexForBinSize(binsize, units);
-        if (z === -1) {
-            throw new Error("Invalid bin size");
-        }
-
-        const zd = matrix.bpZoomData[z];
-        if(zd === null) {
-            let msg = `No data avalailble for resolution: ${binsize}  for map ${region1.chr}-${region2.chr}`;
-            throw new Error(msg)
-        }
-      
-        const blockBinCount = zd.blockBinCount;   // Dimension in bins of a block (width = height = blockBinCount)
-        const col1 = x1 === undefined ? 0 : Math.floor(x1 / blockBinCount);
-        const col2 = x1 === undefined ? zd.blockColumnCount : Math.floor(x2 / blockBinCount);
-        const row1 = y1 === undefined ? 0 : Math.floor(y1 / blockBinCount);
-        const row2 = y2 === undefined ? zd.blockColumnCount : Math.floor(y2 / blockBinCount);
-
-        const promises = [];
-        const sameChr = idx1 === idx2;
-        for (let row = row1; row <= row2; row++) {
-            for (let column = col1; column <= col2; column++) {
-                let blockNumber;
-                if (sameChr && row < column) {
-                    blockNumber = column * zd.blockColumnCount + row;
-                }
-                else {
-                    blockNumber = row * zd.blockColumnCount + column;
-                }
-                promises.push(this.hicFile.readBlock(blockNumber, zd));
-            }
-        }
-
-        return Promise.all(promises)
-    }
-
-    //straw <NONE/VC/VC_SQRT/KR> <ile> <chr1>[:x1:x2] <chr2>[:y1:y2] <BP/FRAG> <binsize>
-    async getContactRecords(normalization, region1, region2, units, binsize) {
-
-        const blocks = await this.getBlocks(region1, region2, units, binsize);
-
-        if(!blocks || blocks.length === 0) {
-            return []
-        }
-
-        const chr1 = this.hicFile.getFileChrName(region1.chr);
-        const chr2 = this.hicFile.getFileChrName(region2.chr);
-        const x1 = (region1.start === undefined) ? undefined : region1.start / binsize;
-        const x2 = (region1.end === undefined) ? undefined : region1.end / binsize;
-        const y1 = (region2.start === undefined) ? undefined : region2.start / binsize;
-        const y2 = (region2.end === undefined) ? undefined : region2.end / binsize;
-
-        let normVector1;
-        let normVector2;
-        const isNorm = normalization && normalization !== "NONE";
-        if (isNorm) {
-            normVector1 = await this.hicFile.getNormalizationVector(normalization, chr1, units, binsize);
-            if (chr1 === chr2) {
-                normVector2 = normVector1;
-            } else {
-                normVector2 = await this.hicFile.getNormalizationVector(normalization, chr2, units, binsize);
-            }
-        }
-
-
-        const contactRecords = [];
-        for (let block of blocks) {
-
-            if (block) { // This is most likely caused by a base pair range outside the chromosome
-                for (let rec of block.records) {
-
-                    // transpose?
-                    if (x1 === undefined || (rec.bin1 >= x1 && rec.bin1 <= x2 && rec.bin2 >= y1 && rec.bin2 <= y2)) {
-                        if (isNorm) {
-                            const x = rec.bin1;
-                            const y = rec.bin2;
-                            const nvnv = normVector1.data[x] * normVector2.data[y];
-                            if (nvnv[x] !== 0 && !isNaN(nvnv)) {
-                                const counts = rec.counts / nvnv;
-                                contactRecords.push(new ContactRecord(x, y, counts));
-                            }
-
-                        } else {
-                            contactRecords.push(rec);
-                        }
-                    }
-                }
-            }
-        }
-
-        return contactRecords;
-    }
-
-    async getNormalizationOptions() {
-        return this.hicFile.getNormalizationOptions()
-    }
-
-    async getNVI() {
-        await
-            this.hicFile.getNormVectorIndex();
-        return this.hicFile.config.nvi;
-    }
-
-    getFileChrName(chrAlias) {
-        if (this.hicFile.chrAliasTable.hasOwnProperty(chrAlias)) {
-            return this.hicFile.chrAliasTable[chrAlias]
-        }
-        else {
-            return chrAlias
-        }
-    }
-}
-
-// Entry point for webpack.
-
-export default Straw;

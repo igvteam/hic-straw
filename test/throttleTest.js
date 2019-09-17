@@ -1,8 +1,7 @@
-const {assert} = require('chai')
-
-const RemoteFile = require("../src/io/remoteFile")
-const ThrottledFile = require("../src/io/throttledFile")
-const RateLimiter = require("../src/io/rateLimiter")
+import { assert } from 'chai';
+import RemoteFile from '../src/io/remoteFile';
+import ThrottledFile from '../src/io/throttledFile';
+import RateLimiter from '../src/io/rateLimiter';
 
 
 suite('ThrottledFile', function () {

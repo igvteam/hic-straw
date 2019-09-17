@@ -1,32 +1,29 @@
 {
   "name": "hic-straw",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "Utilities for reading .files (contact matrix files)",
   "main": "src/index.js",
+  "module": "hic-straw_es6.js",
   "files": [
     "dist/**",
     "src/**"
   ],
-  "dependencies": {
-    "browser-or-node": "^1.2.1",
-    "cross-fetch": "^3.0.2"
+  "scripts": {
+    "build": "npx rollup --config &&  node wrapper/injectRuntime.js",
+    "test": "mocha -u tdd -r esm",
+    "prepack": "npm run build"
   },
   "devDependencies": {
-    "babel-core": "6",
-    "babel-eslint": "^8.0.0",
-    "babel-loader": "^7.1.4",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-env": "^1.1.8",
-    "babel-preset-stage-2": "^6.18.0",
+    "@babel/core": "^7.6.0",
+    "@babel/plugin-transform-regenerator": "^7.4.5",
+    "@babel/preset-env": "^7.6.0",
     "chai": "^4.2.0",
-    "concat": "^1.0.3",
+    "esm": "^3.2.25",
     "mocha": "^5.2.0",
-    "webpack": "^4.30.0",
-    "webpack-cli": "^3.3.1"
-  },
-  "scripts": {
-    "build": "webpack; webpack --config webpack.config.es.js; node wrapper/build.js",
-    "test": "mocha -u tdd"
+    "node-fetch": "^2.6.0",
+    "rollup": "^1.21.2",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-strip": "^1.2.2"
   },
   "repository": {
     "type": "git",

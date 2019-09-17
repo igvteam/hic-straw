@@ -68,4 +68,4 @@ function mean (array) {
     return n > 0 ? t / n : 0;
 }
 
-module.exports = NormalizationVector
+export default NormalizationVector;

@@ -1,6 +1,7 @@
 // Entry point for webpack.
 
-const Straw = require('./straw')
-const HicFile = require('./hicFile')
+import Straw from './straw.js';
 
-module.exports = Straw
+import HicFile from './hicFile';
+
+export default Straw;

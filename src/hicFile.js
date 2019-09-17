@@ -1,16 +1,15 @@
-const zlib = require('zlib')
-const fetch = require('cross-fetch')
-
-const BrowserLocalFile = require("./io/browserLocalFile")
-const RemoteFile = require("./io/remoteFile")
-const ThrottledFile = require("./io/throttledFile")
-const RateLimiter = require("./io/rateLimiter")
-const BufferedFile = require("./io/bufferedFile")
-const BinaryParser = require("./binary")
-const Matrix = require("./matrix")
-const MatrixZoomData = require("./matrixZoomData")
-const NormalizationVector = require("./normalizationVector")
-const ContactRecord = require("./contactRecord")
+import Zlib from "./vendor/zlib_and_gzip.js"
+import crossFetch from "./io/crossFetch.js"
+import BrowserLocalFile from './io/browserLocalFile.js';
+import RemoteFile from './io/remoteFile.js';
+import ThrottledFile from './io/throttledFile.js';
+import RateLimiter from './io/rateLimiter.js';
+import BufferedFile from './io/bufferedFile.js';
+import BinaryParser from './binary.js';
+import Matrix from './matrix.js';
+import MatrixZoomData from './matrixZoomData.js';
+import NormalizationVector from './normalizationVector.js';
+import ContactRecord from './contactRecord.js';
 
 const Short_MIN_VALUE = -32768;
 
@@ -325,8 +324,9 @@ class HicFile {
                 return undefined;
             }
 
-            //var inflate = new Zlib.Inflate(new Uint8Array(data));
-            var plain = zlib.inflateSync(Buffer.from(data))   //.decompress();
+            const inflate = new Zlib.Inflate(new Uint8Array(data));
+            const plain = inflate.decompress();
+            //var plain = zlib.inflateSync(Buffer.from(data))   //.decompress();
             data = plain.buffer;
 
 
@@ -500,7 +500,7 @@ class HicFile {
             if (!this.config.nvi && this.remote && this.url) {
                 const url = new URL(this.url)
                 const key = encodeURIComponent(url.hostname + url.pathname)
-                const nviResponse = await fetch('https://t5dvc6kn3f.execute-api.us-east-1.amazonaws.com/dev/nvi/' + key)
+                const nviResponse = await crossFetch('https://t5dvc6kn3f.execute-api.us-east-1.amazonaws.com/dev/nvi/' + key)
                 if (nviResponse.status === 200) {
                     const nvi = await nviResponse.text()
                     if (nvi) {
@@ -781,4 +781,4 @@ function isGoogleDrive(url) {
 }
 
 
-module.exports = HicFile
+export default HicFile;
