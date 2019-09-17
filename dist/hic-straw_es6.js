@@ -5393,7 +5393,7 @@ const isNode =
     process.versions.node != null;
 
 
-const crossFetch = isNode ? require("node-fetch") : fetch;
+const crossFetch = isNode ? void 0 : fetch;
 
 class BrowserLocalFile {
 
@@ -6050,6 +6050,12 @@ class ContactRecord {
         return "" + this.bin1 + "_" + this.bin2;
     }
 }
+
+const isNode$2 =
+    typeof process !== 'undefined' &&
+    process.versions != null &&
+    process.versions.node != null;
+
 
 const Short_MIN_VALUE = -32768;
 

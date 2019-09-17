@@ -11,6 +11,15 @@ import MatrixZoomData from './matrixZoomData.js';
 import NormalizationVector from './normalizationVector.js';
 import ContactRecord from './contactRecord.js';
 
+const isNode =
+    typeof process !== 'undefined' &&
+    process.versions != null &&
+    process.versions.node != null;
+if(isNode)  {
+    require("url");
+}
+
+
 const Short_MIN_VALUE = -32768;
 
 const googleRateLimiter = new RateLimiter(100)
