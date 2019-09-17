@@ -54,23 +54,26 @@ straw KR https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_3
 
 ### In a script 
 
-See examples/script.js
+See examples/script.js.  Note straw source files are ES modules.  To run from the node command
+line you must use the experimental flag `--experimental-modules` or 
+the npm [esm module](https://www.npmjs.com/package/esm).
+
 
 ```js
-const Straw = require("../src/straw")
-const NodeLocalFile = require("../src/io/nodeLocalFile")
+import Straw from "../src/straw.js";
+import NodeLocalFile from "../src/io/nodeLocalFile.js"
 
 const file = new NodeLocalFile({path: "../test/data/test_chr22.hic"})
 const straw = new Straw({file: file})
 
-// Get  metadata 
+// Get  metadata
 straw.getMetaData()
     .then(function (metaData) {
         console.log(JSON.stringify(metaData, null, 2))
     })
 
 
-// Get the normalization options as an array 
+// Get the normalization options as an array
 straw.getNormalizationOptions()
     .then(function (normOptions) {
         console.log(normOptions)
@@ -83,7 +86,7 @@ straw.getContactRecords(
     {chr: "22", start: 40000000, end: 50000000},
     "BP",
     100000
-    )
+)
     .then(function (contactRecords) {
         for (let record of contactRecords) {
             console.log(record)
@@ -92,7 +95,8 @@ straw.getContactRecords(
     .catch(function (error) {
         console.log(error)
     })
-    
+
+
 
 ```
 
