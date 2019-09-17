@@ -1,7 +1,9 @@
 #!/usr/bin/env node
+// usage node -r esm script.js
+// see https://www.npmjs.com/package/esm
 
-const Straw = require("../src/straw")
-const NodeLocalFile = require("../src/io/nodeLocalFile")
+import Straw from "../src/straw.js";
+import NodeLocalFile from "../src/io/nodeLocalFile.js"
 
 const file = new NodeLocalFile({path: "../test/data/test_chr22.hic"})
 const straw = new Straw({file: file})

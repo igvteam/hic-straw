@@ -1,4 +1,4 @@
-import fetch from 'cross-fetch';
+import crossFetch from "./crossFetch.js"
 
 const  isNode = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
 
@@ -38,7 +38,7 @@ class RemoteFile {
             url = addParameter(url, "key", this.config.apiKey)
         }
 
-        const response = await fetch(url, {
+        const response = await crossFetch(url, {
             method: 'GET',
             headers: headers,
             redirect: 'follow',

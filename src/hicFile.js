@@ -1,5 +1,5 @@
 import Zlib from "./vendor/zlib_and_gzip.js"
-import fetch from 'cross-fetch';
+import crossFetch from "./io/crossFetch.js"
 import BrowserLocalFile from './io/browserLocalFile.js';
 import RemoteFile from './io/remoteFile.js';
 import ThrottledFile from './io/throttledFile.js';
@@ -324,7 +324,8 @@ class HicFile {
                 return undefined;
             }
 
-            var plain = new Zlib.Inflate(new Uint8Array(data));
+            const inflate = new Zlib.Inflate(new Uint8Array(data));
+            const plain = inflate.decompress();
             //var plain = zlib.inflateSync(Buffer.from(data))   //.decompress();
             data = plain.buffer;
 
@@ -499,7 +500,7 @@ class HicFile {
             if (!this.config.nvi && this.remote && this.url) {
                 const url = new URL(this.url)
                 const key = encodeURIComponent(url.hostname + url.pathname)
-                const nviResponse = await fetch('https://t5dvc6kn3f.execute-api.us-east-1.amazonaws.com/dev/nvi/' + key)
+                const nviResponse = await crossFetch('https://t5dvc6kn3f.execute-api.us-east-1.amazonaws.com/dev/nvi/' + key)
                 if (nviResponse.status === 200) {
                     const nvi = await nviResponse.text()
                     if (nvi) {
