@@ -1,5 +1,5 @@
-import strip from 'rollup-plugin-strip';
-import babel from 'rollup-plugin-babel';
+const strip = require('rollup-plugin-strip');
+const babel = require('rollup-plugin-babel');
 
 
 export default [

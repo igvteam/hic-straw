@@ -6592,7 +6592,7 @@ Context.prototype = {
   };
 
   var isNode = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
-  var crossFetch = isNode ? require("node-fetch") : fetch;
+  var crossFetch = isNode ? void 0 : fetch;
 
   var BrowserLocalFile =
   /*#__PURE__*/
@@ -7475,10 +7475,6 @@ Context.prototype = {
   }();
 
   var isNode$2 = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
-
-  if (isNode$2) {
-    require("url");
-  }
 
   var Short_MIN_VALUE = -32768;
   var googleRateLimiter = new RateLimiter(100);
