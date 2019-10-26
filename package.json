@@ -2,11 +2,10 @@
   "name": "hic-straw",
   "version": "0.9.5",
   "description": "Utilities for reading .files (contact matrix files)",
-  "main": "src/index.js",
-  "module": "hic-straw_es6.js",
+  "main": "dist/hic-straw.js",
+  "module": "dist/hic-straw_es6.js",
   "files": [
-    "dist/**",
-    "src/**"
+    "dist/**"
   ],
   "scripts": {
     "build": "npx rollup --config &&  node wrapper/injectRuntime.js",
