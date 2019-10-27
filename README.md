@@ -17,36 +17,33 @@ npm install hic-straw
 
 ### Command line
 
-* Extract file metadata.
+Note: "straw" is installed in node_modules/.bin/straw.  This should be added to the path automatically upon installing
+hic-straw, however if you get the error ```straw: command not found``` try running straw explicitly as
 
-  * genome identifier
-  * sequences (chromosomes)
-  * bin sizes (resolutions)
+```node_modules/.bin/straw...```
+
+#### Extract file metadata (genome identifier, sequences,  resolutions)
 
 ```bash
 straw --meta test/data/test_chr22.hic 
 ```
 
-* Extract normalization options.
-
-  * Array of normalization options
+#### Extract normalization options.
 
 ```
 straw --norms test/data/test_chr22.hic 
 
 ```  
 
-* Extract values from a local hic file between 40MB and 50MB on chromosome 22 at 100KB resolution with KR (balanced) normalization and 
-print to stdout.
+#### Extract contact records from a local hic file
 
-    * array of contact records {binX, binY, value}
 
 ```bash
 
 straw KR test/data/test_chr22.hic 22:40,000,000-50,000,000 22:40,000,000-50,000,000 BP 100,000
 
 ```
-* Extract values from a remote hic file by URL.
+#### Extract contact records from a remote hic file
 
 ```bash
 straw KR https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic 8:48,700,000-48,900,000 8:48700000-48900000 BP 10,000
