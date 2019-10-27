@@ -85,7 +85,7 @@ suite('Straw', function () {
 
         this.timeout(60000);
         const straw = new Straw({
-            "path": "https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic",
+            "url": "https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic",
             "nvi": "863389571,18679"
         })
 
@@ -105,7 +105,7 @@ suite('Straw', function () {
 
         this.timeout(60000);
         const straw = new Straw({
-            "path": "https://data.broadinstitute.org/igvdata/test/data/hic/inter.hic"
+            "url": "https://data.broadinstitute.org/igvdata/test/data/hic/inter.hic"
         })
 
         const contactRecords = await straw.getContactRecords(
@@ -123,7 +123,7 @@ suite('Straw', function () {
     test('norm vectors', async function () {
 
         const straw = new Straw({
-            "path": "https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic"
+            "url": "https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic"
         })
 
         const getNormOptions = async () => {
@@ -139,7 +139,7 @@ suite('Straw', function () {
 
         this.timeout(60000);
         const straw = new Straw({
-            "path": "https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined_30.hic"
+            "url": "https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined_30.hic"
         })
 
         const getNormOptions = async () => {
@@ -155,7 +155,7 @@ suite('Straw', function () {
 
         this.timeout(60000);
         const straw = new Straw({
-            "path": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM2583nnn/GSM2583729/suppl/GSM2583729_H3K27ac_HiChIP_2.hic"
+            "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM2583nnn/GSM2583729/suppl/GSM2583729_H3K27ac_HiChIP_2.hic"
         })
 
         const contactRecords = await straw.getContactRecords(
