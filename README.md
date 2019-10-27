@@ -52,53 +52,16 @@ straw KR test/data/test_chr22.hic 22:40,000,000-50,000,000 22:40,000,000-50,000,
 straw KR https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic 8:48,700,000-48,900,000 8:48700000-48900000 BP 10,000
 ```
 
-### In a script 
+### In a node script
 
-See examples/script.js.  Note straw source files are ES modules.  To run from the node command
-line you must use the experimental flag `--experimental-modules` or 
-the npm [esm module](https://www.npmjs.com/package/esm).
+See ```examples/script-es6.js``` and ```examples/script-cjs.js```. 
 
+** Usage (run from the examples directory)
 
-```js
-import Straw from "../src/straw.js";
-import NodeLocalFile from "../src/io/nodeLocalFile.js"
+* ```node -r esm examples/script-es6.js```
 
-const file = new NodeLocalFile({path: "../test/data/test_chr22.hic"})
-const straw = new Straw({file: file})
+* ```node examples/script-cjs.js```
 
-// Get  metadata
-straw.getMetaData()
-    .then(function (metaData) {
-        console.log(JSON.stringify(metaData, null, 2))
-    })
-
-
-// Get the normalization options as an array
-straw.getNormalizationOptions()
-    .then(function (normOptions) {
-        console.log(normOptions)
-    })
-
-// Get the contact records over a region
-straw.getContactRecords(
-    "KR",
-    {chr: "22", start: 40000000, end: 50000000},
-    {chr: "22", start: 40000000, end: 50000000},
-    "BP",
-    100000
-)
-    .then(function (contactRecords) {
-        for (let record of contactRecords) {
-            console.log(record)
-        }
-    })
-    .catch(function (error) {
-        console.log(error)
-    })
-
-
-
-```
 
 ### In a web page
 
@@ -106,7 +69,7 @@ Script tag - see examples/straw.html
 
 ```html
 
-<script src="https://cdn.jsdelivr.net/npm/hic-straw@0.9.4/dist/hic-straw.js"></script>
+<script src="../dist/hic-straw.js"></script>
 
 ...
 

@@ -1,11 +1,15 @@
-import util from 'util';
+const isNode = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
 
-// don't load fs native module if running in webpacked code
-const fs = typeof __webpack_require__ !== 'function' ? require('fs') : null // eslint-disable-line camelcase
-const fsOpen = fs && util.promisify(fs.open)
-const fsRead = fs && util.promisify(fs.read)
-const fsFStat = fs && util.promisify(fs.stat)
-const fsReadFile = fs && util.promisify(fs.readFile)
+let fs;
+let fsOpen;
+let fsRead;
+
+if (isNode) {
+    const util = require('util');
+    fs = require('fs');
+    fsOpen = fs && util.promisify(fs.open)
+    fsRead = fs && util.promisify(fs.read)
+}
 
 class NodeLocalFile {
 
@@ -20,9 +24,9 @@ class NodeLocalFile {
         const fd = await fsOpen(this.path, 'r')
         const result = await fsRead(fd, buffer, 0, length, position)
 
-       fs.close(fd, function (error) {
-           // TODO Do something with error
-       })
+        fs.close(fd, function (error) {
+            // TODO Do something with error
+        })
 
         //TODO -- compare result.bytesRead with length
         const arrayBuffer = result.buffer.buffer;
@@ -30,4 +34,4 @@ class NodeLocalFile {
     }
 }
 
-export default NodeLocalFile;
+export default NodeLocalFile

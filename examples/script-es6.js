@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-// usage node script.js
+// usage node -r esm script-es6.js
+// see https://www.npmjs.com/package/esm
 
-const Straw = require("../dist/hic-straw.js");
-
+import Straw from "../dist/hic-straw_es6.js";
 const path = "../test/data/test_chr22.hic";
 const straw = new Straw({path: path});
 

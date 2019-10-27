@@ -5393,7 +5393,7 @@ const isNode =
     process.versions.node != null;
 
 
-const crossFetch = isNode ? void 0 : fetch;
+const crossFetch = isNode ? require("node-fetch") : fetch;
 
 class BrowserLocalFile {
 
@@ -5431,7 +5431,43 @@ class BrowserLocalFile {
     }
 }
 
-const  isNode$1 = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
+const isNode$1 = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
+
+let fs;
+let fsOpen;
+let fsRead;
+
+if (isNode$1) {
+    const util = require('util');
+    fs = require('fs');
+    fsOpen = fs && util.promisify(fs.open);
+    fsRead = fs && util.promisify(fs.read);
+}
+
+class NodeLocalFile {
+
+    constructor(args) {
+        this.path = args.path;
+    }
+
+
+    async read(position, length) {
+
+        const buffer = Buffer.alloc(length);
+        const fd = await fsOpen(this.path, 'r');
+        const result = await fsRead(fd, buffer, 0, length, position);
+
+        fs.close(fd, function (error) {
+            // TODO Do something with error
+        });
+
+        //TODO -- compare result.bytesRead with length
+        const arrayBuffer = result.buffer.buffer;
+        return arrayBuffer
+    }
+}
+
+const  isNode$2 = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
 
 class RemoteFile {
 
@@ -5449,7 +5485,7 @@ class RemoteFile {
         headers['Range'] = rangeString;
 
         let url = this.url.slice();    // slice => copy
-        if (isNode$1) {
+        if (isNode$2) {
             headers['User-Agent'] = 'straw';
         } else {
             if (this.config.oauthToken) {
@@ -6051,11 +6087,7 @@ class ContactRecord {
     }
 }
 
-const isNode$2 =
-    typeof process !== 'undefined' &&
-    process.versions != null &&
-    process.versions.node != null;
-
+const isNode$3 = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
 
 const Short_MIN_VALUE = -32768;
 
@@ -6087,25 +6119,26 @@ class HicFile {
             this.file = args.file;
         } else if (args.blob) {
             this.file = new BrowserLocalFile(args.blob);
-        }  else {
-            this.url = args.path || args.url;
+        } else if (args.url || (args.path && !isNode$3)) {
+            this.url = args.url || this.path;
+            this.remote = true;
 
-            if (this.url.startsWith("http://") || this.url.startsWith("https://")) {
-                this.remote = true;
-
-                // Google drive must be rate limited.  Perhaps all
-                const remoteFile = new RemoteFile(args);
-                if(isGoogleDrive(this.url)) {
-                    this.file = new ThrottledFile(remoteFile, googleRateLimiter);
-                } else {
-                    this.file = remoteFile;
-                }
-
+            // Google drive must be rate limited.  Perhaps all remote files should be rate limited?
+            const remoteFile = new RemoteFile(args);
+            if (isGoogleDrive(this.url)) {
+                this.file = new ThrottledFile(remoteFile, googleRateLimiter);
             } else {
-                throw Error("Arguments must include file, blob, or url")
+                this.file = remoteFile;
             }
+        } else if (args.path) {
+            // path argument, assumed local file
+            this.file = new NodeLocalFile({path: args.path});
+
+        } else {
+            throw Error("Arguments must include file, blob, url, or path")
         }
-    };
+    }
+
 
     async init() {
 
@@ -6339,8 +6372,7 @@ class HicFile {
         }
         if (!idx) {
             return undefined
-        }
-        else {
+        } else {
 
             return this.file.read(idx.filePosition, idx.size)
         }
@@ -6358,8 +6390,7 @@ class HicFile {
         }
         if (!idx) {
             return undefined
-        }
-        else {
+        } else {
 
             let data = await this.file.read(idx.filePosition, idx.size);
 
@@ -6554,8 +6585,7 @@ class HicFile {
                 const nviArray = decodeURIComponent(this.config.nvi).split(",");
                 const range = {start: parseInt(nviArray[0]), size: parseInt(nviArray[1])};
                 return this.readNormVectorIndex(range)
-            }
-            else {
+            } else {
                 try {
                     await this.readNormExpectedValuesAndNormVectorIndex();
                     return this.normVectorIndex
@@ -6681,8 +6711,7 @@ class HicFile {
         const nEntries = binaryParser.getInt();   // Total # of expected value chunks
         if (nEntries === 0) {
             return range.start + range.size;
-        }
-        else {
+        } else {
             return parseNext(start + 4, nEntries);
         }     // Skip 4 bytes for int
 
@@ -6710,8 +6739,7 @@ class HicFile {
             nEntries--;
             if (nEntries === 0) {
                 return Promise.resolve(p0 + chunkSize);
-            }
-            else {
+            } else {
                 return parseNext(p0 + chunkSize, nEntries);
             }
         }
@@ -6724,8 +6752,7 @@ class HicFile {
         let resolutionArray;
         if (unit === "BP") {
             resolutionArray = this.bpResolutions;
-        }
-        else if (unit === "FRAG") {
+        } else if (unit === "FRAG") {
             resolutionArray = this.fragResolutions;
         } else {
             throw new Error("Invalid unit: " + unit);
@@ -6757,8 +6784,7 @@ class HicFile {
     getFileChrName(chrAlias) {
         if (this.chrAliasTable.hasOwnProperty(chrAlias)) {
             return this.chrAliasTable[chrAlias]
-        }
-        else {
+        } else {
             return chrAlias
         }
     }

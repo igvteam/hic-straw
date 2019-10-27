@@ -1,6 +1,7 @@
 import Zlib from "./vendor/zlib_and_gzip.js"
 import crossFetch from "./io/crossFetch.js"
 import BrowserLocalFile from './io/browserLocalFile.js';
+import NodeLocalFile from "./io/nodeLocalFile.js";
 import RemoteFile from './io/remoteFile.js';
 import ThrottledFile from './io/throttledFile.js';
 import RateLimiter from './io/rateLimiter.js';
@@ -10,6 +11,8 @@ import Matrix from './matrix.js';
 import MatrixZoomData from './matrixZoomData.js';
 import NormalizationVector from './normalizationVector.js';
 import ContactRecord from './contactRecord.js';
+
+const isNode = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
 
 const Short_MIN_VALUE = -32768;
 
@@ -41,25 +44,26 @@ class HicFile {
             this.file = args.file
         } else if (args.blob) {
             this.file = new BrowserLocalFile(args.blob)
-        }  else {
-            this.url = args.path || args.url
+        } else if (args.url || (args.path && !isNode)) {
+            this.url = args.url || this.path;
+            this.remote = true
 
-            if (this.url.startsWith("http://") || this.url.startsWith("https://")) {
-                this.remote = true
-
-                // Google drive must be rate limited.  Perhaps all
-                const remoteFile = new RemoteFile(args)
-                if(isGoogleDrive(this.url)) {
-                    this.file = new ThrottledFile(remoteFile, googleRateLimiter)
-                } else {
-                    this.file = remoteFile
-                }
-
+            // Google drive must be rate limited.  Perhaps all remote files should be rate limited?
+            const remoteFile = new RemoteFile(args)
+            if (isGoogleDrive(this.url)) {
+                this.file = new ThrottledFile(remoteFile, googleRateLimiter)
             } else {
-                throw Error("Arguments must include file, blob, or url")
+                this.file = remoteFile
             }
+        } else if (args.path) {
+            // path argument, assumed local file
+            this.file = new NodeLocalFile({path: args.path})
+
+        } else {
+            throw Error("Arguments must include file, blob, url, or path")
         }
-    };
+    }
+
 
     async init() {
 
@@ -296,8 +300,7 @@ class HicFile {
         }
         if (!idx) {
             return undefined
-        }
-        else {
+        } else {
 
             return this.file.read(idx.filePosition, idx.size)
         }
@@ -315,8 +318,7 @@ class HicFile {
         }
         if (!idx) {
             return undefined
-        }
-        else {
+        } else {
 
             let data = await this.file.read(idx.filePosition, idx.size)
 
@@ -513,8 +515,7 @@ class HicFile {
                 const nviArray = decodeURIComponent(this.config.nvi).split(",")
                 const range = {start: parseInt(nviArray[0]), size: parseInt(nviArray[1])};
                 return this.readNormVectorIndex(range)
-            }
-            else {
+            } else {
                 try {
                     await this.readNormExpectedValuesAndNormVectorIndex()
                     return this.normVectorIndex
@@ -640,8 +641,7 @@ class HicFile {
         const nEntries = binaryParser.getInt();   // Total # of expected value chunks
         if (nEntries === 0) {
             return range.start + range.size;
-        }
-        else {
+        } else {
             return parseNext(start + 4, nEntries);
         }     // Skip 4 bytes for int
 
@@ -669,8 +669,7 @@ class HicFile {
             nEntries--;
             if (nEntries === 0) {
                 return Promise.resolve(p0 + chunkSize);
-            }
-            else {
+            } else {
                 return parseNext(p0 + chunkSize, nEntries);
             }
         }
@@ -683,8 +682,7 @@ class HicFile {
         let resolutionArray
         if (unit === "BP") {
             resolutionArray = this.bpResolutions;
-        }
-        else if (unit === "FRAG") {
+        } else if (unit === "FRAG") {
             resolutionArray = this.fragResolutions;
         } else {
             throw new Error("Invalid unit: " + unit);
@@ -716,8 +714,7 @@ class HicFile {
     getFileChrName(chrAlias) {
         if (this.chrAliasTable.hasOwnProperty(chrAlias)) {
             return this.chrAliasTable[chrAlias]
-        }
-        else {
+        } else {
             return chrAlias
         }
     }

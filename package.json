@@ -1,16 +1,19 @@
 {
   "name": "hic-straw",
-  "version": "0.9.5",
+  "version": "0.9.8",
   "description": "Utilities for reading .files (contact matrix files)",
   "main": "dist/hic-straw.js",
   "module": "dist/hic-straw_es6.js",
   "files": [
-    "dist/**"
+    "dist/**",
+    "src/**",
+    "cli.js"
   ],
   "scripts": {
-    "build": "npx rollup --config &&  node wrapper/injectRuntime.js",
+    "build": "npx rollup --config &&  node scripts/injectRuntime.js",
     "test": "mocha -u tdd -r esm",
-    "prepack": "npm run build"
+    "prepack": "npm run build",
+    "fix-mocha": "npx uni -D mocha && npx i -D mocha"
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",
@@ -18,11 +21,11 @@
     "@babel/preset-env": "^7.6.0",
     "chai": "^4.2.0",
     "esm": "^3.2.25",
-    "mocha": "^5.2.0",
-    "node-fetch": "^2.6.0",
+    "mocha": "^6.2.2",
     "rollup": "^1.21.2",
     "rollup-plugin-babel": "^4.3.3",
-    "rollup-plugin-strip": "^1.2.2"
+    "rollup-plugin-strip": "^1.2.2",
+    "node-fetch": "^2.6.0"
   },
   "repository": {
     "type": "git",
@@ -39,7 +42,7 @@
     "url": "https://github.com/igvteam/hic-straw/issues"
   },
   "bin": {
-    "straw": "src/cli.js"
+    "straw": "cli.js"
   },
   "homepage": "https://github.com/igvteam/hic-straw#readme"
 }

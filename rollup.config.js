@@ -4,6 +4,7 @@ import babel from 'rollup-plugin-babel';
 
 export default [
 
+    // Browser ES6 bundle
     {
         input: './src/index.js',
         output: [
@@ -17,7 +18,7 @@ export default [
                 debugger: true,
 
                 // defaults to `[ 'console.*', 'assert.*' ]`
-                functions: ['console.log', 'assert.*', 'debug', 'require'],
+                functions: ['console.log', 'assert.*', 'debug'],
 
                 // set this to `false` if you're not using sourcemaps –
                 // defaults to `true`
@@ -26,6 +27,7 @@ export default [
         ]
     },
 
+    // Browser / Node  bundle
     {
         input: './src/index.js',
         output: [
@@ -39,7 +41,7 @@ export default [
                 debugger: true,
 
                 // defaults to `[ 'console.*', 'assert.*' ]`
-                functions: ['console.log', 'assert.*', 'debug', 'require'],
+                functions: ['console.log', 'assert.*', 'debug'],
 
                 // set this to `false` if you're not using sourcemaps –
                 // defaults to `true`
@@ -49,5 +51,6 @@ export default [
                 exclude: 'node_modules/**'
             }),
         ]
-    }
+    },
+
 ];

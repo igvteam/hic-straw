@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-// usage node script.js
 
 const Straw = require("../dist/hic-straw.js");
 
-const path = "../test/data/test_chr22.hic";
-const straw = new Straw({path: path});
+// Local file  -- must use CJS NodeLocalFile explicitly
+const url = "https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic"
+const straw = new Straw({url: url})
 
 // Get  metadata
 straw.getMetaData()
@@ -35,4 +35,6 @@ straw.getContactRecords(
     .catch(function (error) {
         console.log(error)
     })
+
+
 

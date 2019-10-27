@@ -1,17 +1,11 @@
 #!/usr/bin/env node
-
-import Straw from './straw.js';
-
-import NodeLocalFile from './io/nodeLocalFile';
+const Straw = require("./dist/hic-straw.js");
 
 const [, , ...args] = process.argv
-
 const usageString = "Usage: $straw normalization hicfile region1 region2 units resolution"
-
 const a = prepArgs(args)
 
 if (a.options.has("--meta") && a.positional.length === 1) {
-
     printMetaData(a.positional[0])
 
 } else if (a.options.has("--norms") && a.positional.length === 1) {
@@ -45,22 +39,19 @@ function prepArgs(args) {
 }
 
 async function printNVI(filepath) {
-    const file = new NodeLocalFile({path: filepath})
-    const straw = new Straw({file: file})
+    const straw = getStraw(filepath);
     const nvi = await straw.getNVI()
     console.log('nvi=' + nvi)
 }
 
 async function printNormalization(filepath) {
-    const file = new NodeLocalFile({path: filepath})
-    const straw = new Straw({file: file})
+    const straw = getStraw(filepath);
     const norms = await straw.getNormalizationOptions()
     console.log(norms)
 }
 
 async function printMetaData(filepath) {
-    const file = new NodeLocalFile({path: filepath})
-    const straw = new Straw({file: file})
+    const straw = getStraw(filepath);
     const meta = await straw.getMetaData()
     console.log(JSON.stringify(meta, null, 2))
 }
@@ -88,8 +79,7 @@ async function fetchContacts(normalization, filepath, region1, region2, units, r
 
     const r1 = parseRegion(region1)
     const r2 = parseRegion(region2)
-    const file = new NodeLocalFile({path: filepath})
-    const straw = new Straw({file: file})
+    const straw = getStraw(filepath);
     return straw.getContactRecords(normalization, r1, r2, units, resolution)
 
 }
@@ -127,6 +117,15 @@ function parseRegion(region) {
         end: end
     }
 }
+
+function getStraw(filepath) {
+    if(filepath.startsWith("http://") || filepath.startsWith("https://")) {
+        return new Straw({url: filepath});
+    } else {
+        return new Straw({path: filepath})
+    }
+}
+
 
 // args:  region1, region2, resolution, normalization, units
 

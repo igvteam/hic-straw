@@ -6592,7 +6592,7 @@ Context.prototype = {
   };
 
   var isNode = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
-  var crossFetch = isNode ? void 0 : fetch;
+  var crossFetch = isNode ? require("node-fetch") : fetch;
 
   var BrowserLocalFile =
   /*#__PURE__*/
@@ -6655,6 +6655,75 @@ Context.prototype = {
   }();
 
   var isNode$1 = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
+  var fs;
+  var fsOpen;
+  var fsRead;
+
+  if (isNode$1) {
+    var util = require('util');
+
+    fs = require('fs');
+    fsOpen = fs && util.promisify(fs.open);
+    fsRead = fs && util.promisify(fs.read);
+  }
+
+  var NodeLocalFile =
+  /*#__PURE__*/
+  function () {
+    function NodeLocalFile(args) {
+      _classCallCheck(this, NodeLocalFile);
+
+      this.path = args.path;
+    }
+
+    _createClass(NodeLocalFile, [{
+      key: "read",
+      value: function () {
+        var _read = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee(position, length) {
+          var buffer, fd, result, arrayBuffer;
+          return regeneratorRuntime.wrap(function _callee$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  buffer = Buffer.alloc(length);
+                  _context.next = 3;
+                  return fsOpen(this.path, 'r');
+
+                case 3:
+                  fd = _context.sent;
+                  _context.next = 6;
+                  return fsRead(fd, buffer, 0, length, position);
+
+                case 6:
+                  result = _context.sent;
+                  fs.close(fd, function (error) {// TODO Do something with error
+                  }); //TODO -- compare result.bytesRead with length
+
+                  arrayBuffer = result.buffer.buffer;
+                  return _context.abrupt("return", arrayBuffer);
+
+                case 10:
+                case "end":
+                  return _context.stop();
+              }
+            }
+          }, _callee, this);
+        }));
+
+        function read(_x, _x2) {
+          return _read.apply(this, arguments);
+        }
+
+        return read;
+      }()
+    }]);
+
+    return NodeLocalFile;
+  }();
+
+  var isNode$2 = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
 
   var RemoteFile =
   /*#__PURE__*/
@@ -6719,7 +6788,7 @@ Context.prototype = {
                   headers['Range'] = rangeString;
                   url = this.url.slice(); // slice => copy
 
-                  if (isNode$1) {
+                  if (isNode$2) {
                     headers['User-Agent'] = 'straw';
                   } else {
                     if (this.config.oauthToken) {
@@ -7474,8 +7543,7 @@ Context.prototype = {
     return ContactRecord;
   }();
 
-  var isNode$2 = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
-
+  var isNode$3 = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
   var Short_MIN_VALUE = -32768;
   var googleRateLimiter = new RateLimiter(100);
 
@@ -7504,22 +7572,24 @@ Context.prototype = {
         this.file = args.file;
       } else if (args.blob) {
         this.file = new BrowserLocalFile(args.blob);
-      } else {
-        this.url = args.path || args.url;
+      } else if (args.url || args.path && !isNode$3) {
+        this.url = args.url || this.path;
+        this.remote = true; // Google drive must be rate limited.  Perhaps all remote files should be rate limited?
 
-        if (this.url.startsWith("http://") || this.url.startsWith("https://")) {
-          this.remote = true; // Google drive must be rate limited.  Perhaps all
+        var remoteFile = new RemoteFile(args);
 
-          var remoteFile = new RemoteFile(args);
-
-          if (isGoogleDrive(this.url)) {
-            this.file = new ThrottledFile(remoteFile, googleRateLimiter);
-          } else {
-            this.file = remoteFile;
-          }
+        if (isGoogleDrive(this.url)) {
+          this.file = new ThrottledFile(remoteFile, googleRateLimiter);
         } else {
-          throw Error("Arguments must include file, blob, or url");
+          this.file = remoteFile;
         }
+      } else if (args.path) {
+        // path argument, assumed local file
+        this.file = new NodeLocalFile({
+          path: args.path
+        });
+      } else {
+        throw Error("Arguments must include file, blob, url, or path");
       }
     }
 
