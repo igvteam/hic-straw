@@ -15,6 +15,70 @@ npm install hic-straw
 
 ## Examples
 
+
+### In a web page
+
+Script tag - see examples/straw.html
+
+```html
+
+<script src="../dist/hic-straw.js"></script>
+
+...
+
+ const straw = new HicStraw({
+            url: "https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic"
+        })
+
+        straw.getContactRecords(
+            "KR",
+            {chr: "8",start: 50000000, end: 60000000},
+            {chr: "8",start: 50000000, end: 60000000},
+            "BP",
+            1000000
+        )
+            .then(function (contactRecords) {...})
+
+```
+      
+
+ES6 module - see examples/straw-es6.html
+
+```js
+
+
+    import HicStraw from '../dist/hic-straw_es6.js'
+
+    const straw = new HicStraw({
+        url: "https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic"
+    })
+
+    straw.getContactRecords(
+        "KR",
+        {chr: "8",start: 50000000, end: 60000000},
+        {chr: "8",start: 50000000, end: 60000000},
+        "BP",
+        1000000
+     )
+        .then(function (contactRecords) {...})
+
+
+
+```
+
+`
+
+### In a node script
+
+See ```examples/script-es6.js``` and ```examples/script-cjs.js```. 
+
+** Usage (run from the examples directory)
+
+* ```node -r esm examples/script-es6.js```
+
+* ```node examples/script.js```
+
+      
 ### Command line
 
 Note: "straw" is installed in node_modules/.bin/straw.  This should be added to the path automatically upon installing
@@ -47,66 +111,4 @@ straw KR test/data/test_chr22.hic 22:40,000,000-50,000,000 22:40,000,000-50,000,
 
 ```bash
 straw KR https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic 8:48,700,000-48,900,000 8:48700000-48900000 BP 10,000
-```
-
-### In a node script
-
-See ```examples/script-es6.js``` and ```examples/script-cjs.js```. 
-
-** Usage (run from the examples directory)
-
-* ```node -r esm examples/script-es6.js```
-
-* ```node examples/script-cjs.js```
-
-
-### In a web page
-
-Script tag - see examples/straw.html
-
-```html
-
-<script src="../dist/hic-straw.js"></script>
-
-...
-
- const straw = new HicStraw({
-            "url": "https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic"
-        })
-
-        straw.getContactRecords(
-            "KR",
-            {chr: "8",start: 50000000, end: 60000000},
-            {chr: "8",start: 50000000, end: 60000000},
-            "BP",
-            1000000
-        )
-            .then(function (contactRecords) {...})
-
-```
-      
-
-ES6 module - see examples/straw-es6.html
-
-```js
-
-
-    import HicStraw from '../dist/hic-straw_es6.js'
-
-    const straw = new HicStraw({
-        "path": "https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic"
-    })
-
-    straw.getContactRecords(
-        "KR",
-        {chr: "8",start: 50000000, end: 60000000},
-        {chr: "8",start: 50000000, end: 60000000},
-        "BP",
-        1000000
-     )
-        .then(function (contactRecords) {...})
-
-
-
-```
-      
+``
