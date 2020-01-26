@@ -7793,7 +7793,7 @@ Context.prototype = {
         var _readFooter = _asyncToGenerator(
         /*#__PURE__*/
         regeneratorRuntime.mark(function _callee4() {
-          var data, binaryParser, nBytes, nEntries, miSize, range, key, pos, size;
+          var data, binaryParser, nBytes, nEntries, miSize, key, pos, size;
           return regeneratorRuntime.wrap(function _callee4$(_context4) {
             while (1) {
               switch (_context4.prev = _context4.next) {
@@ -7813,19 +7813,15 @@ Context.prototype = {
 
                 case 5:
                   binaryParser = new BinaryParser(new DataView(data));
-                  nBytes = binaryParser.getInt(); // Total size, master index + expected values
+                  nBytes = binaryParser.getInt() + 4; // Total size, master index + expected values
 
                   nEntries = binaryParser.getInt(); // Estimate the size of the master index. String length of key is unknown, be conservative (100 bytes)
 
                   miSize = nEntries * (100 + 64 + 32);
-                  range = {
-                    start: this.masterIndexPos + 8,
-                    size: Math.min(miSize, nBytes - 4)
-                  };
-                  _context4.next = 12;
+                  _context4.next = 11;
                   return this.file.read(this.masterIndexPos + 8, Math.min(miSize, nBytes - 4));
 
-                case 12:
+                case 11:
                   data = _context4.sent;
                   binaryParser = new BinaryParser(new DataView(data));
                   this.masterIndex = {};
@@ -7867,7 +7863,7 @@ Context.prototype = {
                   this.normExpectedValueVectorsPosition = this.masterIndexPos + 4 + nBytes;
                   return _context4.abrupt("return", this);
 
-                case 20:
+                case 19:
                 case "end":
                   return _context4.stop();
               }
@@ -8584,6 +8580,15 @@ Context.prototype = {
 
                 case 12:
                   data = _context14.sent;
+
+                  if (!(data.byteLength === 0)) {
+                    _context14.next = 15;
+                    break;
+                  }
+
+                  return _context14.abrupt("return");
+
+                case 15:
                   binaryParser = new BinaryParser(new DataView(data));
                   nEntries = binaryParser.getInt();
                   sizeEstimate = nEntries * 30;
@@ -8591,21 +8596,21 @@ Context.prototype = {
                     start: nviStart + byteCount,
                     size: sizeEstimate
                   };
-                  _context14.next = 19;
+                  _context14.next = 21;
                   return this.file.read(range.start, range.size);
 
-                case 19:
+                case 21:
                   data = _context14.sent;
                   this.normalizedExpectedValueVectors = {};
                   this.normVectorIndex = {}; // Recursively process entries
 
-                  _context14.next = 24;
+                  _context14.next = 26;
                   return processEntries.call(this, nEntries, data);
 
-                case 24:
+                case 26:
                   this.config.nvi = nviStart.toString() + "," + byteCount;
 
-                case 25:
+                case 27:
                 case "end":
                   return _context14.stop();
               }

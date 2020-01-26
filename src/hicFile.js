@@ -177,12 +177,11 @@ class HicFile {
         }
 
         let binaryParser = new BinaryParser(new DataView(data))
-        const nBytes = binaryParser.getInt()   // Total size, master index + expected values
+        const nBytes = binaryParser.getInt() + 4  // Total size, master index + expected values
         let nEntries = binaryParser.getInt()
 
         // Estimate the size of the master index. String length of key is unknown, be conservative (100 bytes)
         const miSize = nEntries * (100 + 64 + 32)
-        let range = {start: this.masterIndexPos + 8, size: Math.min(miSize, nBytes - 4)}
         data = await this.file.read(this.masterIndexPos + 8, Math.min(miSize, nBytes - 4))
         binaryParser = new BinaryParser(new DataView(data));
 
@@ -390,9 +389,7 @@ class HicFile {
                                 records.push(new ContactRecord(bin1, bin2, counts));
                             }
                         }
-
                     }
-
                 } else {
                     throw new Error("Unknown block type: " + type);
                 }
@@ -586,7 +583,11 @@ class HicFile {
         const nviStart = await this.skipExpectedValues(this.normExpectedValueVectorsPosition)
         let byteCount = 4;
 
-        let data = await this.file.read(nviStart, 4)
+        let data = await this.file.read(nviStart, 4);
+        if (data.byteLength === 0) {
+            // This is possible if there are no norm vectors.  Its a legal v8 file, though uncommon
+            return;
+        }
         const binaryParser = new BinaryParser(new DataView(data));
         const nEntries = binaryParser.getInt();
         const sizeEstimate = nEntries * 30;
