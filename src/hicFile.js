@@ -730,7 +730,7 @@ function parseMatixZoomData(chr1, chr2, chr1Sites, chr2Sites, dis) {
 
     unit = dis.getString();
 
-    dis.getInt();                // Old "zoom" index -- not used, must be read
+    const zoomIndex = dis.getInt();
 
     // Stats.  Not used yet, but we need to read them anyway
     sumCounts = dis.getFloat();
@@ -739,7 +739,7 @@ function parseMatixZoomData(chr1, chr2, chr1Sites, chr2Sites, dis) {
     percent95 = dis.getFloat();
 
     binSize = dis.getInt();
-    zoom = {unit: unit, binSize: binSize};
+    zoom = {index: zoomIndex, unit: unit, binSize: binSize};
 
     blockBinCount = dis.getInt();
     blockColumnCount = dis.getInt();
