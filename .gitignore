@@ -80,3 +80,4 @@ typings/
 .dynamodb/
 /.idea/
 *.iml
+/node_modules/

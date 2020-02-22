@@ -1,5 +1,8 @@
-import strip from 'rollup-plugin-strip';
+import commonjs from 'rollup-plugin-commonjs';
+import resolve from 'rollup-plugin-node-resolve';
 import babel from 'rollup-plugin-babel';
+import strip from 'rollup-plugin-strip';
+import {terser} from "rollup-plugin-terser"
 
 
 export default [
@@ -8,21 +11,20 @@ export default [
     {
         input: './src/index.js',
         output: [
-            {file: 'dist/hic-straw_es6.js', format: 'es', name: 'HicStraw'},
+            {file: 'dist/hic-straw.esm.js', format: 'es'},
+            {file: 'dist/hic-straw.esm.js', format: 'es', sourcemap: true},
         ],
-
         plugins: [
             strip({
-                // set this to `false` if you don't want to
-                // remove debugger statements
                 debugger: true,
-
-                // defaults to `[ 'console.*', 'assert.*' ]`
-                functions: ['console.log', 'assert.*', 'debug'],
-
-                // set this to `false` if you're not using sourcemaps –
-                // defaults to `true`
-                sourceMap: false
+                functions: ['console.log', 'assert.*', 'debug']
+            }),
+            terser({
+                include: [/^.+\.min\.js$/],
+                sourcemap: {
+                    filename: "hic-straw.esm.min.js",
+                    url: "hic-straw.esm.min.js.map"
+                }
             })
         ]
     },
@@ -31,25 +33,24 @@ export default [
     {
         input: './src/index.js',
         output: [
-            {file: 'tmp/hic-straw.js', format: 'umd', name: 'HicStraw'}
+            {file: 'dist/hic-straw.js', format: 'umd', name: 'HicStraw'},
+            {file: 'dist/hic-straw.min.js', format: 'umd', name: 'HicStraw', sourcemap: true}
         ],
-
         plugins: [
             strip({
-                // set this to `false` if you don't want to
-                // remove debugger statements
                 debugger: true,
-
-                // defaults to `[ 'console.*', 'assert.*' ]`
-                functions: ['console.log', 'assert.*', 'debug'],
-
-                // set this to `false` if you're not using sourcemaps –
-                // defaults to `true`
-                sourceMap: false
+                functions: ['console.log', 'assert.*', 'debug']
             }),
-            babel({
-                exclude: 'node_modules/**'
-            }),
+            commonjs(),
+            resolve(),
+            babel(),
+            terser({
+                include: [/^.+\.min\.js$/],
+                sourcemap: {
+                    filename: "hic-straw.min.js",
+                    url: "hic-straw.min.js.map"
+                }
+            })
         ]
     },
 
