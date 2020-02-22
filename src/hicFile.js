@@ -177,12 +177,12 @@ class HicFile {
         }
 
         let binaryParser = new BinaryParser(new DataView(data))
-        const nBytes = binaryParser.getInt() + 4  // Total size, master index + expected values
+        const nBytes = binaryParser.getInt()  // Total size, master index + expected values
         let nEntries = binaryParser.getInt()
 
         // Estimate the size of the master index. String length of key is unknown, be conservative (100 bytes)
         const miSize = nEntries * (100 + 64 + 32)
-        data = await this.file.read(this.masterIndexPos + 8, Math.min(miSize, nBytes - 4))
+        data = await this.file.read(this.masterIndexPos + 8, Math.min(miSize, nBytes))
         binaryParser = new BinaryParser(new DataView(data));
 
         this.masterIndex = {}
@@ -195,10 +195,9 @@ class HicFile {
 
         this.expectedValueVectors = {}
 
-        nEntries = binaryParser.getInt()
-
         // Expected values
-        // while (nEntries-- > 0) {
+        // const nExpValues = binaryParser.readInt();
+        // while (nExpValues-- > 0) {
         //     type = "NONE";
         //     unit = binaryParser.getString();
         //     binSize = binaryParser.getInt();
@@ -220,6 +219,7 @@ class HicFile {
         //     //      new ExpectedValueFunction(type, unit, binSize, values, normFactors);
         // }
 
+        // normalized expected values start after expected value.  Add 4 for
         this.normExpectedValueVectorsPosition = this.masterIndexPos + 4 + nBytes;
 
         return this;
@@ -655,9 +655,9 @@ class HicFile {
 
             let data = await file.read(range.start, range.size)
             let binaryParser = new BinaryParser(new DataView(data));
-            binaryParser.getString(); // type
-            binaryParser.getString(); // unit
-            binaryParser.getInt(); // binSize
+            const type = binaryParser.getString(); // type
+            const unit = binaryParser.getString(); // unit
+            const binSize = binaryParser.getInt(); // binSize
             const nValues = binaryParser.getInt();
             chunkSize += binaryParser.position + nValues * 8;
 
@@ -669,7 +669,7 @@ class HicFile {
 
             nEntries--;
             if (nEntries === 0) {
-                return Promise.resolve(p0 + chunkSize);
+                return p0 + chunkSize;
             } else {
                 return parseNext(p0 + chunkSize, nEntries);
             }
