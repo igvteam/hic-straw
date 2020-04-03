@@ -76,6 +76,21 @@ class HicFile {
         }
     }
 
+    async getVersion() {
+        if (this.version === undefined) {
+            const data = await this.file.read(0, 128)
+            if (!data) {
+                return undefined;
+            }
+            const binaryParser = new BinaryParser(new DataView(data));
+            this.magic = binaryParser.getString();
+            this.version = binaryParser.getInt();
+            return this.version
+        } else {
+            return this.version
+        }
+    }
+
     async getMetaData() {
         await this.init()
         return this.meta
@@ -93,6 +108,11 @@ class HicFile {
 
         this.magic = binaryParser.getString();
         this.version = binaryParser.getInt();
+
+        if (this.version < 6) {
+            throw Error("Unsupported hic version: " + this.version)
+        }
+
         this.masterIndexPos = binaryParser.getLong();
         this.genomeId = binaryParser.getString();
 
@@ -130,16 +150,21 @@ class HicFile {
         if (this.loadFragData) {
             this.fragResolutions = [];
             let nFragResolutions = binaryParser.getInt();
-            while (nFragResolutions-- > 0) {
-                this.fragResolutions.push(binaryParser.getInt());
-            }
-
             if (nFragResolutions > 0) {
-                this.sites = [];
-                let nSites = binaryParser.getInt();
-                while (nSites-- > 0) {
-                    this.sites.push(binaryParser.getInt());
+                while (nFragResolutions-- > 0) {
+                    this.fragResolutions.push(binaryParser.getInt());
                 }
+
+                // this.sites = [];
+                // for(let i=0; i<this.chromosomes.length - 1; i++) {
+                //     const chrSites = [];
+                //     this.sites.push(chrSites);
+                //     let nSites = binaryParser.getInt();
+                //     console.log(nSites);
+                //     for(let s=0; s<nSites; s++) {
+                //         chrSites.push(binaryParser.getInt());
+                //     }
+                // }
             }
         }
 
@@ -169,7 +194,6 @@ class HicFile {
     }
 
     async readFooter() {
-
 
         let data = await this.file.read(this.masterIndexPos, 8)
         if (!data) {
@@ -492,6 +516,10 @@ class HicFile {
     }
 
     async getNormVectorIndex() {
+
+        if (this.version < 6) {
+            return undefined;
+        }
 
         if (!this.normVectorIndex) {
 
