@@ -109,7 +109,7 @@ class HicFile {
         this.magic = binaryParser.getString();
         this.version = binaryParser.getInt();
 
-        if (this.version < 6) {
+        if (this.version < 5) {
             throw Error("Unsupported hic version: " + this.version)
         }
 
@@ -244,8 +244,9 @@ class HicFile {
         // }
 
         // normalized expected values start after expected value.  Add 4 for
-        this.normExpectedValueVectorsPosition = this.masterIndexPos + 4 + nBytes;
-
+        if (this.version > 5) {
+            this.normExpectedValueVectorsPosition = this.masterIndexPos + 4 + nBytes;
+        }
         return this;
     };
 
