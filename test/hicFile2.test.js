@@ -26,7 +26,7 @@ suite('HicFile', function () {
 
         const hicFile = new HicFile({file: file})
 
-        const matrix = await hicFile.readMatrix(0, 0)
+        const matrix = await hicFile.readMatrix(1, 1)
         assert.ok(matrix)
     })
 
