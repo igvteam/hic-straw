@@ -350,7 +350,7 @@ class HicFile {
         }
         return new Matrix(chrIdx1, chrIdx2, zdList);
     }
-    
+
     /***
      * Return the raw data for the block.  Function provided for testing and development
      * @param blockNumber
@@ -919,7 +919,7 @@ class DynamicBlockIndex {
     // boundsMin is guaranteed to start at the beginning of an entry, boundsMax at the end
     async searchForBlockIndexEntry(blockNumber, boundsMin, boundsMax) {
 
-        console.log(`${blockNumber}  ${boundsMin}  ${boundsMax}`)
+//        console.log(`${blockNumber}  ${boundsMin}  ${boundsMax}`)
         const chunkSize = 16 * 100000;
         if (boundsMax - boundsMin < chunkSize) {
             const data = await this.file.read(boundsMin, boundsMax - boundsMin);
