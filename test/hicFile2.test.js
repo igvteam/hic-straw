@@ -4,7 +4,7 @@ import HicFile from '../src/hicFile'
 import NodeLocalFile from '../src/io/nodeLocalFile'
 import Straw from "../src"
 
-suite('HicFile', function () {
+suite('HicFile-2', function () {
 
     const file = new NodeLocalFile({
         "path": require.resolve("./data/testFiles/testBp.hic"),
@@ -13,28 +13,15 @@ suite('HicFile', function () {
     test('read header and footer', async function () {
 
         const hicFile = new HicFile({file: file})
-
         await hicFile.readHeader()
         assert.equal(hicFile.magic, "HIC")
-
         await hicFile.readFooter();
 
     })
 
-
-    test('local file read matrix', async function () {
-
-        const hicFile = new HicFile({file: file})
-
-        const matrix = await hicFile.readMatrix(1, 1)
-        assert.ok(matrix)
-    })
-
     test('local file contact records', async function () {
 
-
         const straw = new Straw({file: file})
-
         const contactRecords = await straw.getContactRecords(
             undefined,
             {chr: "0", start: 0, end: 100000000},
@@ -50,7 +37,6 @@ suite('HicFile', function () {
     test('local file nvi', async function () {
 
         const hicFile = new HicFile({file: file})
-
         const matrix = await hicFile.readMatrix(0, 0)
         assert.ok(matrix)
 

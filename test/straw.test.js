@@ -83,9 +83,9 @@ suite('Straw', function () {
 
     test('remote file contact records', async function () {
 
-        this.timeout(60000);
+        this.timeout(100000);
         const straw = new Straw({
-            "url": "https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic",
+            "url": "https://s3.amazonaws.com/igv.org.test/data/hic/intra_nofrag_30.hic",
             "nvi": "863389571,18679"
         })
 
@@ -103,11 +103,10 @@ suite('Straw', function () {
 
     test('Version 7 file', async function () {
 
-        this.timeout(60000);
+        this.timeout(100000);
         const straw = new Straw({
-            "url": "https://data.broadinstitute.org/igvdata/test/data/hic/inter.hic"
+            "url": "https://s3.amazonaws.com/igv.org.test/data/hic/intra_nofrag_30.hic"
         })
-
         const contactRecords = await straw.getContactRecords(
             "NONE",
             {chr: "1", start: 0, end: 1000000},
@@ -122,10 +121,10 @@ suite('Straw', function () {
 
     test('norm vectors', async function () {
 
+        this.timeout(100000);
         const straw = new Straw({
-            "url": "https://s3.amazonaws.com/igv.broadinstitute.org/data/hic/intra_nofrag_30.hic"
+            "url": "https://s3.amazonaws.com/igv.org.test/data/hic/intra_nofrag_30.hic"
         })
-
         const getNormOptions = async () => {
             const normOptions = await straw.getNormalizationOptions();
             assert.equal(normOptions.length, 4)
@@ -137,14 +136,13 @@ suite('Straw', function () {
 
     test('norm vectors - no NVI', async function () {
 
-        this.timeout(60000);
+        this.timeout(100000);
         const straw = new Straw({
-            "url": "https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined_30.hic"
+            "url": "https://s3.amazonaws.com/igv.org.test/data/hic/intra_nofrag_30.hic"
         })
-
         const getNormOptions = async () => {
             const normOptions = await straw.getNormalizationOptions();
-            assert.equal(normOptions.length, 8)
+            assert.equal(normOptions.length, 4)
         }
 
         getNormOptions()
@@ -153,11 +151,10 @@ suite('Straw', function () {
 
     test('GEO file', async function () {
 
-        this.timeout(60000);
+        this.timeout(100000);
         const straw = new Straw({
             "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM2583nnn/GSM2583729/suppl/GSM2583729_H3K27ac_HiChIP_2.hic"
         })
-
         const contactRecords = await straw.getContactRecords(
             "KR",
             {chr: "arm_2L", start: 0, end: 1000000},
