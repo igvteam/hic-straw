@@ -11,20 +11,12 @@ export default [
     {
         input: './src/index.js',
         output: [
-            {file: 'dist/hic-straw.esm.js', format: 'es'},
-            {file: 'dist/hic-straw.esm.js', format: 'es', sourcemap: true},
+            {file: 'dist/hic-straw.esm.js', format: 'es'}
         ],
         plugins: [
             strip({
                 debugger: true,
                 functions: ['console.log', 'assert.*', 'debug']
-            }),
-            terser({
-                include: [/^.+\.min\.js$/],
-                sourcemap: {
-                    filename: "hic-straw.esm.min.js",
-                    url: "hic-straw.esm.min.js.map"
-                }
             })
         ]
     },
