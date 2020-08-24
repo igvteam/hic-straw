@@ -23,22 +23,17 @@ class Straw {
         const idx1 = this.hicFile.chromosomeIndexMap[chr1]
         const idx2 = this.hicFile.chromosomeIndexMap[chr2]
 
-        if(idx1 === undefined) {
+        if (idx1 === undefined) {
             console.log("No chromosome named: " + region1.chr)
             return []
         }
-        if(idx2 === undefined) {
+        if (idx2 === undefined) {
             console.log("No chromosome named: " + region2.chr)
             return []
         }
 
-        const x1 = (region1.start === undefined) ? undefined : region1.start / binsize
-        const x2 = (region1.end === undefined) ? undefined : region1.end / binsize
-        const y1 = (region2.start === undefined) ? undefined : region2.start / binsize
-        const y2 = (region2.end === undefined) ? undefined : region2.end / binsize
-
         const matrix = await this.hicFile.readMatrix(idx1, idx2)
-        if(!matrix) {
+        if (!matrix) {
             console.log("No matrix for " + region1.chr + "-" + region2.chr)
             return []
         }
@@ -50,11 +45,25 @@ class Straw {
         }
 
         const zd = matrix.bpZoomData[z]
-        if(zd === null) {
+        if (zd === null) {
             let msg = `No data avalailble for resolution: ${binsize}  for map ${region1.chr}-${region2.chr}`
             throw new Error(msg)
         }
-      
+
+        const sameChr = idx1 === idx2;
+        if(this.version < 9 || !sameChr) {
+            return this.getBlocksV8(region1, region2, binsize, zd, sameChr);
+        } else {
+            return this.getBlocksV9(region1, region2, binsize, zd);
+        }
+    }
+
+    getBlocksV8(region1, region2, binsize, zd, sameChr) {
+        const x1 = (region1.start === undefined) ? undefined : region1.start / binsize
+        const x2 = (region1.end === undefined) ? undefined : region1.end / binsize
+        const y1 = (region2.start === undefined) ? undefined : region2.start / binsize
+        const y2 = (region2.end === undefined) ? undefined : region2.end / binsize
+
         const blockBinCount = zd.blockBinCount   // Dimension in bins of a block (width = height = blockBinCount)
         const col1 = x1 === undefined ? 0 : Math.floor(x1 / blockBinCount)
         const col2 = x1 === undefined ? zd.blockColumnCount : Math.floor(x2 / blockBinCount)
@@ -62,29 +71,54 @@ class Straw {
         const row2 = y2 === undefined ? zd.blockColumnCount : Math.floor(y2 / blockBinCount)
 
         const promises = [];
-        const sameChr = idx1 === idx2;
         for (let row = row1; row <= row2; row++) {
             for (let column = col1; column <= col2; column++) {
                 let blockNumber
                 if (sameChr && row < column) {
                     blockNumber = column * zd.blockColumnCount + row;
-                }
-                else {
+                } else {
                     blockNumber = row * zd.blockColumnCount + column;
                 }
                 promises.push(this.hicFile.readBlock(blockNumber, zd))
             }
         }
-
         return Promise.all(promises)
     }
 
-    //straw <NONE/VC/VC_SQRT/KR> <ile> <chr1>[:x1:x2] <chr2>[:y1:y2] <BP/FRAG> <binsize>
+    getBlocksV9(region1, region2, binsize, zd, sameChr) {
+
+        const binX1 = region1.start / binsize
+        const binX2 = region1.end / binsize
+        const binY1 = region2.start / binsize
+        const binY2 = region2.end / binsize
+
+        const blockBinCount = zd.blockBinCount   // Dimension in bins of a block (width = height = blockBinCount)
+
+        const position_along_diagonal1 = Math.floor((binX1 + binY1) / 2 / blockBinCount);
+        const position_along_diagonal2 = Math.floor((binX2 + binY2) / 2 / blockBinCount) + 1;
+        const position_along_anti_diagonal1 = Math.floor(Math.log2(1 + Math.abs(binX1 - binY2) / Math.sqrt(2) / blockBinCount));
+        const position_along_anti_diagonal2 = Math.floor(Math.log2(1 + Math.abs(binX2 - binY1) / Math.sqrt(2) / blockBinCount));
+        const min_position_along_anti_diagonal = Math.min(position_along_anti_diagonal1, position_along_anti_diagonal2);
+        const translatedNearerDepth = Math.sqrt(binX1*binX1 + binY2*binY2);
+        const translatedFurtherDepth = Math.sqrt(binX2*binX2 + binY1*binY1);
+        const max_position_along_anti_diagonal = Math.floor(Math.max(translatedNearerDepth, translatedFurtherDepth)) + 1;
+
+        const promises = [];
+        for (let pDiag = position_along_diagonal1; pDiag <= position_along_diagonal2; pDiag++) {
+            for (let pAntiDiag = min_position_along_anti_diagonal; pAntiDiag <= max_position_along_anti_diagonal; pAntiDiag++) {
+                const block_number = pAntiDiag * zd.blockColumnCount + pDiag
+                promises.push(this.hicFile.readBlock(block_number, zd))
+            }
+        }
+        return Promise.all(promises)
+    }
+
+//straw <NONE/VC/VC_SQRT/KR> <ile> <chr1>[:x1:x2] <chr2>[:y1:y2] <BP/FRAG> <binsize>
     async getContactRecords(normalization, region1, region2, units, binsize) {
 
         const blocks = await this.getBlocks(region1, region2, units, binsize)
 
-        if(!blocks || blocks.length === 0) {
+        if (!blocks || blocks.length === 0) {
             return []
         }
 
@@ -149,8 +183,7 @@ class Straw {
     getFileChrName(chrAlias) {
         if (this.hicFile.chrAliasTable.hasOwnProperty(chrAlias)) {
             return this.hicFile.chrAliasTable[chrAlias]
-        }
-        else {
+        } else {
             return chrAlias
         }
     }

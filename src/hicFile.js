@@ -113,8 +113,13 @@ class HicFile {
             throw Error("Unsupported hic version: " + this.version)
         }
 
-        this.masterIndexPos = binaryParser.getLong();
+        this.footerPosition = binaryParser.getLong();
         this.genomeId = binaryParser.getString();
+
+        if(this.version >= 9) {
+           this.normVectorIndexPosition = binaryParser.getLong();
+           this.normVectorIndexSize = binaryParser.getLong();
+        }
 
         this.attributes = {};
         let nAttributes = binaryParser.getInt();
@@ -130,7 +135,7 @@ class HicFile {
             const chr = {
                 index: i,
                 name: binaryParser.getString(),
-                size: binaryParser.getInt()
+                size: this.version < 9 ? binaryParser.getInt() : binaryParser.getLong()
             };
             if (chr.name.toLowerCase() === "all") {
                 this.wholeGenomeChromosome = chr;
@@ -195,18 +200,20 @@ class HicFile {
 
     async readFooter() {
 
-        let data = await this.file.read(this.masterIndexPos, 8)
+        const skip = this.version < 9 ? 8 : 12;
+        let data = await this.file.read(this.footerPosition, skip)
         if (!data) {
             return null;
         }
 
         let binaryParser = new BinaryParser(new DataView(data))
-        const nBytes = binaryParser.getInt()  // Total size, master index + expected values
+        const nBytes = this.version < 9 ? binaryParser.getInt() : binaryParser.getLong()  // Total size, master index + expected values
         let nEntries = binaryParser.getInt()
 
         // Estimate the size of the master index. String length of key is unknown, be conservative (100 bytes)
-        const miSize = nEntries * (100 + 64 + 32)
-        data = await this.file.read(this.masterIndexPos + 8, Math.min(miSize, nBytes))
+        const miSize = nEntries * (100 + 64 + 32);
+
+        data = await this.file.read(this.footerPosition + skip, Math.min(miSize, nBytes))
         binaryParser = new BinaryParser(new DataView(data));
 
         this.masterIndex = {}
@@ -245,7 +252,8 @@ class HicFile {
 
         // normalized expected values start after expected value.  Add 4 for
         if (this.version > 5) {
-            this.normExpectedValueVectorsPosition = this.masterIndexPos + 4 + nBytes;
+            const skip = this.version < 9 ? 4 : 8;
+            this.normExpectedValueVectorsPosition = this.footerPosition + skip + nBytes;
         }
         return this;
     };
@@ -697,6 +705,7 @@ class HicFile {
      */
     async skipExpectedValues(start) {
 
+        const version = this.version;
         const file = new BufferedFile({file: this.file, size: 256000})
         const range = {start: start, size: 4};
         const data = await file.read(range.start, range.size)
@@ -720,14 +729,14 @@ class HicFile {
             const type = binaryParser.getString(); // type
             const unit = binaryParser.getString(); // unit
             const binSize = binaryParser.getInt(); // binSize
-            const nValues = binaryParser.getInt();
-            chunkSize += binaryParser.position + nValues * 8;
+            const nValues = version < 9 ? binaryParser.getInt() : binaryParser.getLong();
+            chunkSize += binaryParser.position + nValues * 4;  // nValues * float
 
             range = {start: start + chunkSize, size: 4};
             data = await file.read(range.start, range.size)
             binaryParser = new BinaryParser(new DataView(data));
             const nChrScaleFactors = binaryParser.getInt();
-            chunkSize += (4 + nChrScaleFactors * (4 + 8));
+            chunkSize += (4 + nChrScaleFactors * (4 + 4));
 
             nEntries--;
             if (nEntries === 0) {
