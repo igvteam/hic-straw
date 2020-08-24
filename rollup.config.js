@@ -26,7 +26,7 @@ export default [
         input: './src/index.js',
         output: [
             {file: 'dist/hic-straw.js', format: 'umd', name: 'HicStraw'},
-            {file: 'dist/hic-straw.min.js', format: 'umd', name: 'HicStraw', plugins: [terser()]}
+            {file: 'dist/hic-straw.min.js', format: 'umd', name: 'HicStraw', sourcemap: true, plugins: [terser()]}
         ],
         plugins: [
             strip({
