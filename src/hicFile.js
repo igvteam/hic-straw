@@ -413,22 +413,24 @@ class HicFile {
                 var binXOffset = parser.getInt();
                 var binYOffset = parser.getInt();
 
-                var useShort = parser.getByte() == 0;
+                var useShort = parser.getByte() != 1;
+                const useFloatContact = !useShort;
+                const useIntXPos = this.version < 9 ? false : parser.getByte() == 1;
+                const useIntYPos = this.version < 9 ? false : parser.getByte() == 1;
+
                 var type = parser.getByte();
 
                 if (type === 1) {
                     // List-of-rows representation
-                    var rowCount = parser.getShort();
-
+                    var rowCount = useIntYPos ? parser.getInt() : parser.getShort();
                     for (let i = 0; i < rowCount; i++) {
-
-                        binY = binYOffset + parser.getShort();
-                        var colCount = parser.getShort();
-
+                        const dy = useIntYPos ? parser.getInt() : parser.getShort();
+                        const binY = binYOffset + dy;
+                        const colCount =  useIntXPos ? parser.getInt() : parser.getShort();
                         for (let j = 0; j < colCount; j++) {
-
-                            binX = binXOffset + parser.getShort();
-                            counts = useShort ? parser.getShort() : parser.getFloat();
+                            const dx = useIntXPos ? parser.getInt() : parser.getShort();
+                            binX = binXOffset + dx;
+                            counts = useFloatContact ? parser.getFloat() : parser.getShort();
                             records.push(new ContactRecord(binX, binY, counts));
                         }
                     }

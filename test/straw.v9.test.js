@@ -30,14 +30,14 @@ suite('Straw', function () {
         })
 
         const contactRecords = await straw.getContactRecords(
-            "KR",
+            "NONE",
             {chr: "8", start: 48700000, end: 48900000},
             {chr: "8", start: 48700000, end: 48900000},
             "BP",
             10000
         )
 
-        assert.equal(contactRecords.length, 341)
+        assert.equal(231, contactRecords.length)
 
     })
     //

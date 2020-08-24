@@ -92,19 +92,18 @@ class Straw {
         const binY1 = region2.start / binsize
         const binY2 = region2.end / binsize
 
-        const blockBinCount = zd.blockBinCount   // Dimension in bins of a block (width = height = blockBinCount)
+        const blockBinCount = zd.blockBinCount
+        const blockColumnCount = zd.blockColumnCount
 
-        const position_along_diagonal1 = Math.floor((binX1 + binY1) / 2 / blockBinCount);
-        const position_along_diagonal2 = Math.floor((binX2 + binY2) / 2 / blockBinCount) + 1;
-        const position_along_anti_diagonal1 = Math.floor(Math.log2(1 + Math.abs(binX1 - binY2) / Math.sqrt(2) / blockBinCount));
-        const position_along_anti_diagonal2 = Math.floor(Math.log2(1 + Math.abs(binX2 - binY1) / Math.sqrt(2) / blockBinCount));
-        const min_position_along_anti_diagonal = Math.min(position_along_anti_diagonal1, position_along_anti_diagonal2);
-        const translatedNearerDepth = Math.sqrt(binX1*binX1 + binY2*binY2);
-        const translatedFurtherDepth = Math.sqrt(binX2*binX2 + binY1*binY1);
-        const max_position_along_anti_diagonal = Math.floor(Math.max(translatedNearerDepth, translatedFurtherDepth)) + 1;
+        const pDiag1 = Math.floor((binX1 + binY1) / 2 / blockBinCount);
+        const pDiag2 = Math.floor((binX2 + binY2) / 2 / blockBinCount);
+        const pAntiDiag1 = Math.floor(Math.log2(1 + Math.abs(binX1 - binY2) / Math.sqrt(2) / blockBinCount));
+        const pAntiDiag2 = Math.floor(Math.log2(1 + Math.abs(binX2 - binY1) / Math.sqrt(2) / blockBinCount));
+        const min_position_along_anti_diagonal = Math.min(pAntiDiag1, pAntiDiag2);
+        const max_position_along_anti_diagonal = Math.max(pAntiDiag1, pAntiDiag2);
 
         const promises = [];
-        for (let pDiag = position_along_diagonal1; pDiag <= position_along_diagonal2; pDiag++) {
+        for (let pDiag = pDiag1; pDiag <= pDiag2; pDiag++) {
             for (let pAntiDiag = min_position_along_anti_diagonal; pAntiDiag <= max_position_along_anti_diagonal; pAntiDiag++) {
                 const block_number = pAntiDiag * zd.blockColumnCount + pDiag
                 promises.push(this.hicFile.readBlock(block_number, zd))
