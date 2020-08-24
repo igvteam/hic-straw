@@ -51,7 +51,7 @@ class Straw {
         }
 
         const sameChr = idx1 === idx2;
-        if(this.version < 9 || !sameChr) {
+        if (this.hicFile.version < 9 || !sameChr) {
             return this.getBlocksV8(region1, region2, binsize, zd, sameChr);
         } else {
             return this.getBlocksV9(region1, region2, binsize, zd);
@@ -59,16 +59,17 @@ class Straw {
     }
 
     getBlocksV8(region1, region2, binsize, zd, sameChr) {
-        const x1 = (region1.start === undefined) ? undefined : region1.start / binsize
-        const x2 = (region1.end === undefined) ? undefined : region1.end / binsize
-        const y1 = (region2.start === undefined) ? undefined : region2.start / binsize
-        const y2 = (region2.end === undefined) ? undefined : region2.end / binsize
+
+        const x1 = region1.start / binsize
+        const x2 = region1.end / binsize
+        const y1 = region2.start / binsize
+        const y2 = region2.end / binsize
 
         const blockBinCount = zd.blockBinCount   // Dimension in bins of a block (width = height = blockBinCount)
-        const col1 = x1 === undefined ? 0 : Math.floor(x1 / blockBinCount)
-        const col2 = x1 === undefined ? zd.blockColumnCount : Math.floor(x2 / blockBinCount)
-        const row1 = y1 === undefined ? 0 : Math.floor(y1 / blockBinCount)
-        const row2 = y2 === undefined ? zd.blockColumnCount : Math.floor(y2 / blockBinCount)
+        const col1 = Math.floor(x1 / blockBinCount)
+        const col2 = Math.floor(x2 / blockBinCount)
+        const row1 = Math.floor(y1 / blockBinCount)
+        const row2 = Math.floor(y2 / blockBinCount)
 
         const promises = [];
         for (let row = row1; row <= row2; row++) {
@@ -85,7 +86,7 @@ class Straw {
         return Promise.all(promises)
     }
 
-    getBlocksV9(region1, region2, binsize, zd, sameChr) {
+    getBlocksV9(region1, region2, binsize, zd) {
 
         const binX1 = region1.start / binsize
         const binX2 = region1.end / binsize
@@ -121,16 +122,11 @@ class Straw {
             return []
         }
 
-        const chr1 = this.hicFile.getFileChrName(region1.chr)
-        const chr2 = this.hicFile.getFileChrName(region2.chr)
-        const x1 = (region1.start === undefined) ? undefined : region1.start / binsize
-        const x2 = (region1.end === undefined) ? undefined : region1.end / binsize
-        const y1 = (region2.start === undefined) ? undefined : region2.start / binsize
-        const y2 = (region2.end === undefined) ? undefined : region2.end / binsize
-
         let normVector1
         let normVector2
         const isNorm = normalization && normalization !== "NONE"
+        const chr1 = this.hicFile.getFileChrName(region1.chr)
+        const chr2 = this.hicFile.getFileChrName(region2.chr)
         if (isNorm) {
             normVector1 = await this.hicFile.getNormalizationVector(normalization, chr1, units, binsize)
             if (chr1 === chr2) {
@@ -140,15 +136,16 @@ class Straw {
             }
         }
 
-
         const contactRecords = [];
+        const x1 = region1.start / binsize
+        const x2 = region1.end / binsize
+        const y1 = region2.start / binsize
+        const y2 = region2.end / binsize
         for (let block of blocks) {
-
-            if (block) { // This is most likely caused by a base pair range outside the chromosome
+            if (block) { // An undefined block is most likely caused by a base pair range outside the chromosome
                 for (let rec of block.records) {
-
                     // transpose?
-                    if (x1 === undefined || (rec.bin1 >= x1 && rec.bin1 <= x2 && rec.bin2 >= y1 && rec.bin2 <= y2)) {
+                    if (rec.bin1 >= x1 && rec.bin1 <= x2 && rec.bin2 >= y1 && rec.bin2 <= y2) {
                         if (isNorm) {
                             const x = rec.bin1
                             const y = rec.bin2
@@ -157,7 +154,6 @@ class Straw {
                                 const counts = rec.counts / nvnv;
                                 contactRecords.push(new ContactRecord(x, y, counts));
                             }
-
                         } else {
                             contactRecords.push(rec);
                         }

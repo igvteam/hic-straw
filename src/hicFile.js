@@ -732,13 +732,13 @@ class HicFile {
             const unit = binaryParser.getString(); // unit
             const binSize = binaryParser.getInt(); // binSize
             const nValues = version < 9 ? binaryParser.getInt() : binaryParser.getLong();
-            chunkSize += binaryParser.position + nValues * 4;  // nValues * float
+            chunkSize += binaryParser.position + nValues * (version < 9 ? 8 : 4);  // nValues * double float
 
             range = {start: start + chunkSize, size: 4};
             data = await file.read(range.start, range.size)
             binaryParser = new BinaryParser(new DataView(data));
             const nChrScaleFactors = binaryParser.getInt();
-            chunkSize += (4 + nChrScaleFactors * (4 + 4));
+            chunkSize += (4 + nChrScaleFactors * (4 + (version < 9 ? 8 : 4)));
 
             nEntries--;
             if (nEntries === 0) {
