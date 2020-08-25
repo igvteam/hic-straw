@@ -1,4 +1,4 @@
-import { assert } from 'chai';
+import {assert} from 'chai';
 import Straw from '../src/straw';
 import NodeLocalFile from '../src/io/nodeLocalFile';
 
@@ -115,7 +115,7 @@ suite('Straw', function () {
             250000
         )
 
-        assert.ok (contactRecords.length > 0)
+        assert.ok(contactRecords.length > 0)
 
     })
 
@@ -125,27 +125,19 @@ suite('Straw', function () {
         const straw = new Straw({
             "url": "https://s3.amazonaws.com/igv.org.test/data/hic/intra_nofrag_30.hic"
         })
-        const getNormOptions = async () => {
-            const normOptions = await straw.getNormalizationOptions();
-            assert.equal(normOptions.length, 4)
-        }
-
-        getNormOptions()
-
+        const normOptions = await straw.getNormalizationOptions();
+        assert.equal(normOptions.length, 4)
     })
 
-    test('norm vectors - no NVI', async function () {
+    test('norm vectors - with NVI', async function () {
 
         this.timeout(100000);
         const straw = new Straw({
-            "url": "https://s3.amazonaws.com/igv.org.test/data/hic/intra_nofrag_30.hic"
+            "url": "https://s3.amazonaws.com/igv.org.test/data/hic/intra_nofrag_30.hic",
+            "nvi": "863389571,18679"
         })
-        const getNormOptions = async () => {
-            const normOptions = await straw.getNormalizationOptions();
-            assert.equal(normOptions.length, 4)
-        }
-
-        getNormOptions()
+        const normOptions = await straw.getNormalizationOptions();
+        assert.equal(normOptions.length, 4)
 
     })
 
@@ -163,7 +155,7 @@ suite('Straw', function () {
             100000
         )
 
-        assert.ok (contactRecords.length > 0)
+        assert.ok(contactRecords.length > 0)
 
     })
 

@@ -1,26 +1,24 @@
-import { assert } from 'chai';
+import {assert} from 'chai';
 import Straw from '../src/straw';
-import NodeLocalFile from '../src/io/nodeLocalFile';
+import HicFile from "../src/hicFile.js";
 
 suite('Straw', function () {
 
-    // test('meta data', async function () {
-    //
-    //     this.timeout(100000);
-    //     const straw = new Straw({
-    //         "url": "https://adam.3dg.io/suhas_juicebox/libs/corrected_combined_maps_v9/GM12878/GM12878_intact_18.7B_8.15.20_30.hic"
-    //     })
-    //
-    //     const meta = await straw.getMetaData()
-    //     assert.ok(meta)
-    //     assert.equal(meta.version, 9)
-    //     assert.equal(meta.genome, "hg19")
-    //     assert.equal(meta.chromosomes.length, 26)
-    //     assert.equal(meta.resolutions.length, 17)
-    //
-    // })
+    test('meta data', async function () {
 
+        this.timeout(100000);
+        const straw = new Straw({
+            "url": "https://adam.3dg.io/suhas_juicebox/libs/corrected_combined_maps_v9/GM12878/GM12878_intact_18.7B_8.15.20_30.hic"
+        })
 
+        const meta = await straw.getMetaData()
+        assert.ok(meta)
+        assert.equal(meta.version, 9)
+        assert.equal(meta.genome, "hg19")
+        assert.equal(meta.chromosomes.length, 26)
+        assert.equal(meta.resolutions.length, 17)
+
+    })
 
     test('contact records', async function () {
 
@@ -36,75 +34,60 @@ suite('Straw', function () {
             "BP",
             10000
         )
-
         assert.equal(231, contactRecords.length)
+    })
+
+    test('contact records - off diagonal', async function () {
+
+        this.timeout(100000);
+        const straw = new Straw({
+            "url": "https://adam.3dg.io/suhas_juicebox/libs/corrected_combined_maps_v9/GM12878/GM12878_intact_18.7B_8.15.20_30.hic"
+        })
+
+        const contactRecords = await straw.getContactRecords(
+            "NONE",
+            {chr: "8", start: 0, end: 900000},
+            {chr: "8", start: 58700000, end: 58900000},
+            "BP",
+            10000
+        )
+        assert.equal(344, contactRecords.length)
+    })
+
+    test('norm vector index', async function () {
+        this.timeout(100000);
+        const straw = new Straw({
+            "url": "https://adam.3dg.io/suhas_juicebox/libs/corrected_combined_maps_v9/GM12878/GM12878_intact_18.7B_8.15.20_30.hic"
+        })
+        const normOptions = await straw.getNormalizationOptions();
+        assert.equal(normOptions.length, 3)
+    })
+
+    test('norm vector index - with nvi', async function () {
+        this.timeout(100000);
+        const straw = new Straw({
+            "url": "https://adam.3dg.io/suhas_juicebox/libs/corrected_combined_maps_v9/GM12878/GM12878_intact_18.7B_8.15.20_30.hic",
+            "nvi": "201983310862,26779"
+        })
+        const normOptions = await straw.getNormalizationOptions();
+        assert.equal(normOptions.length, 3)
+    })
+
+
+    test('norm vector', async function () {
+
+        const hicFile = new HicFile({
+            "url": "https://adam.3dg.io/suhas_juicebox/libs/corrected_combined_maps_v9/GM12878/GM12878_intact_18.7B_8.15.20_30.hic",
+            "nvi": "201983310862,26779"
+        })
+
+        const type = "VC"
+        const chr = "22"
+        const unit = "BP"
+        const binSize = 100000
+        const normVector = await hicFile.getNormalizationVector(type, chr, unit, binSize)
+        assert.equal(normVector.data.length, 515)
+        assert.ok(normVector)
 
     })
-    //
-    // test('Version 7 file', async function () {
-    //
-    //     this.timeout(100000);
-    //     const straw = new Straw({
-    //         "url": "https://s3.amazonaws.com/igv.org.test/data/hic/intra_nofrag_30.hic"
-    //     })
-    //     const contactRecords = await straw.getContactRecords(
-    //         "NONE",
-    //         {chr: "1", start: 0, end: 1000000},
-    //         {chr: "1", start: 0, end: 1000000},
-    //         "BP",
-    //         250000
-    //     )
-    //
-    //     assert.ok (contactRecords.length > 0)
-    //
-    // })
-    //
-    // test('norm vectors', async function () {
-    //
-    //     this.timeout(100000);
-    //     const straw = new Straw({
-    //         "url": "https://s3.amazonaws.com/igv.org.test/data/hic/intra_nofrag_30.hic"
-    //     })
-    //     const getNormOptions = async () => {
-    //         const normOptions = await straw.getNormalizationOptions();
-    //         assert.equal(normOptions.length, 4)
-    //     }
-    //
-    //     getNormOptions()
-    //
-    // })
-    //
-    // test('norm vectors - no NVI', async function () {
-    //
-    //     this.timeout(100000);
-    //     const straw = new Straw({
-    //         "url": "https://s3.amazonaws.com/igv.org.test/data/hic/intra_nofrag_30.hic"
-    //     })
-    //     const getNormOptions = async () => {
-    //         const normOptions = await straw.getNormalizationOptions();
-    //         assert.equal(normOptions.length, 4)
-    //     }
-    //
-    //     getNormOptions()
-    //
-    // })
-    //
-    // test('GEO file', async function () {
-    //
-    //     this.timeout(100000);
-    //     const straw = new Straw({
-    //         "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM2583nnn/GSM2583729/suppl/GSM2583729_H3K27ac_HiChIP_2.hic"
-    //     })
-    //     const contactRecords = await straw.getContactRecords(
-    //         "KR",
-    //         {chr: "arm_2L", start: 0, end: 1000000},
-    //         {chr: "arm_2L", start: 0, end: 1000000},
-    //         "BP",
-    //         100000
-    //     )
-    //
-    //     assert.ok (contactRecords.length > 0)
-    //
-    // })
-
 })

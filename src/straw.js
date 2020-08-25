@@ -96,17 +96,22 @@ class Straw {
         const blockBinCount = zd.blockBinCount
         const blockColumnCount = zd.blockColumnCount
 
-        const pDiag1 = Math.floor((binX1 + binY1) / 2 / blockBinCount);
-        const pDiag2 = Math.floor((binX2 + binY2) / 2 / blockBinCount);
-        const pAntiDiag1 = Math.floor(Math.log2(1 + Math.abs(binX1 - binY2) / Math.sqrt(2) / blockBinCount));
-        const pAntiDiag2 = Math.floor(Math.log2(1 + Math.abs(binX2 - binY1) / Math.sqrt(2) / blockBinCount));
-        const min_position_along_anti_diagonal = Math.min(pAntiDiag1, pAntiDiag2);
-        const max_position_along_anti_diagonal = Math.max(pAntiDiag1, pAntiDiag2);
+        // PAD = positionAlongDiagonal (~projected)
+        // Depth is axis perpendicular to diagonal; nearer means closer to diagonal
+        const translatedLowerPAD = Math.floor((binX1 + binY1) / 2 / blockBinCount);
+        const translatedHigherPAD = Math.floor((binX2 + binY2) / 2 / blockBinCount);
+        const translatedNearerDepth = Math.floor(Math.log2(1 + Math.abs(binX1 - binY2) / Math.sqrt(2) / blockBinCount));
+        const translatedFurtherDepth = Math.floor(Math.log2(1 + Math.abs(binX2 - binY1) / Math.sqrt(2) / blockBinCount));
+
+        // because code above assume above diagonal; but we could be below diagonal
+        const containsDiagonal = (binX2 - binY1) * (binX1 - binY2) < 0;   // i.e. sign of (x-y) opposite on 2 corners
+        const nearerDepth = containsDiagonal ? 0 : Math.min(translatedNearerDepth, translatedFurtherDepth);
+        const furtherDepth = Math.max(translatedNearerDepth, translatedFurtherDepth);
 
         const promises = [];
-        for (let pDiag = pDiag1; pDiag <= pDiag2; pDiag++) {
-            for (let pAntiDiag = min_position_along_anti_diagonal; pAntiDiag <= max_position_along_anti_diagonal; pAntiDiag++) {
-                const block_number = pAntiDiag * zd.blockColumnCount + pDiag
+        for (let depth = nearerDepth; depth <= furtherDepth; depth++) {
+            for (let pad = translatedLowerPAD; pad <= translatedHigherPAD; pad++) {
+                const block_number = depth * blockColumnCount + pad;
                 promises.push(this.hicFile.readBlock(block_number, zd))
             }
         }

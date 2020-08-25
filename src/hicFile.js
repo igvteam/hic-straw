@@ -368,11 +368,9 @@ class HicFile {
     async readBlockData(blockNumber, zd) {
 
         const idx = await zd.blockIndex.getBlockIndexEntry(blockNumber);
-
         if (!idx) {
             return undefined
         } else {
-
             return this.file.read(idx.filePosition, idx.size)
         }
     }
@@ -384,9 +382,7 @@ class HicFile {
         if (!idx) {
             return undefined
         } else {
-
             let data = await this.file.read(idx.filePosition, idx.size)
-
             if (!data) {
                 return undefined;
             }
@@ -395,7 +391,6 @@ class HicFile {
             const plain = inflate.decompress();
             //var plain = zlib.inflateSync(Buffer.from(data))   //.decompress();
             data = plain.buffer;
-
 
             var parser = new BinaryParser(new DataView(data));
             var nRecords = parser.getInt();
@@ -542,11 +537,11 @@ class HicFile {
         }
 
         const parser = new BinaryParser(new DataView(data));
-        const nValues = parser.getInt();
+        const nValues = this.version < 9 ? parser.getInt() : parser.getLong();
         const values = [];
         let allNaN = true;
         for (let i = 0; i < nValues; i++) {
-            values[i] = parser.getDouble();
+            values[i] = this.version < 9 ? parser.getDouble() : parser.getFloat();
             if (!isNaN(values[i])) {
                 allNaN = false;
             }
@@ -775,7 +770,7 @@ class HicFile {
         const unit = binaryParser.getString();      //3
         const binSize = binaryParser.getInt();      //4
         const filePosition = binaryParser.getLong();  //8
-        const sizeInBytes = binaryParser.getInt();     //4
+        const sizeInBytes = this.version < 9 ? binaryParser.getInt() : binaryParser.getLong();     //4:8
         const key = type + "_" + chrIdx + "_" + unit + "_" + binSize;
         // TODO -- why does this not work?  NormalizationVector.getNormalizationVectorKey(type, chrIdx, unit, binSize);
 
