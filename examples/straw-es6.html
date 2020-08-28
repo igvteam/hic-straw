@@ -2,9 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Straw as ES6 module example</title>
-
-    <script src="example-es6.js" type="module"></script>
+    <title>Straw example</title>
 
     <style>
         tr:nth-child(even) {
@@ -28,11 +26,9 @@
     </thead>
 </table>
 
-
 <script type="module">
 
-    //import HicStraw from '../src/straw.js';
-    import HicStraw from '../dist/hic-straw_es6.js'
+    import HicStraw from "../dist/hic-straw.esm.js"
 
     const table = document.getElementById("resultsTable")
 
@@ -56,6 +52,7 @@
             }
 
         })
+
 
 </script>
 

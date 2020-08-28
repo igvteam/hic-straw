@@ -8,24 +8,17 @@ import RateLimiter from './io/rateLimiter.js';
 import BufferedFile from './io/bufferedFile.js';
 import BinaryParser from './binary.js';
 import Matrix from './matrix.js';
-import MatrixZoomData from './matrixZoomData.js';
 import NormalizationVector from './normalizationVector.js';
 import ContactRecord from './contactRecord.js';
+import LRU from './lru.js';
 
 const isNode = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
-
 const Short_MIN_VALUE = -32768;
+const DOUBLE = 8
+const FLOAT = 4
+const INT = 4;
+const GoogleRateLimiter = new RateLimiter(100)
 
-const googleRateLimiter = new RateLimiter(100)
-
-class Block {
-    constructor(blockNumber, zoomData, records, idx) {
-        this.blockNumber = blockNumber;
-        this.zoomData = zoomData;
-        this.records = records;
-        this.idx = idx
-    }
-}
 
 class HicFile {
 
@@ -34,10 +27,11 @@ class HicFile {
         this.config = args
 
         this.loadFragData = args.loadFragData
-
         this.fragmentSitesCache = {}
         this.normVectorCache = {}
         this.normalizationTypes = ['NONE'];
+        this.matrixCache = new LRU();
+        this.blockCache = new BlockCache();
 
         // args may specify an io.File object, a local path (Node only), or a url
         if (args.file) {
@@ -51,7 +45,7 @@ class HicFile {
             // Google drive must be rate limited.  Perhaps all remote files should be rate limited?
             const remoteFile = new RemoteFile(args)
             if (isGoogleDrive(this.url)) {
-                this.file = new ThrottledFile(remoteFile, googleRateLimiter)
+                this.file = new ThrottledFile(remoteFile, GoogleRateLimiter)
             } else {
                 this.file = remoteFile
             }
@@ -113,8 +107,13 @@ class HicFile {
             throw Error("Unsupported hic version: " + this.version)
         }
 
-        this.masterIndexPos = binaryParser.getLong();
+        this.footerPosition = binaryParser.getLong();
         this.genomeId = binaryParser.getString();
+
+        if (this.version >= 9) {
+            this.normVectorIndexPosition = binaryParser.getLong();
+            this.normVectorIndexSize = binaryParser.getLong();
+        }
 
         this.attributes = {};
         let nAttributes = binaryParser.getInt();
@@ -130,7 +129,7 @@ class HicFile {
             const chr = {
                 index: i,
                 name: binaryParser.getString(),
-                size: binaryParser.getInt()
+                size: this.version < 9 ? binaryParser.getInt() : binaryParser.getLong()
             };
             if (chr.name.toLowerCase() === "all") {
                 this.wholeGenomeChromosome = chr;
@@ -195,18 +194,22 @@ class HicFile {
 
     async readFooter() {
 
-        let data = await this.file.read(this.masterIndexPos, 8)
+
+        const skip = this.version < 9 ? 8 : 12;
+        let data = await this.file.read(this.footerPosition, skip)
         if (!data) {
             return null;
         }
 
         let binaryParser = new BinaryParser(new DataView(data))
-        const nBytes = binaryParser.getInt()  // Total size, master index + expected values
+        const nBytes = this.version < 9 ? binaryParser.getInt() : binaryParser.getLong()  // Total size, master index + expected values
         let nEntries = binaryParser.getInt()
 
         // Estimate the size of the master index. String length of key is unknown, be conservative (100 bytes)
-        const miSize = nEntries * (100 + 64 + 32)
-        data = await this.file.read(this.masterIndexPos + 8, Math.min(miSize, nBytes))
+
+        const miSize = nEntries * (100 + 64 + 32);
+        data = await this.file.read(this.footerPosition + skip, Math.min(miSize, nBytes))
+
         binaryParser = new BinaryParser(new DataView(data));
 
         this.masterIndex = {}
@@ -245,7 +248,8 @@ class HicFile {
 
         // normalized expected values start after expected value.  Add 4 for
         if (this.version > 5) {
-            this.normExpectedValueVectorsPosition = this.masterIndexPos + 4 + nBytes;
+            const skip = this.version < 9 ? 4 : 8;
+            this.normExpectedValueVectorsPosition = this.footerPosition + skip + nBytes;
         }
         return this;
     };
@@ -253,12 +257,31 @@ class HicFile {
     async printIndexStats() {
 
         let totalSize = 0;
+        let maxSize = 0;
+        let maxKey;
+        await await this.init();
         for (let key of Object.keys(this.masterIndex)) {
             const entry = this.masterIndex[key];
-            console.log(`${key}\t${entry.start}\t${entry.size}`)
+          //  console.log(`${key}\t${entry.start}\t${entry.size}`)
             totalSize += entry.size;
+            if(entry.size > maxSize) {
+                maxSize = entry.size;
+                maxKey = key;
+            }
         }
-        console.log(`Total size  = ${totalSize}`);
+       // console.log(`Total size  = ${totalSize}`);
+        console.log(`${maxSize}  ${maxKey}  ${this.config.url}`)
+    }
+
+    async getMatrix(chrIdx1, chrIdx2) {
+        const key = `${chrIdx1}__${chrIdx2}`;
+        if (this.matrixCache.has(key)) {
+            return this.matrixCache.get(key);
+        } else {
+            const matrix = this.readMatrix(chrIdx1, chrIdx2);
+            this.matrixCache.set(key, matrix);
+            return matrix;
+        }
     }
 
     async readMatrix(chrIdx1, chrIdx2) {
@@ -272,101 +295,122 @@ class HicFile {
         }
 
         const key = "" + chrIdx1 + "_" + chrIdx2
-
         const idx = this.masterIndex[key]
         if (!idx) {
             return undefined
         }
 
-        //const data = await this.file.read(idx.start, idx.size)    // *********  Don't use idx.size if >
-        const data = await this.file.read(idx.start, 12)
+        const data = await this.file.read(idx.start, idx.size)
         if (!data) {
             return undefined
         }
 
-        const dis = new BinaryParser(new DataView(data));
-        const c1 = dis.getInt();     // Should equal chrIdx1
-        const c2 = dis.getInt();     // Should equal chrIdx2
-        const chr1 = this.chromosomes[c1];
-        const chr2 = this.chromosomes[c2];
+        return Matrix.parseMatrix(data, this.chromosomes);
 
-        // # of resolution levels (bp and frags)
-        let nResolutions = dis.getInt();
-        const zdList = [];
-
-        //const sites1 = await this.getSites.call(this, chr1.name)
-        //const sites2 = await this.getSites.call(this, chr2.name)
-        //let bytesAvailable = dis.available()
-        //let filePosition = idx.start
-
-        // Loop through resolutions
-        let ptr = idx.start + 12;
-        while (nResolutions-- > 0) {
-
-            let data = await this.file.read(ptr, 60)
-            let dis = new BinaryParser(new DataView(data));
-
-            const unit = dis.getString();
-            const zoomIndex = dis.getInt();
-
-            //const res = this.bpResolutions[zoomIndex];
-            // console.log(res)
-
-            // Stats.  Not used yet, but we need to read them anyway
-            const sumCounts = dis.getFloat();
-            const occupiedCellCount = dis.getFloat();
-            const stdDev = dis.getFloat();
-            const percent95 = dis.getFloat();
-            const binSize = dis.getInt();
-            const blockBinCount = dis.getInt();
-            const blockColumnCount = dis.getInt();
-            const nBlocks = dis.getInt();
-            ptr += dis.position;   // Position of first block
-
-            const maxPossibleBlockNumber = blockColumnCount * blockColumnCount - 1;
-            const zoom = {index: zoomIndex, unit: unit, binSize: binSize};
-            const zd = new MatrixZoomData(chr1, chr2, zoom, blockBinCount, blockColumnCount); //, chr1Sites, chr2Sites);
-            zd.blockIndex = new DynamicBlockIndex({
-                file: this.file,
-                position: ptr,
-                nBlocks: nBlocks,
-                maxBlock: maxPossibleBlockNumber
-            });
-
-            ptr += nBlocks * 16;
-
-            const nBins1 = (chr1.size / binSize);
-            const nBins2 = (chr2.size / binSize);
-            const avgCount = (sumCounts / nBins1) / nBins2;   // <= trying to avoid overflows
-
-            zd.averageCount = avgCount;
-            zd.sumCounts = sumCounts;
-            zd.stdDev = stdDev;
-            zd.occupiedCellCount = occupiedCellCount;
-            zd.percent95 = percent95;
-
-            zdList.push(zd);
-
-        }
-        return new Matrix(chrIdx1, chrIdx2, zdList);
     }
 
-    /***
-     * Return the raw data for the block.  Function provided for testing and development
-     * @param blockNumber
-     * @param zd
-     * @returns {Promise<void>}
-     */
-    async readBlockData(blockNumber, zd) {
+    async getContactRecords(normalization, region1, region2, units, binsize) {
 
-        const idx = await zd.blockIndex.getBlockIndexEntry(blockNumber);
+        const blocks = await this.getBlocks(region1, region2, units, binsize)
 
-        if (!idx) {
-            return undefined
-        } else {
-
-            return this.file.read(idx.filePosition, idx.size)
+        if (!blocks || blocks.length === 0) {
+            return []
         }
+
+        let normVector1
+        let normVector2
+        const isNorm = normalization && normalization !== "NONE"
+        const chr1 = this.getFileChrName(region1.chr)
+        const chr2 = this.getFileChrName(region2.chr)
+        if (isNorm) {
+            normVector1 = await this.getNormalizationVector(normalization, chr1, units, binsize)
+            if (chr1 === chr2) {
+                normVector2 = normVector1
+            } else {
+                normVector2 = await this.getNormalizationVector(normalization, chr2, units, binsize)
+            }
+        }
+
+        const contactRecords = [];
+        const sameChr = region1.chr === region2.chr;
+        const x1 = region1.start / binsize
+        const x2 = region1.end / binsize
+        const y1 = region2.start / binsize
+        const y2 = region2.end / binsize
+        for (let block of blocks) {
+            if (block) { // An undefined block is most likely caused by a base pair range outside the chromosome
+                for (let rec of block.records) {
+
+                    if (rec.bin1 >= x1 && rec.bin1 <= x2 && rec.bin2 >= y1 && rec.bin2 <= y2 ||
+                        sameChr && (rec.bin1 >= y1 && rec.bin1 <= y2 && rec.bin2 >= x1 && rec.bin2 <= x2)) {
+                        if (isNorm) {
+                            const x = rec.bin1
+                            const y = rec.bin2
+                            const nvnv = normVector1.data[x] * normVector2.data[y];
+                            if (nvnv[x] !== 0 && !isNaN(nvnv)) {
+                                const counts = rec.counts / nvnv;
+                                contactRecords.push(new ContactRecord(x, y, counts));
+                            }
+                        } else {
+                            contactRecords.push(rec);
+                        }
+                    }
+                }
+            }
+        }
+
+        return contactRecords;
+    }
+
+    async getBlocks(region1, region2, unit, binSize) {
+
+        await this.init()
+        const chr1 = this.getFileChrName(region1.chr)
+        const chr2 = this.getFileChrName(region2.chr)
+        const idx1 = this.chromosomeIndexMap[chr1]
+        const idx2 = this.chromosomeIndexMap[chr2]
+
+        if (idx1 === undefined) {
+            console.log("No chromosome named: " + region1.chr)
+            return []
+        }
+        if (idx2 === undefined) {
+            console.log("No chromosome named: " + region2.chr)
+            return []
+        }
+
+        const matrix = await this.getMatrix(idx1, idx2)
+        if (!matrix) {
+            console.log("No matrix for " + region1.chr + "-" + region2.chr)
+            return []
+        }
+
+        const zd = matrix.getZoomData(binSize, unit);
+        if (!zd) {
+            let msg = `No data avalailble for resolution: ${binSize}  for map ${region1.chr}-${region2.chr}`
+            throw new Error(msg)
+        }
+
+        const blockNumbers = zd.getBlockNumbers(region1, region2, this.version);
+
+        const blocks = [];
+        const blockNumbersToQuery = [];
+        for (let num of blockNumbers) {
+            if (this.blockCache.has(binSize, num)) {
+                blocks.push(this.blockCache.get(binSize, num));
+            } else {
+                blockNumbersToQuery.push(num);
+            }
+        }
+
+        const promises = blockNumbersToQuery.map(blockNumber => this.readBlock(blockNumber, zd));
+        const newBlocks = await Promise.all(promises);
+        for (let block of newBlocks) {
+            if (block) {
+                this.blockCache.set(binSize, block.blockNumber, block);
+            }
+        }
+        return blocks.concat(newBlocks);
     }
 
     async readBlock(blockNumber, zd) {
@@ -376,9 +420,7 @@ class HicFile {
         if (!idx) {
             return undefined
         } else {
-
             let data = await this.file.read(idx.filePosition, idx.size)
-
             if (!data) {
                 return undefined;
             }
@@ -388,39 +430,38 @@ class HicFile {
             //var plain = zlib.inflateSync(Buffer.from(data))   //.decompress();
             data = plain.buffer;
 
-
-            var parser = new BinaryParser(new DataView(data));
-            var nRecords = parser.getInt();
-            var records = [];
+            const parser = new BinaryParser(new DataView(data));
+            const nRecords = parser.getInt();
+            const records = [];
 
             if (this.version < 7) {
                 for (let i = 0; i < nRecords; i++) {
-                    var binX = parser.getInt();
-                    var binY = parser.getInt();
-                    var counts = parser.getFloat();
+                    const binX = parser.getInt();
+                    const binY = parser.getInt();
+                    const counts = parser.getFloat();
                     records.push(new ContactRecord(binX, binY, counts));
                 }
             } else {
 
-                var binXOffset = parser.getInt();
-                var binYOffset = parser.getInt();
+                const binXOffset = parser.getInt();
+                const binYOffset = parser.getInt();
 
-                var useShort = parser.getByte() == 0;
-                var type = parser.getByte();
+                const useFloatContact = parser.getByte() === 1;
+                const useIntXPos = this.version < 9 ? false : parser.getByte() == 1;
+                const useIntYPos = this.version < 9 ? false : parser.getByte() == 1;
+                const type = parser.getByte();
 
                 if (type === 1) {
                     // List-of-rows representation
-                    var rowCount = parser.getShort();
-
+                    var rowCount = useIntYPos ? parser.getInt() : parser.getShort();
                     for (let i = 0; i < rowCount; i++) {
-
-                        binY = binYOffset + parser.getShort();
-                        var colCount = parser.getShort();
-
+                        const dy = useIntYPos ? parser.getInt() : parser.getShort();
+                        const binY = binYOffset + dy;
+                        const colCount = useIntXPos ? parser.getInt() : parser.getShort();
                         for (let j = 0; j < colCount; j++) {
-
-                            binX = binXOffset + parser.getShort();
-                            counts = useShort ? parser.getShort() : parser.getFloat();
+                            const dx = useIntXPos ? parser.getInt() : parser.getShort();
+                            const binX = binXOffset + dx;
+                            const counts = useFloatContact ? parser.getFloat() : parser.getShort();
                             records.push(new ContactRecord(binX, binY, counts));
                         }
                     }
@@ -437,12 +478,12 @@ class HicFile {
                         var bin2 = binYOffset + row;
 
                         if (useShort) {
-                            counts = parser.getShort();
+                            const counts = parser.getShort();
                             if (counts != Short_MIN_VALUE) {
                                 records.push(new ContactRecord(bin1, bin2, counts));
                             }
                         } else {
-                            counts = parser.getFloat();
+                            const counts = parser.getFloat();
                             if (!isNaN(counts)) {
                                 records.push(new ContactRecord(bin1, bin2, counts));
                             }
@@ -459,38 +500,6 @@ class HicFile {
 
         }
     };
-
-    async getSites(chrName) {
-
-        return undefined
-
-        // var self = this;
-        // var sites, entry;
-        //
-        // sites = self.fragmentSitesCache[chrName];
-        //
-        // if (sites) {
-        //     return Promise.resolve(sites);
-        //
-        // } else if (self.fragmentSitesIndex) {
-        //
-        //     entry = self.fragmentSitesIndex[chrName];
-        //
-        //     if (entry !== undefined && entry.nSites > 0) {
-        //
-        //         return readSites(entry.position, entry.nSites)
-        //             .then(function (sites) {
-        //                 self.fragmentSitesCache[chrName] = sites;
-        //                 return sites;
-        //
-        //             })
-        //     }
-        // }
-        // else {
-        //     return Promise.resolve(undefined);
-        // }
-
-    }
 
     async getNormalizationVector(type, chr, unit, binSize) {
 
@@ -532,11 +541,11 @@ class HicFile {
         }
 
         const parser = new BinaryParser(new DataView(data));
-        const nValues = parser.getInt();
+        const nValues = this.version < 9 ? parser.getInt() : parser.getLong();
         const values = [];
         let allNaN = true;
         for (let i = 0; i < nValues; i++) {
-            values[i] = parser.getDouble();
+            values[i] = this.version < 9 ? parser.getDouble() : parser.getFloat();
             if (!isNaN(values[i])) {
                 allNaN = false;
             }
@@ -643,9 +652,9 @@ class HicFile {
         }
 
         const nviStart = await this.skipExpectedValues(this.normExpectedValueVectorsPosition)
-        let byteCount = 4;
+        let byteCount = INT;
 
-        let data = await this.file.read(nviStart, 4);
+        let data = await this.file.read(nviStart, INT);
         if (data.byteLength === 0) {
             // This is possible if there are no norm vectors.  Its a legal v8 file, though uncommon
             return;
@@ -689,23 +698,24 @@ class HicFile {
     }
 
     /**
-     * This function is used when the position of the norm vector index is unknown.  We must read through the expected
-     * values to find the index
+     * This function is used when the position of the norm vector index is unknown.  We must read through the
+     * normalized expected values to find the index
      *
      * @param dataset
      * @returns {Promise}
      */
     async skipExpectedValues(start) {
 
+        const version = this.version;
         const file = new BufferedFile({file: this.file, size: 256000})
-        const range = {start: start, size: 4};
+        const range = {start: start, size: INT};
         const data = await file.read(range.start, range.size)
         const binaryParser = new BinaryParser(new DataView(data));
         const nEntries = binaryParser.getInt();   // Total # of expected value chunks
         if (nEntries === 0) {
-            return range.start + range.size;
+            return start + INT;
         } else {
-            return parseNext(start + 4, nEntries);
+            return parseNext(start + INT, nEntries);
         }     // Skip 4 bytes for int
 
 
@@ -720,14 +730,16 @@ class HicFile {
             const type = binaryParser.getString(); // type
             const unit = binaryParser.getString(); // unit
             const binSize = binaryParser.getInt(); // binSize
-            const nValues = binaryParser.getInt();
-            chunkSize += binaryParser.position + nValues * 8;
+            const nValues = version < 9 ? binaryParser.getInt() : binaryParser.getLong();
 
-            range = {start: start + chunkSize, size: 4};
+            chunkSize += binaryParser.position + nValues * (version < 9 ? DOUBLE : FLOAT);
+
+            range = {start: start + chunkSize, size: INT};
             data = await file.read(range.start, range.size)
             binaryParser = new BinaryParser(new DataView(data));
             const nChrScaleFactors = binaryParser.getInt();
-            chunkSize += (4 + nChrScaleFactors * (4 + 8));
+            chunkSize += (INT + nChrScaleFactors * (INT + (version < 9 ? DOUBLE : FLOAT)));
+
 
             nEntries--;
             if (nEntries === 0) {
@@ -764,7 +776,7 @@ class HicFile {
         const unit = binaryParser.getString();      //3
         const binSize = binaryParser.getInt();      //4
         const filePosition = binaryParser.getLong();  //8
-        const sizeInBytes = binaryParser.getInt();     //4
+        const sizeInBytes = this.version < 9 ? binaryParser.getInt() : binaryParser.getLong();     //4:8
         const key = type + "_" + chrIdx + "_" + unit + "_" + binSize;
         // TODO -- why does this not work?  NormalizationVector.getNormalizationVectorKey(type, chrIdx, unit, binSize);
 
@@ -782,93 +794,23 @@ class HicFile {
         }
     }
 
-    async dumpBlockIndexIndex(chrIdx1, chrIdx2) {
-
-        await this.init()
-
-        if (chrIdx1 > chrIdx2) {
-            const tmp = chrIdx1
-            chrIdx1 = chrIdx2
-            chrIdx2 = tmp
-        }
-
-        const key = "" + chrIdx1 + "_" + chrIdx2
-        const idx = this.masterIndex[key]
-        if (!idx) {
-            return
-        }
-
-        const data = await this.file.read(idx.start, 200)    // *********  Don't use idx.size if >
-        if (!data) {
-            return undefined
-        }
-
-        const dis = new BinaryParser(new DataView(data));
-        const c1 = dis.getInt();     // Should equal chrIdx1
-        const c2 = dis.getInt();     // Should equal chrIdx2
-
-        // TODO validate this
-        const chr1 = this.chromosomes[c1];
-        const chr2 = this.chromosomes[c2];
-
-        // # of resolution levels (bp and frags)
-        let nResolutions = dis.getInt();
-        const zdList = [];
-
-        const sites1 = await this.getSites.call(this, chr1.name)
-        const sites2 = await this.getSites.call(this, chr2.name)
-
-        let bytesAvailable = dis.available()
-        let z = 0
-        //let filePosition = idx.start
-        while (nResolutions-- > 0) {
-
-            const zd = dumpResolution(chr1, chr2, sites1, sites2, dis);
-            const bytesUsed = bytesAvailable - dis.available()
-            // zd.idx = {
-            //     start: filePosition,
-            //     size: bytesUsed
-            // }
-            bytesAvailable = dis.available()
-            zdList.push(zd);
-            //console.log(`zd${z++}: ${bytesUsed}`)
-        }
-        return new Matrix(chrIdx1, chrIdx2, zdList);
-
-        function dumpResolution(chr1, chr2, dis) {
-
-            const unit = dis.getString();
-            const zoomIndex = dis.getInt();
-
-            console.log(zoomIndex);
-
-            // Stats.  Not used , but we need to read them anyway
-            const sumCounts = dis.getFloat();
-            const occupiedCellCount = dis.getFloat();
-            const stdDev = dis.getFloat();
-            const percent95 = dis.getFloat();
-
-            const binSize = dis.getInt();
-            const zoom = {index: zoomIndex, unit: unit, binSize: binSize};
-
-            const blockBinCount = dis.getInt();
-            const blockColumnCount = dis.getInt();
-
-            let nBlocks = dis.getInt();
-            const blockIndex = {};
-            while (nBlocks-- > 0) {
-                const blockNumber = dis.getInt();
-                const filePosition = dis.getLong();
-                const blockSizeInBytes = dis.getInt();
-                blockIndex[blockNumber] = {filePosition: filePosition, size: blockSizeInBytes};
-            }
-            zd.blockIndexMap = blockIndex;
 
 
-        }
-
-
-    }
+    // NOTE sties are not currently used
+    // async getSites(chrName) {
+    //     let sites = this.fragmentSitesCache[chrName];
+    //     if (!sites) {
+    //         if (this.fragmentSitesIndex) {
+    //             const entry = self.fragmentSitesIndex[chrName];
+    //             if (entry && entry.nSites > 0) {
+    //                 sites = await this.readSites(entry.position, entry.nSites)
+    //                 this.fragmentSitesCache[chrName] = sites;
+    //             }
+    //         }
+    //     }
+    //     return sites;
+    // }
+    //
 
 }
 
@@ -881,87 +823,38 @@ function isGoogleDrive(url) {
     return url.indexOf("drive.google.com") >= 0 || url.indexOf("www.googleapis.com/drive") > 0
 }
 
-class DynamicBlockIndex {
+class Block {
+    constructor(blockNumber, zoomData, records, idx) {
+        this.blockNumber = blockNumber;
+        this.zoomData = zoomData;
+        this.records = records;
+        this.idx = idx
+    }
+}
 
-    constructor({file, position, nBlocks, maxBlock}) {
-        this.file = file;
-        this.minPosition = position;
-        this.maxPosition = position + nBlocks * 16;
-        this.nBlocks = nBlocks;
-        this.maxBlock = maxBlock;
+
+class BlockCache {
+
+    constructor() {
+        this.resolution = undefined;
+        this.map = new LRU(6);
     }
 
-    async getBlockIndexEntry(blockNumber) {
-        if(blockNumber > this.maxBlock) {
-            return undefined;
-        } else if(this.blockNumberRange && blockNumber >= this.blockNumberRange.first && blockNumber <= this.blockNumberRange.last) {
-            return this.blockIndexMap[blockNumber];
-        } else {
-            let minPosition = this.minPosition;
-            let maxPosition = this.maxPosition;
-            if(this.blockNumberRange && this.mapFileBounds) {
-                if(blockNumber < this.blockNumberRange.first) {
-                    maxPosition = this.mapFileBounds.min;
-                } else if(blockNumber > this.blockNumberRange.last) {
-                    minPosition = this.mapFileBounds.max;
-                }
-            }
-            if(maxPosition - minPosition < 16) {
-                return undefined;
-            } else {
-                return this.searchForBlockIndexEntry(blockNumber, minPosition, maxPosition);
-            }
+    set(resolution, key, value) {
+        if (this.resolution !== resolution) {
+            this.map.clear();
         }
+        this.resolution = resolution;
+        this.map.set(key, value);
     }
 
-
-    // Search entry for blockNumber between file positions boundsMin and boundsMax
-    // boundsMin is guaranteed to start at the beginning of an entry, boundsMax at the end
-    async searchForBlockIndexEntry(blockNumber, boundsMin, boundsMax) {
-
-//        console.log(`${blockNumber}  ${boundsMin}  ${boundsMax}`)
-        const chunkSize = 16 * 100000;
-        if (boundsMax - boundsMin < chunkSize) {
-            const data = await this.file.read(boundsMin, boundsMax - boundsMin);
-            const dis = new BinaryParser(new DataView(data));
-            const blockIndex = {};
-            let ptr = boundsMin;
-            let firstBlockNumber, lastBlockNumber;
-            while (ptr < boundsMax) {
-                const bn = dis.getInt();
-                const filePosition = dis.getLong();
-                const blockSizeInBytes = dis.getInt();
-                blockIndex[bn] = {filePosition: filePosition, size: blockSizeInBytes};
-                if(firstBlockNumber === undefined) firstBlockNumber = bn;
-                lastBlockNumber = bn;
-                ptr += 16;
-            }
-            this.mapFileBounds = {min: boundsMin, max: boundsMax};
-            this.blockNumberRange = {first: firstBlockNumber, last: lastBlockNumber};
-            this.blockIndexMap = blockIndex;
-            return blockIndex[blockNumber];
-
-        }
-        // Midpoint in units of 16 byte chunks
-        const nEntries = (boundsMax - boundsMin) / 16;
-        const pos1 = boundsMin + Math.floor(nEntries / 2) * 16;
-        const data = await this.file.read(pos1, 16);
-        const dis = new BinaryParser(new DataView(data));
-        const bn = dis.getInt();
-        if (bn === blockNumber) {
-            const filePosition = dis.getLong();
-            const blockSizeInBytes = dis.getInt();
-            return {filePosition: filePosition, size: blockSizeInBytes}   // Extraordinarily lucky
-        } else if (blockNumber > bn) {
-            const bie = await this.searchForBlockIndexEntry(blockNumber, pos1 + 16, boundsMax);
-            return bie;
-        } else {
-            const bie = await this.searchForBlockIndexEntry(blockNumber, boundsMin, pos1);
-            return bie;
-        }
+    get(resolution, key) {
+        return this.resolution === resolution ? this.map.get(key) : undefined;
     }
 
-
+    has(resolution, key) {
+        return this.resolution === resolution && this.map.has(key);
+    }
 }
 
 

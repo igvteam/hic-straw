@@ -1,34 +1,30 @@
+import BinaryParser from "./binary.js"
+import MatrixZoomData from "./matrixZoomData.js"
 
 class Matrix {
-  
+
     constructor(chr1, chr2, zoomDataList) {
-
-        const self = this
-
         this.chr1 = chr1
         this.chr2 = chr2
         this.bpZoomData = []
         this.fragZoomData = []
-        
-        zoomDataList.forEach(function (zd) {
+        for(let zd of zoomDataList) {
             if (zd.zoom.unit === "BP") {
-                self.bpZoomData.push(zd)
+                this.bpZoomData.push(zd)
             } else {
-                self.fragZoomData.push(zd)
+                this.fragZoomData.push(zd)
             }
-        })
+        }
     }
 
-    getZoomDataByIndex(index, unit) {
-        const zdArray = "FRAG" === unit ? this.fragZoomData : this.bpZoomData
-        return zdArray[index]
-    }
-
-
+    /**
+     * Find the best zoom level for the given bin size
+     * @param binSize
+     * @param unit
+     * @returns {number}
+     */
     findZoomForResolution(binSize, unit) {
-
-        const  zdArray = "FRAG" === unit ? this.fragZoomData : this.bpZoomData
-
+        const zdArray = "FRAG" === unit ? this.fragZoomData : this.bpZoomData
         for (let i = 1; i < zdArray.length; i++) {
             var zd = zdArray[i]
             if (zd.zoom.binSize < binSize) {
@@ -36,24 +32,60 @@ class Matrix {
             }
         }
         return zdArray.length - 1
-
     }
 
-
-    // Legacy implementation, used only in tests.
-    getZoomData(zoom) {
-
-        const zdArray = zoom.unit === "BP" ? this.bpZoomData : this.fragZoomData
-
+    /**
+     * Fetch zoom data by bin size.  If no matching level exists return undefined.
+     *
+     * @param unit
+     * @param binSize
+     * @param zoom
+     * @returns {undefined|*}
+     */
+    getZoomData(binSize, unit) {
+        unit = unit || "BP"
+        const zdArray = unit === "BP" ? this.bpZoomData : this.fragZoomData;
         for (let i = 0; i < zdArray.length; i++) {
-            var zd = zdArray[i]
-            if (zoom.binSize === zd.zoom.binSize) {
+            var zd = zdArray[i];
+            if (binSize === zd.zoom.binSize) {
                 return zd
             }
         }
-
         return undefined
     }
+
+    /**
+     * Return zoom data by resolution index.
+     * @param index
+     * @param unit
+     * @returns {*}
+     */
+    getZoomDataByIndex(index, unit) {
+        const zdArray = "FRAG" === unit ? this.fragZoomData : this.bpZoomData
+        return zdArray[index]
+    }
+
+    static parseMatrix(data, chromosomes) {
+
+        const dis = new BinaryParser(new DataView(data));
+        const c1 = dis.getInt();     // Should equal chrIdx1
+        const c2 = dis.getInt();     // Should equal chrIdx2
+
+        // TODO validate this
+        const chr1 = chromosomes[c1];
+        const chr2 = chromosomes[c2];
+
+        // # of resolution levels (bp and frags)
+        let nResolutions = dis.getInt();
+        const zdList = [];
+
+        while (nResolutions-- > 0) {
+            const zd = MatrixZoomData.parseMatrixZoomData(chr1, chr2, dis);
+            zdList.push(zd);
+        }
+        return new Matrix(c1, c2, zdList);
+    }
+
 }
 
 export default Matrix;
