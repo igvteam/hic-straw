@@ -97,7 +97,7 @@ suite('Straw', function () {
             10000
         )
 
-        assert.equal(contactRecords.length, 341)
+        assert.equal(contactRecords.length, 341 - 110)  // Earlier versions contained 110 duplicates
 
     })
 
@@ -158,5 +158,65 @@ suite('Straw', function () {
         assert.ok(contactRecords.length > 0)
 
     })
+
+
+    test('remote file transpose', async function () {
+        this.timeout(100000);
+        const straw = new Straw({
+            "url": "https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/primary.hic",
+            "nvi": "33860030033,37504"
+        })
+
+        const blockBinCount = 685;
+        const binSize = 25000;
+
+        // cell [1,1]
+        const start = 2 * blockBinCount * binSize;
+        const contactRecords = await straw.getContactRecords(
+            "KR",
+            {chr: "22", start: start, end: start + 3 * binSize},
+            {chr: "22", start: start, end: start + 3 * binSize},
+            "BP",
+            binSize
+        )
+        assert.equal(contactRecords.length, 10);
+
+        // convention is bin2 > bin1,  other diagonal can be inferred by transposition
+        for(let record of contactRecords) {
+            assert.ok(record.bin2 >= record.bin1)
+        }
+    })
+
+    test('remote file transpose 2', async function () {
+        this.timeout(100000);
+        const straw = new Straw({
+            "url": "https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/primary.hic",
+            "nvi": "33860030033,37504"
+        })
+
+        const blockBinCount = 685;
+        const binSize = 25000;
+
+        // cell [1,2]
+        const region1 = {chr: "8", start: 2 * blockBinCount * binSize, end: (2 * blockBinCount + 5) * binSize};
+        const region2 = {chr: "8", start: 3 * blockBinCount * binSize, end: (3 * blockBinCount + 5)  * binSize};
+        const contactRecords = await straw.getContactRecords(
+            "NONE",
+            region1,
+            region2,
+            "BP",
+            binSize
+        )
+
+        const contactRecordsTranposed = await straw.getContactRecords(
+            "NONE",
+            region2,
+            region1,
+            "BP",
+            binSize
+        )
+        assert.equal(contactRecordsTranposed.length, contactRecords.length);
+    })
+
 
 })

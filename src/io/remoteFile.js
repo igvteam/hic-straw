@@ -49,6 +49,7 @@ class RemoteFile {
         const status = response.status;
 
         if (status >= 400) {
+            console.error(`${status}  ${this.config.url}`)
             const err = Error(response.statusText)
             err.code = status
             throw err

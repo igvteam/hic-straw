@@ -2,7 +2,7 @@ import {assert} from 'chai';
 import Straw from '../src/straw';
 import HicFile from "../src/hicFile.js";
 
-suite('Straw', function () {
+suite('Straw v9', function () {
 
     test('meta data', async function () {
 
@@ -35,6 +35,23 @@ suite('Straw', function () {
             10000
         )
         assert.equal(231, contactRecords.length)
+
+        // This is an on-diagonal block,  convention is 1 diagonal is returned only, other can be inferred by transposition
+        for(let record of contactRecords) {
+            assert.ok(record.bin2 >= record.bin1)
+        }
+
+
+        // Test cache
+        console.log("cache")
+        const contactRecordsCached = await straw.getContactRecords(
+            "NONE",
+            {chr: "8", start: 48700000, end: 48900000},
+            {chr: "8", start: 48700000, end: 48900000},
+            "BP",
+            10000
+        )
+        assert.equal(contactRecords.length, contactRecordsCached.length);
     })
 
     test('contact records - off diagonal', async function () {
@@ -44,14 +61,27 @@ suite('Straw', function () {
             "url": "https://adam.3dg.io/suhas_juicebox/libs/corrected_combined_maps_v9/GM12878/GM12878_intact_18.7B_8.15.20_30.hic"
         })
 
+        let region1 = {chr: "8", start: 0, end: 900000}
+        let region2 = {chr: "8", start: 58700000, end: 58900000}
         const contactRecords = await straw.getContactRecords(
             "NONE",
-            {chr: "8", start: 0, end: 900000},
-            {chr: "8", start: 58700000, end: 58900000},
+            region1,
+            region2,
             "BP",
             10000
         )
         assert.equal(344, contactRecords.length)
+
+        const contactRecordsTransposed = await straw.getContactRecords(
+            "NONE",
+            region2,
+            region1,
+            "BP",
+            10000
+        )
+        assert.equal(344, contactRecordsTransposed.length)
+
+
     })
 
     test('norm vector index', async function () {
