@@ -14277,7 +14277,9 @@
 	    value: function set(key, val) {
 	      // refresh key
 	      if (this.map.has(key)) this.map.delete(key); // evict oldest
-	      else if (this.map.size == this.max) this.map.delete(this.first());
+	      else if (this.map.size == this.max) {
+	          this.map.delete(this.first());
+	        }
 	      this.map.set(key, val);
 	    }
 	  }, {
@@ -14290,10 +14292,15 @@
 	    value: function clear() {
 	      this.map.clear();
 	    }
+	  }, {
+	    key: "first",
+	    value: function first() {
+	      return this.map.keys().next().value;
+	    }
 	  }]);
 
 	  return LRU;
-	}();
+	}(); //ref https://stackoverflow.com/questions/996505/lru-cache-implementation-in-javascript
 
 	var isNode$3 = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
 	var Short_MIN_VALUE = -32768;
@@ -15181,16 +15188,16 @@
 	                  bin1 = binXOffset + col;
 	                  bin2 = binYOffset + row;
 
-	                  if (useShort) {
-	                    _counts2 = parser.getShort();
+	                  if (useFloatContact) {
+	                    _counts2 = parser.getFloat();
 
-	                    if (_counts2 != Short_MIN_VALUE) {
+	                    if (!isNaN(_counts2)) {
 	                      records.push(new ContactRecord(bin1, bin2, _counts2));
 	                    }
 	                  } else {
-	                    _counts3 = parser.getFloat();
+	                    _counts3 = parser.getShort();
 
-	                    if (!isNaN(_counts3)) {
+	                    if (_counts3 != Short_MIN_VALUE) {
 	                      records.push(new ContactRecord(bin1, bin2, _counts3));
 	                    }
 	                  }

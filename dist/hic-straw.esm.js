@@ -6221,7 +6221,9 @@ class LRU {
         // refresh key
         if (this.map.has(key)) this.map.delete(key);
         // evict oldest
-        else if (this.map.size == this.max) this.map.delete(this.first());
+        else if (this.map.size == this.max) {
+            this.map.delete(this.first());
+        }
         this.map.set(key, val);
     }
 
@@ -6231,6 +6233,10 @@ class LRU {
 
     clear() {
         this.map.clear();
+    }
+
+    first() {
+        return this.map.keys().next().value;
     }
 }
 
@@ -6483,13 +6489,13 @@ class HicFile {
         await await this.init();
         for (let key of Object.keys(this.masterIndex)) {
             const entry = this.masterIndex[key];
-          //  console.log(`${key}\t${entry.start}\t${entry.size}`)
+            //  console.log(`${key}\t${entry.start}\t${entry.size}`)
             totalSize += entry.size;
-            if(entry.size > maxSize) {
+            if (entry.size > maxSize) {
                 maxSize = entry.size;
             }
         }
-       // console.log(`Total size  = ${totalSize}`);
+        // console.log(`Total size  = ${totalSize}`);
     }
 
     async getMatrix(chrIdx1, chrIdx2) {
@@ -6669,7 +6675,7 @@ class HicFile {
 
                 if (type === 1) {
                     // List-of-rows representation
-                    var rowCount = useIntYPos ? parser.getInt() : parser.getShort();
+                    const rowCount = useIntYPos ? parser.getInt() : parser.getShort();
                     for (let i = 0; i < rowCount; i++) {
                         const dy = useIntYPos ? parser.getInt() : parser.getShort();
                         const binY = binYOffset + dy;
@@ -6683,24 +6689,24 @@ class HicFile {
                     }
                 } else if (type == 2) {
 
-                    var nPts = parser.getInt();
-                    var w = parser.getShort();
+                    const nPts = parser.getInt();
+                    const w = parser.getShort();
 
                     for (let i = 0; i < nPts; i++) {
                         //int idx = (p.y - binOffset2) * w + (p.x - binOffset1);
-                        var row = Math.floor(i / w);
-                        var col = i - row * w;
-                        var bin1 = binXOffset + col;
-                        var bin2 = binYOffset + row;
+                        const row = Math.floor(i / w);
+                        const col = i - row * w;
+                        const bin1 = binXOffset + col;
+                        const bin2 = binYOffset + row;
 
-                        if (useShort) {
-                            const counts = parser.getShort();
-                            if (counts != Short_MIN_VALUE) {
+                        if (useFloatContact) {
+                            const counts = parser.getFloat();
+                            if (!isNaN(counts)) {
                                 records.push(new ContactRecord(bin1, bin2, counts));
                             }
                         } else {
-                            const counts = parser.getFloat();
-                            if (!isNaN(counts)) {
+                            const counts = parser.getShort();
+                            if (counts != Short_MIN_VALUE) {
                                 records.push(new ContactRecord(bin1, bin2, counts));
                             }
                         }
@@ -7007,7 +7013,6 @@ class HicFile {
             return chrAlias
         }
     }
-
 
 
     // NOTE sties are not currently used

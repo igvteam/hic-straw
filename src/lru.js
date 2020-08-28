@@ -18,7 +18,9 @@ class LRU {
         // refresh key
         if (this.map.has(key)) this.map.delete(key);
         // evict oldest
-        else if (this.map.size == this.max) this.map.delete(this.first());
+        else if (this.map.size == this.max) {
+            this.map.delete(this.first());
+        }
         this.map.set(key, val);
     }
 
@@ -29,6 +31,12 @@ class LRU {
     clear() {
         this.map.clear();
     }
+
+    first() {
+        return this.map.keys().next().value;
+    }
 }
+
+//ref https://stackoverflow.com/questions/996505/lru-cache-implementation-in-javascript
 
 export default LRU

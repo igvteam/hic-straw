@@ -218,5 +218,36 @@ suite('Straw', function () {
         assert.equal(contactRecordsTranposed.length, contactRecords.length);
     })
 
+    test('contact records - inter chr', async function () {
+
+        this.timeout(100000);
+        const straw = new Straw({
+            "url": "https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/primary.hic"
+        })
+
+        let region1 = {chr: "22", start: 0, end: 342500000}
+        let region2 = {chr: "X", start: 0, end: 342500000}
+
+        const contactRecords = await straw.getContactRecords(
+            "NONE",
+            region1,
+            region2,
+            "BP",
+            500000
+        )
+        assert.equal(21720, contactRecords.length)
+
+        const contactRecordsTransposed = await straw.getContactRecords(
+            "NONE",
+            region2,
+            region1,
+            "BP",
+            500000
+        )
+        assert.equal(contactRecords.length, contactRecordsTransposed.length)
+
+
+    })
+
 
 })

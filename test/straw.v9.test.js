@@ -84,6 +84,38 @@ suite('Straw v9', function () {
 
     })
 
+    test('contact records - inter chr', async function () {
+
+        this.timeout(100000);
+        const straw = new Straw({
+            "url": "https://adam.3dg.io/suhas_juicebox/libs/corrected_combined_maps_v9/GM12878/GM12878_intact_18.7B_8.15.20_30.hic"
+        })
+
+        let region1 = {chr: "22", start: 0, end: 342500000}
+        let region2 = {chr: "X", start: 0, end: 342500000}
+
+        const contactRecords = await straw.getContactRecords(
+            "NONE",
+            region1,
+            region2,
+            "BP",
+            500000
+        )
+        assert.equal(21684, contactRecords.length)
+
+        const contactRecordsTransposed = await straw.getContactRecords(
+            "NONE",
+            region2,
+            region1,
+            "BP",
+            500000
+        )
+        assert.equal(contactRecords.length, contactRecordsTransposed.length)
+
+
+    })
+
+
     test('norm vector index', async function () {
         this.timeout(100000);
         const straw = new Straw({
