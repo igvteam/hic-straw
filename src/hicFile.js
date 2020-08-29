@@ -8,7 +8,6 @@ import RateLimiter from './io/rateLimiter.js';
 import BufferedFile from './io/bufferedFile.js';
 import BinaryParser from './binary.js';
 import Matrix from './matrix.js';
-import NormalizationVector from './normalizationVector.js';
 import ContactRecord from './contactRecord.js';
 import LRU from './lru.js';
 
@@ -16,6 +15,7 @@ const isNode = typeof process !== 'undefined' && process.versions != null && pro
 const Short_MIN_VALUE = -32768;
 const DOUBLE = 8
 const FLOAT = 4
+const LONG = 8;
 const INT = 4;
 const GoogleRateLimiter = new RateLimiter(100)
 
@@ -28,9 +28,9 @@ class HicFile {
 
         this.loadFragData = args.loadFragData
         this.fragmentSitesCache = {}
-        this.normVectorCache = {}
+        this.normVectorCache = new LRU(10)
         this.normalizationTypes = ['NONE'];
-        this.matrixCache = new LRU();
+        this.matrixCache = new LRU(10);
         this.blockCache = new BlockCache();
 
         // args may specify an io.File object, a local path (Node only), or a url
@@ -317,19 +317,6 @@ class HicFile {
             return []
         }
 
-        let normVector1
-        let normVector2
-        const isNorm = normalization && normalization !== "NONE"
-        const chr1 = this.getFileChrName(region1.chr)
-        const chr2 = this.getFileChrName(region2.chr)
-        if (isNorm) {
-            normVector1 = await this.getNormalizationVector(normalization, chr1, units, binsize)
-            if (chr1 === chr2) {
-                normVector2 = normVector1
-            } else {
-                normVector2 = await this.getNormalizationVector(normalization, chr2, units, binsize)
-            }
-        }
 
         const contactRecords = [];
         const sameChr = region1.chr === region2.chr;
@@ -339,15 +326,27 @@ class HicFile {
         const y2 = region2.end / binsize
         for (let block of blocks) {
             if (block) { // An undefined block is most likely caused by a base pair range outside the chromosome
-                for (let rec of block.records) {
 
-                    if (rec.bin1 >= x1 && rec.bin1 <= x2 && rec.bin2 >= y1 && rec.bin2 <= y2 ||
-                        sameChr && (rec.bin1 >= y1 && rec.bin1 <= y2 && rec.bin2 >= x1 && rec.bin2 <= x2)) {
+                let normVector1;
+                let normVector2;
+                const isNorm = normalization && normalization !== "NONE";
+                const chr1 = this.getFileChrName(region1.chr);
+                const chr2 = this.getFileChrName(region2.chr);
+                if (isNorm) {
+                    const nv1 = await this.getNormalizationVector(normalization, chr1, units, binsize);
+                    normVector1 = await nv1.getValues(x1, x2);
+                    const nv2 = (chr1 === chr2) ? nv1 : await this.getNormalizationVector(normalization, chr2, units, binsize);
+                    normVector2 = await nv2.getValues(y1, y2);
+                }
+
+                for (let rec of block.records) {
+                    if (rec.bin1 >= x1 && rec.bin1 < x2 && rec.bin2 >= y1 && rec.bin2 < y2 ||
+                        sameChr && (rec.bin1 >= y1 && rec.bin1 < y2 && rec.bin2 >= x1 && rec.bin2 < x2)) {
                         if (isNorm) {
-                            const x = rec.bin1
-                            const y = rec.bin2
-                            const nvnv = normVector1.data[x] * normVector2.data[y];
-                            if (nvnv[x] !== 0 && !isNaN(nvnv)) {
+                            const x = rec.bin1;
+                            const y = rec.bin2;
+                            const nvnv = normVector1[x - x1] * normVector2[y - y1];
+                            if (nvnv !== 0 && !isNaN(nvnv)) {
                                 const counts = rec.counts / nvnv;
                                 contactRecords.push(new ContactRecord(x, y, counts));
                             }
@@ -513,11 +512,10 @@ class HicFile {
             chrIdx = this.chromosomeIndexMap[canonicalName]
         }
 
-
         const key = getNormalizationVectorKey(type, chrIdx, unit.toString(), binSize);
 
-        if (this.normVectorCache.hasOwnProperty(key)) {
-            return Promise.resolve(this.normVectorCache[key]);
+        if (this.normVectorCache.has(key)) {
+            return this.normVectorCache.get(key);
         }
 
         const normVectorIndex = await this.getNormVectorIndex()
@@ -534,7 +532,7 @@ class HicFile {
             return undefined;
         }
 
-        const data = await this.file.read(idx.filePosition, idx.size)
+        const data = await this.file.read(idx.filePosition, 8)
 
         if (!data) {
             return undefined;
@@ -542,19 +540,11 @@ class HicFile {
 
         const parser = new BinaryParser(new DataView(data));
         const nValues = this.version < 9 ? parser.getInt() : parser.getLong();
-        const values = [];
-        let allNaN = true;
-        for (let i = 0; i < nValues; i++) {
-            values[i] = this.version < 9 ? parser.getDouble() : parser.getFloat();
-            if (!isNaN(values[i])) {
-                allNaN = false;
-            }
-        }
-        if (allNaN) {
-            return undefined;
-        } else {
-            return new NormalizationVector(type, chrIdx, unit, binSize, values);
-        }
+        const dataType = this.version < 9 ? DOUBLE : FLOAT;
+        const filePosition = this.version < 9 ? idx.filePosition + 4 : idx.filePosition + 8;
+        const nv = new NormalizationVector(this.file, filePosition, nValues, dataType);
+        this.normVectorCache.set(key, nv);
+        return nv;
 
     }
 
@@ -821,6 +811,61 @@ function getNormalizationVectorKey(type, chrIdx, unit, resolution) {
 function isGoogleDrive(url) {
     return url.indexOf("drive.google.com") >= 0 || url.indexOf("www.googleapis.com/drive") > 0
 }
+
+class NormalizationVector {
+
+    constructor(file, filePosition, nValues, dataType) {
+        this.file = file;
+        this.filePosition = filePosition;
+        this.nValues = nValues;
+        this.dataType = dataType;
+        this.cache = undefined;
+    }
+
+    async getValues(start, end) {
+
+        if (end >= this.nValues) {
+            throw Error(`Normalization index out of range: ${end}. Max value = ${this.nValues - 1}`);
+        }
+
+        if(!this.cache || start < this.cache.start || end > this.cache.end) {
+            const adjustedStart = Math.max(0, start - 1000);
+            const adjustedEnd = Math.min(this.nValues, end + 1000);
+            const startPosition = this.filePosition + adjustedStart * this.dataType;
+            const sizeInBytes = (adjustedEnd - adjustedStart) * this.dataType;
+            const data = await this.file.read(startPosition, sizeInBytes);
+            if (!data) {
+                return undefined;
+            }
+            const parser = new BinaryParser(new DataView(data));
+            const n = adjustedEnd - adjustedStart;
+            const values = [];
+            for (let i = 0; i < n; i++) {
+                values[i] = this.dataType === DOUBLE ? parser.getDouble() : parser.getFloat();
+
+            }
+            this.cache = {
+                start: adjustedStart,
+                end: adjustedEnd,
+                values: values
+            }
+        }
+
+        const sliceStart = start - this.cache.start;
+        const sliceEnd = sliceStart + (end - start);
+        return this.cache.values.slice(sliceStart, sliceEnd);
+    }
+
+    getKey() {
+        return NormalizationVector.getKey(this.type, this.chrIdx, this.unit, this.resolution);
+    }
+
+
+    static getNormalizationVectorKey(type, chrIdx, unit, resolution) {
+        return type + "_" + chrIdx + "_" + unit + "_" + resolution;
+    }
+}
+
 
 class Block {
     constructor(blockNumber, zoomData, records, idx) {

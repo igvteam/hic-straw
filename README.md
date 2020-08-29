@@ -12,6 +12,19 @@ Requires Node (https://nodejs.org)
 npm install hic-straw
 ```
 
+## API
+
+#### getContactRecords
+
+Return a collection of binned contact counts.
+
+Arguments
+* normalization - string indicating normalization scheme
+* region 1  {chr, start, end} - genomic region in base pair or fragment units.  Interval convention is zero based 1/2 open
+* region 2  {chr, start, end}
+* units -- "BP" for base pairs.  Currently this is the only unit supported
+* binSize -- size of each bin in base pair or fragment units.  Bins are square
+
 
 ## Examples
 
