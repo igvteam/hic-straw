@@ -10,6 +10,7 @@ import BinaryParser from './binary.js';
 import Matrix from './matrix.js';
 import ContactRecord from './contactRecord.js';
 import LRU from './lru.js';
+import NormalizationVector from "./normalizationVector.js";
 
 const isNode = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
 const Short_MIN_VALUE = -32768;
@@ -810,60 +811,6 @@ function getNormalizationVectorKey(type, chrIdx, unit, resolution) {
 
 function isGoogleDrive(url) {
     return url.indexOf("drive.google.com") >= 0 || url.indexOf("www.googleapis.com/drive") > 0
-}
-
-class NormalizationVector {
-
-    constructor(file, filePosition, nValues, dataType) {
-        this.file = file;
-        this.filePosition = filePosition;
-        this.nValues = nValues;
-        this.dataType = dataType;
-        this.cache = undefined;
-    }
-
-    async getValues(start, end) {
-
-        if (end >= this.nValues) {
-            throw Error(`Normalization index out of range: ${end}. Max value = ${this.nValues - 1}`);
-        }
-
-        if(!this.cache || start < this.cache.start || end > this.cache.end) {
-            const adjustedStart = Math.max(0, start - 1000);
-            const adjustedEnd = Math.min(this.nValues, end + 1000);
-            const startPosition = this.filePosition + adjustedStart * this.dataType;
-            const sizeInBytes = (adjustedEnd - adjustedStart) * this.dataType;
-            const data = await this.file.read(startPosition, sizeInBytes);
-            if (!data) {
-                return undefined;
-            }
-            const parser = new BinaryParser(new DataView(data));
-            const n = adjustedEnd - adjustedStart;
-            const values = [];
-            for (let i = 0; i < n; i++) {
-                values[i] = this.dataType === DOUBLE ? parser.getDouble() : parser.getFloat();
-
-            }
-            this.cache = {
-                start: adjustedStart,
-                end: adjustedEnd,
-                values: values
-            }
-        }
-
-        const sliceStart = start - this.cache.start;
-        const sliceEnd = sliceStart + (end - start);
-        return this.cache.values.slice(sliceStart, sliceEnd);
-    }
-
-    getKey() {
-        return NormalizationVector.getKey(this.type, this.chrIdx, this.unit, this.resolution);
-    }
-
-
-    static getNormalizationVectorKey(type, chrIdx, unit, resolution) {
-        return type + "_" + chrIdx + "_" + unit + "_" + resolution;
-    }
 }
 
 

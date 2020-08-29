@@ -115,6 +115,36 @@ suite('Straw v9', function () {
 
     })
 
+    test('contact records - transposed', async function () {
+
+        this.timeout(100000);
+        const straw = new Straw({
+            "url": "https://adam.3dg.io/suhas_juicebox/libs/corrected_combined_maps_v9/GM12878/GM12878_insitu_quadRE_8.15.20.hic"
+        })
+
+        let region1 = {chr: "1", start: 20550000, end: 23975000}
+        let region2 = {chr: "1", start: 17125000, end: 20550000}
+
+        const contactRecords = await straw.getContactRecords(
+            "SCALE",
+            region1,
+            region2,
+            "BP",
+            5000
+        )
+        assert.equal(27579, contactRecords.length)
+
+        // const contactRecordsTransposed = await straw.getContactRecords(
+        //     "NONE",
+        //     region2,
+        //     region1,
+        //     "BP",
+        //     5000
+        // )
+        // assert.equal(contactRecords.length, contactRecordsTransposed.length)
+
+
+    })
 
     test('norm vector index', async function () {
         this.timeout(100000);
@@ -134,7 +164,6 @@ suite('Straw v9', function () {
         const normOptions = await straw.getNormalizationOptions();
         assert.equal(normOptions.length, 3)
     })
-
 
     test('norm vector', async function () {
 
