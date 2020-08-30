@@ -46,10 +46,6 @@ class NormalizationVector {
 
     async getValues(start, end) {
 
-        if (end >= this.nValues) {
-            throw Error(`Normalization index out of range: ${end}. Max value = ${this.nValues - 1}`);
-        }
-
         if(!this.cache || start < this.cache.start || end > this.cache.end) {
             const adjustedStart = Math.max(0, start - 1000);
             const adjustedEnd = Math.min(this.nValues, end + 1000);

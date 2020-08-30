@@ -91,20 +91,20 @@ suite('Straw v9', function () {
             "url": "https://adam.3dg.io/suhas_juicebox/libs/corrected_combined_maps_v9/GM12878/GM12878_intact_18.7B_8.15.20_30.hic"
         })
 
-        let region1 = {chr: "22", start: 0, end: 342500000}
-        let region2 = {chr: "X", start: 0, end: 342500000}
+        let region1 = {chr: "22", start: 0, end: 51304566}
+        let region2 = {chr: "X", start: 0, end: 155270560}
 
         const contactRecords = await straw.getContactRecords(
-            "NONE",
+            "SCALE",
             region1,
             region2,
             "BP",
             500000
         )
-        assert.equal(21684, contactRecords.length)
+        assert.equal(21308, contactRecords.length)
 
         const contactRecordsTransposed = await straw.getContactRecords(
-            "NONE",
+            "SCALE",
             region2,
             region1,
             "BP",
@@ -134,14 +134,14 @@ suite('Straw v9', function () {
         )
         assert.equal(27579, contactRecords.length)
 
-        // const contactRecordsTransposed = await straw.getContactRecords(
-        //     "NONE",
-        //     region2,
-        //     region1,
-        //     "BP",
-        //     5000
-        // )
-        // assert.equal(contactRecords.length, contactRecordsTransposed.length)
+        const contactRecordsTransposed = await straw.getContactRecords(
+            "SCALE",
+            region2,
+            region1,
+            "BP",
+            5000
+        )
+        assert.equal(contactRecords.length, contactRecordsTransposed.length)
 
 
     })

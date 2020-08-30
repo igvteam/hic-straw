@@ -312,22 +312,30 @@ class HicFile {
 
     async getContactRecords(normalization, region1, region2, units, binsize) {
 
-        const blocks = await this.getBlocks(region1, region2, units, binsize)
+        await this.init();
 
+        const idx1 = this.chromosomeIndexMap[this.getFileChrName(region1.chr)];
+        const idx2 = this.chromosomeIndexMap[this.getFileChrName(region2.chr)];
+
+        const transpose = (idx1 > idx2) || (idx1 === idx2 && region1.start >= region2.end);
+        if (transpose) {
+            const tmp = region1
+            region1 = region2;
+            region2 = tmp;
+        }
+
+        const blocks = await this.getBlocks(region1, region2, units, binsize)
         if (!blocks || blocks.length === 0) {
             return []
         }
 
-
         const contactRecords = [];
-        const sameChr = region1.chr === region2.chr;
         const x1 = region1.start / binsize
         const x2 = region1.end / binsize
         const y1 = region2.start / binsize
         const y2 = region2.end / binsize
         for (let block of blocks) {
             if (block) { // An undefined block is most likely caused by a base pair range outside the chromosome
-
                 let normVector1;
                 let normVector2;
                 const isNorm = normalization && normalization !== "NONE";
@@ -341,8 +349,7 @@ class HicFile {
                 }
 
                 for (let rec of block.records) {
-                    if (rec.bin1 >= x1 && rec.bin1 < x2 && rec.bin2 >= y1 && rec.bin2 < y2 ||
-                        sameChr && (rec.bin1 >= y1 && rec.bin1 < y2 && rec.bin2 >= x1 && rec.bin2 < x2)) {
+                    if (rec.bin1 >= x1 && rec.bin1 < x2 && rec.bin2 >= y1 && rec.bin2 < y2) {
                         if (isNorm) {
                             const x = rec.bin1;
                             const y = rec.bin2;
@@ -812,7 +819,6 @@ function getNormalizationVectorKey(type, chrIdx, unit, resolution) {
 function isGoogleDrive(url) {
     return url.indexOf("drive.google.com") >= 0 || url.indexOf("www.googleapis.com/drive") > 0
 }
-
 
 class Block {
     constructor(blockNumber, zoomData, records, idx) {

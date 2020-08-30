@@ -14,6 +14,14 @@ class MatrixZoomData {
     }
 
     getBlockNumbers(region1, region2, version) {
+
+        // Verify region chromosomes and swap if neccessary
+        if(region1.chr == this.chr2 && region2.chr === this.chr1) {
+            const tmp = region1;
+            region1 = region2;
+            region2 = tmp;
+        }
+
         const sameChr = this.chr1 === this.chr2;
         const binsize = this.zoom.binSize;
         const blockBinCount = this.blockBinCount
