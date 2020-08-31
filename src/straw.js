@@ -12,13 +12,17 @@ class Straw {
         return await this.hicFile.getMetaData()
     }
 
-//straw <NONE/VC/VC_SQRT/KR> <ile> <chr1>[:x1:x2] <chr2>[:y1:y2] <BP/FRAG> <binsize>
+    //straw <NONE/VC/VC_SQRT/KR> <ile> <chr1>[:x1:x2] <chr2>[:y1:y2] <BP/FRAG> <binsize>
     async getContactRecords(normalization, region1, region2, units, binsize) {
         return this.hicFile.getContactRecords(normalization, region1, region2, units, binsize);
     }
 
     async getNormalizationOptions() {
         return this.hicFile.getNormalizationOptions()
+    }
+
+    async hasNormalizationVector(type, chr, unit, binSize) {
+        await this.hicFile.hasNormalizationVector(type, chr, unit, binSize);
     }
 
     async getNVI() {

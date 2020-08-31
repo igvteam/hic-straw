@@ -515,6 +515,20 @@ class HicFile {
         }
     };
 
+    async hasNormalizationVector(type, chr, unit, binSize) {
+        await this.init()
+        let chrIdx
+        if (Number.isInteger(chr)) {
+            chrIdx = chr
+        } else {
+            const canonicalName = this.getFileChrName(chr)
+            chrIdx = this.chromosomeIndexMap[canonicalName]
+        }
+        const key = getNormalizationVectorKey(type, chrIdx, unit.toString(), binSize);
+        const normVectorIndex = await this.getNormVectorIndex()
+        return normVectorIndex && normVectorIndex[key];
+    }
+
     async getNormalizationVector(type, chr, unit, binSize) {
 
         await this.init()
