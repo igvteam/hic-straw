@@ -310,7 +310,7 @@ class HicFile {
 
     }
 
-    async getContactRecords(normalization, region1, region2, units, binsize) {
+    async getContactRecords(normalization, region1, region2, units, binsize, allRecords = false) {
 
         await this.init();
 
@@ -338,18 +338,25 @@ class HicFile {
             if (block) { // An undefined block is most likely caused by a base pair range outside the chromosome
                 let normVector1;
                 let normVector2;
-                const isNorm = normalization && normalization !== "NONE";
+                let isNorm = normalization && normalization !== "NONE";
                 const chr1 = this.getFileChrName(region1.chr);
                 const chr2 = this.getFileChrName(region2.chr);
                 if (isNorm) {
                     const nv1 = await this.getNormalizationVector(normalization, chr1, units, binsize);
-                    normVector1 = await nv1.getValues(x1, x2);
                     const nv2 = (chr1 === chr2) ? nv1 : await this.getNormalizationVector(normalization, chr2, units, binsize);
-                    normVector2 = await nv2.getValues(y1, y2);
+
+                    if(nv1 && nv2) {
+                        normVector1 = await nv1.getValues(x1, x2);
+                        normVector2 = await nv2.getValues(y1, y2);
+                    }
+                    else {
+                        isNorm = false;
+                        // Raise message and switch pulldown
+                    }
                 }
 
                 for (let rec of block.records) {
-                    if (rec.bin1 >= x1 && rec.bin1 < x2 && rec.bin2 >= y1 && rec.bin2 < y2) {
+                    if (allRecords || (rec.bin1 >= x1 && rec.bin1 < x2 && rec.bin2 >= y1 && rec.bin2 < y2)) {
                         if (isNorm) {
                             const x = rec.bin1;
                             const y = rec.bin2;
