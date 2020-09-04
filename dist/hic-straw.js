@@ -13548,6 +13548,13 @@
 	  }, {
 	    key: "getBlockNumbers",
 	    value: function getBlockNumbers(region1, region2, version) {
+	      // Verify region chromosomes and swap if neccessary
+	      if (region1.chr == this.chr2 && region2.chr === this.chr1) {
+	        var tmp = region1;
+	        region1 = region2;
+	        region2 = tmp;
+	      }
+
 	      var sameChr = this.chr1 === this.chr2;
 	      var binsize = this.zoom.binSize;
 	      var blockBinCount = this.blockBinCount;
@@ -13791,82 +13798,6 @@
 
 	  return Matrix;
 	}();
-
-	/*
-	 *  The MIT License (MIT)
-	 *
-	 * Copyright (c) 2016-2017 The Regents of the University of California
-	 *
-	 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
-	 * associated documentation files (the "Software"), to deal in the Software without restriction, including
-	 * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-	 * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the
-	 * following conditions:
-	 *
-	 * The above copyright notice and this permission notice shall be included in all copies or substantial
-	 * portions of the Software.
-	 *
-	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
-	 * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,  FITNESS FOR A PARTICULAR PURPOSE AND
-	 * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-	 * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-	 * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-	 * THE SOFTWARE.
-	 *
-	 */
-
-	/**
-	 * @author Jim Robinson
-	 */
-	var NormalizationVector = /*#__PURE__*/function () {
-	  function NormalizationVector(type, chrIdx, unit, resolution, values) {
-	    _classCallCheck(this, NormalizationVector);
-
-	    var avg = mean(values),
-	        i;
-
-	    if (avg > 0) {
-	      for (i = 0; i < values.length; i++) {
-	        values[i] /= avg;
-	      }
-	    }
-
-	    this.type = type;
-	    this.chrIdx = chrIdx;
-	    this.unit = unit;
-	    this.resolution = resolution;
-	    this.data = values;
-	  }
-
-	  _createClass(NormalizationVector, [{
-	    key: "getKey",
-	    value: function getKey() {
-	      return NormalizationVector.getKey(this.type, this.chrIdx, this.unit, this.resolution);
-	    }
-	  }], [{
-	    key: "getNormalizationVectorKey",
-	    value: function getNormalizationVectorKey(type, chrIdx, unit, resolution) {
-	      return type + "_" + chrIdx + "_" + unit + "_" + resolution;
-	    }
-	  }]);
-
-	  return NormalizationVector;
-	}();
-
-	function mean(array) {
-	  var t = 0,
-	      n = 0,
-	      i;
-
-	  for (i = 0; i < array.length; i++) {
-	    if (!isNaN(array[i])) {
-	      t += array[i];
-	      n++;
-	    }
-	  }
-
-	  return n > 0 ? t / n : 0;
-	}
 
 	var ContactRecord = /*#__PURE__*/function () {
 	  function ContactRecord(bin1, bin2, counts) {
@@ -14302,9 +14233,102 @@
 	  return LRU;
 	}(); //ref https://stackoverflow.com/questions/996505/lru-cache-implementation-in-javascript
 
+	var DOUBLE = 8;
+
+	var NormalizationVector = /*#__PURE__*/function () {
+	  function NormalizationVector(file, filePosition, nValues, dataType) {
+	    _classCallCheck(this, NormalizationVector);
+
+	    this.file = file;
+	    this.filePosition = filePosition;
+	    this.nValues = nValues;
+	    this.dataType = dataType;
+	    this.cache = undefined;
+	  }
+
+	  _createClass(NormalizationVector, [{
+	    key: "getValues",
+	    value: function () {
+	      var _getValues = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(start, end) {
+	        var adjustedStart, adjustedEnd, startPosition, sizeInBytes, data, parser, n, values, i, sliceStart, sliceEnd;
+	        return regeneratorRuntime.wrap(function _callee$(_context) {
+	          while (1) {
+	            switch (_context.prev = _context.next) {
+	              case 0:
+	                if (!(!this.cache || start < this.cache.start || end > this.cache.end)) {
+	                  _context.next = 15;
+	                  break;
+	                }
+
+	                adjustedStart = Math.max(0, start - 1000);
+	                adjustedEnd = Math.min(this.nValues, end + 1000);
+	                startPosition = this.filePosition + adjustedStart * this.dataType;
+	                sizeInBytes = (adjustedEnd - adjustedStart) * this.dataType;
+	                _context.next = 7;
+	                return this.file.read(startPosition, sizeInBytes);
+
+	              case 7:
+	                data = _context.sent;
+
+	                if (data) {
+	                  _context.next = 10;
+	                  break;
+	                }
+
+	                return _context.abrupt("return", undefined);
+
+	              case 10:
+	                parser = new BinaryParser(new DataView(data));
+	                n = adjustedEnd - adjustedStart;
+	                values = [];
+
+	                for (i = 0; i < n; i++) {
+	                  values[i] = this.dataType === DOUBLE ? parser.getDouble() : parser.getFloat();
+	                }
+
+	                this.cache = {
+	                  start: adjustedStart,
+	                  end: adjustedEnd,
+	                  values: values
+	                };
+
+	              case 15:
+	                sliceStart = start - this.cache.start;
+	                sliceEnd = sliceStart + (end - start);
+	                return _context.abrupt("return", this.cache.values.slice(sliceStart, sliceEnd));
+
+	              case 18:
+	              case "end":
+	                return _context.stop();
+	            }
+	          }
+	        }, _callee, this);
+	      }));
+
+	      function getValues(_x, _x2) {
+	        return _getValues.apply(this, arguments);
+	      }
+
+	      return getValues;
+	    }()
+	  }, {
+	    key: "getKey",
+	    value: function getKey() {
+	      return NormalizationVector.getKey(this.type, this.chrIdx, this.unit, this.resolution);
+	    }
+	  }], [{
+	    key: "getNormalizationVectorKey",
+	    value: function getNormalizationVectorKey(type, chrIdx, unit, resolution) {
+	      return type + "_" + chrIdx + "_" + unit + "_" + resolution;
+	    }
+	  }]);
+
+	  return NormalizationVector;
+	}();
+
 	var isNode$3 = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
 	var Short_MIN_VALUE = -32768;
-	var DOUBLE = 8;
+	var DOUBLE$1 = 8;
 	var FLOAT = 4;
 	var INT = 4;
 	var GoogleRateLimiter = new RateLimiter(100);
@@ -14316,9 +14340,9 @@
 	    this.config = args;
 	    this.loadFragData = args.loadFragData;
 	    this.fragmentSitesCache = {};
-	    this.normVectorCache = {};
+	    this.normVectorCache = new LRU(10);
 	    this.normalizationTypes = ['NONE'];
-	    this.matrixCache = new LRU();
+	    this.matrixCache = new LRU(10);
 	    this.blockCache = new BlockCache(); // args may specify an io.File object, a local path (Node only), or a url
 
 	    if (args.file) {
@@ -14840,114 +14864,208 @@
 	    key: "getContactRecords",
 	    value: function () {
 	      var _getContactRecords = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee9(normalization, region1, region2, units, binsize) {
-	        var blocks, normVector1, normVector2, isNorm, chr1, chr2, contactRecords, sameChr, x1, x2, y1, y2, _iterator, _step, block, _iterator2, _step2, rec, x, y, nvnv, counts;
+	        var allRecords,
+	            idx1,
+	            idx2,
+	            transpose,
+	            tmp,
+	            blocks,
+	            contactRecords,
+	            x1,
+	            x2,
+	            y1,
+	            y2,
+	            _iterator,
+	            _step,
+	            block,
+	            normVector1,
+	            normVector2,
+	            isNorm,
+	            chr1,
+	            chr2,
+	            nv1,
+	            nv2,
+	            _iterator2,
+	            _step2,
+	            rec,
+	            x,
+	            y,
+	            nvnv,
+	            counts,
+	            _args9 = arguments;
 
 	        return regeneratorRuntime.wrap(function _callee9$(_context9) {
 	          while (1) {
 	            switch (_context9.prev = _context9.next) {
 	              case 0:
-	                _context9.next = 2;
+	                allRecords = _args9.length > 5 && _args9[5] !== undefined ? _args9[5] : false;
+	                _context9.next = 3;
+	                return this.init();
+
+	              case 3:
+	                idx1 = this.chromosomeIndexMap[this.getFileChrName(region1.chr)];
+	                idx2 = this.chromosomeIndexMap[this.getFileChrName(region2.chr)];
+	                transpose = idx1 > idx2 || idx1 === idx2 && region1.start >= region2.end;
+
+	                if (transpose) {
+	                  tmp = region1;
+	                  region1 = region2;
+	                  region2 = tmp;
+	                }
+
+	                _context9.next = 9;
 	                return this.getBlocks(region1, region2, units, binsize);
 
-	              case 2:
+	              case 9:
 	                blocks = _context9.sent;
 
 	                if (!(!blocks || blocks.length === 0)) {
-	                  _context9.next = 5;
+	                  _context9.next = 12;
 	                  break;
 	                }
 
 	                return _context9.abrupt("return", []);
 
-	              case 5:
-	                isNorm = normalization && normalization !== "NONE";
-	                chr1 = this.getFileChrName(region1.chr);
-	                chr2 = this.getFileChrName(region2.chr);
-
-	                if (!isNorm) {
-	                  _context9.next = 19;
-	                  break;
-	                }
-
-	                _context9.next = 11;
-	                return this.getNormalizationVector(normalization, chr1, units, binsize);
-
-	              case 11:
-	                normVector1 = _context9.sent;
-
-	                if (!(chr1 === chr2)) {
-	                  _context9.next = 16;
-	                  break;
-	                }
-
-	                normVector2 = normVector1;
-	                _context9.next = 19;
-	                break;
-
-	              case 16:
-	                _context9.next = 18;
-	                return this.getNormalizationVector(normalization, chr2, units, binsize);
-
-	              case 18:
-	                normVector2 = _context9.sent;
-
-	              case 19:
+	              case 12:
 	                contactRecords = [];
-	                sameChr = region1.chr === region2.chr;
 	                x1 = region1.start / binsize;
 	                x2 = region1.end / binsize;
 	                y1 = region2.start / binsize;
 	                y2 = region2.end / binsize;
 	                _iterator = _createForOfIteratorHelper(blocks);
+	                _context9.prev = 18;
+
+	                _iterator.s();
+
+	              case 20:
+	                if ((_step = _iterator.n()).done) {
+	                  _context9.next = 54;
+	                  break;
+	                }
+
+	                block = _step.value;
+
+	                if (!block) {
+	                  _context9.next = 52;
+	                  break;
+	                }
+
+	                // An undefined block is most likely caused by a base pair range outside the chromosome
+	                normVector1 = void 0;
+	                normVector2 = void 0;
+	                isNorm = normalization && normalization !== "NONE";
+	                chr1 = this.getFileChrName(region1.chr);
+	                chr2 = this.getFileChrName(region2.chr);
+
+	                if (!isNorm) {
+	                  _context9.next = 50;
+	                  break;
+	                }
+
+	                _context9.next = 31;
+	                return this.getNormalizationVector(normalization, chr1, units, binsize);
+
+	              case 31:
+	                nv1 = _context9.sent;
+
+	                if (!(chr1 === chr2)) {
+	                  _context9.next = 36;
+	                  break;
+	                }
+
+	                _context9.t0 = nv1;
+	                _context9.next = 39;
+	                break;
+
+	              case 36:
+	                _context9.next = 38;
+	                return this.getNormalizationVector(normalization, chr2, units, binsize);
+
+	              case 38:
+	                _context9.t0 = _context9.sent;
+
+	              case 39:
+	                nv2 = _context9.t0;
+
+	                if (!(nv1 && nv2)) {
+	                  _context9.next = 49;
+	                  break;
+	                }
+
+	                _context9.next = 43;
+	                return nv1.getValues(x1, x2);
+
+	              case 43:
+	                normVector1 = _context9.sent;
+	                _context9.next = 46;
+	                return nv2.getValues(y1, y2);
+
+	              case 46:
+	                normVector2 = _context9.sent;
+	                _context9.next = 50;
+	                break;
+
+	              case 49:
+	                isNorm = false; // Raise message and switch pulldown
+
+	              case 50:
+	                _iterator2 = _createForOfIteratorHelper(block.records);
 
 	                try {
-	                  for (_iterator.s(); !(_step = _iterator.n()).done;) {
-	                    block = _step.value;
+	                  for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+	                    rec = _step2.value;
 
-	                    if (block) {
-	                      // An undefined block is most likely caused by a base pair range outside the chromosome
-	                      _iterator2 = _createForOfIteratorHelper(block.records);
+	                    if (allRecords || rec.bin1 >= x1 && rec.bin1 < x2 && rec.bin2 >= y1 && rec.bin2 < y2) {
+	                      if (isNorm) {
+	                        x = rec.bin1;
+	                        y = rec.bin2;
+	                        nvnv = normVector1[x - x1] * normVector2[y - y1];
 
-	                      try {
-	                        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-	                          rec = _step2.value;
-
-	                          if (rec.bin1 >= x1 && rec.bin1 <= x2 && rec.bin2 >= y1 && rec.bin2 <= y2 || sameChr && rec.bin1 >= y1 && rec.bin1 <= y2 && rec.bin2 >= x1 && rec.bin2 <= x2) {
-	                            if (isNorm) {
-	                              x = rec.bin1;
-	                              y = rec.bin2;
-	                              nvnv = normVector1.data[x] * normVector2.data[y];
-
-	                              if (nvnv[x] !== 0 && !isNaN(nvnv)) {
-	                                counts = rec.counts / nvnv;
-	                                contactRecords.push(new ContactRecord(x, y, counts));
-	                              }
-	                            } else {
-	                              contactRecords.push(rec);
-	                            }
-	                          }
+	                        if (nvnv !== 0 && !isNaN(nvnv)) {
+	                          counts = rec.counts / nvnv;
+	                          contactRecords.push(new ContactRecord(x, y, counts));
 	                        }
-	                      } catch (err) {
-	                        _iterator2.e(err);
-	                      } finally {
-	                        _iterator2.f();
+	                      } else {
+	                        contactRecords.push(rec);
 	                      }
 	                    }
 	                  }
 	                } catch (err) {
-	                  _iterator.e(err);
+	                  _iterator2.e(err);
 	                } finally {
-	                  _iterator.f();
+	                  _iterator2.f();
 	                }
 
+	              case 52:
+	                _context9.next = 20;
+	                break;
+
+	              case 54:
+	                _context9.next = 59;
+	                break;
+
+	              case 56:
+	                _context9.prev = 56;
+	                _context9.t1 = _context9["catch"](18);
+
+	                _iterator.e(_context9.t1);
+
+	              case 59:
+	                _context9.prev = 59;
+
+	                _iterator.f();
+
+	                return _context9.finish(59);
+
+	              case 62:
 	                return _context9.abrupt("return", contactRecords);
 
-	              case 28:
+	              case 63:
 	              case "end":
 	                return _context9.stop();
 	            }
 	          }
-	        }, _callee9, this);
+	        }, _callee9, this, [[18, 56, 59, 62]]);
 	      }));
 
 	      function getContactRecords(_x5, _x6, _x7, _x8, _x9) {
@@ -15227,10 +15345,10 @@
 	      return readBlock;
 	    }()
 	  }, {
-	    key: "getNormalizationVector",
+	    key: "hasNormalizationVector",
 	    value: function () {
-	      var _getNormalizationVector = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee12(type, chr, unit, binSize) {
-	        var chrIdx, canonicalName, key, normVectorIndex, idx, data, parser, nValues, values, allNaN, i;
+	      var _hasNormalizationVector = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee12(type, chr, unit, binSize) {
+	        var chrIdx, canonicalName, key, normVectorIndex;
 	        return regeneratorRuntime.wrap(function _callee12$(_context12) {
 	          while (1) {
 	            switch (_context12.prev = _context12.next) {
@@ -15247,77 +15365,14 @@
 	                }
 
 	                key = getNormalizationVectorKey(type, chrIdx, unit.toString(), binSize);
-
-	                if (!this.normVectorCache.hasOwnProperty(key)) {
-	                  _context12.next = 6;
-	                  break;
-	                }
-
-	                return _context12.abrupt("return", Promise.resolve(this.normVectorCache[key]));
-
-	              case 6:
-	                _context12.next = 8;
+	                _context12.next = 6;
 	                return this.getNormVectorIndex();
 
-	              case 8:
+	              case 6:
 	                normVectorIndex = _context12.sent;
+	                return _context12.abrupt("return", normVectorIndex && normVectorIndex[key]);
 
-	                if (normVectorIndex) {
-	                  _context12.next = 11;
-	                  break;
-	                }
-
-	                return _context12.abrupt("return", undefined);
-
-	              case 11:
-	                idx = normVectorIndex[key];
-
-	                if (idx) {
-	                  _context12.next = 14;
-	                  break;
-	                }
-
-	                return _context12.abrupt("return", undefined);
-
-	              case 14:
-	                _context12.next = 16;
-	                return this.file.read(idx.filePosition, idx.size);
-
-	              case 16:
-	                data = _context12.sent;
-
-	                if (data) {
-	                  _context12.next = 19;
-	                  break;
-	                }
-
-	                return _context12.abrupt("return", undefined);
-
-	              case 19:
-	                parser = new BinaryParser(new DataView(data));
-	                nValues = this.version < 9 ? parser.getInt() : parser.getLong();
-	                values = [];
-	                allNaN = true;
-
-	                for (i = 0; i < nValues; i++) {
-	                  values[i] = this.version < 9 ? parser.getDouble() : parser.getFloat();
-
-	                  if (!isNaN(values[i])) {
-	                    allNaN = false;
-	                  }
-	                }
-
-	                if (!allNaN) {
-	                  _context12.next = 28;
-	                  break;
-	                }
-
-	                return _context12.abrupt("return", undefined);
-
-	              case 28:
-	                return _context12.abrupt("return", new NormalizationVector(type, chrIdx, unit, binSize, values));
-
-	              case 29:
+	              case 8:
 	              case "end":
 	                return _context12.stop();
 	            }
@@ -15325,7 +15380,97 @@
 	        }, _callee12, this);
 	      }));
 
-	      function getNormalizationVector(_x16, _x17, _x18, _x19) {
+	      function hasNormalizationVector(_x16, _x17, _x18, _x19) {
+	        return _hasNormalizationVector.apply(this, arguments);
+	      }
+
+	      return hasNormalizationVector;
+	    }()
+	  }, {
+	    key: "getNormalizationVector",
+	    value: function () {
+	      var _getNormalizationVector = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee13(type, chr, unit, binSize) {
+	        var chrIdx, canonicalName, key, normVectorIndex, idx, data, parser, nValues, dataType, filePosition, nv;
+	        return regeneratorRuntime.wrap(function _callee13$(_context13) {
+	          while (1) {
+	            switch (_context13.prev = _context13.next) {
+	              case 0:
+	                _context13.next = 2;
+	                return this.init();
+
+	              case 2:
+	                if (Number.isInteger(chr)) {
+	                  chrIdx = chr;
+	                } else {
+	                  canonicalName = this.getFileChrName(chr);
+	                  chrIdx = this.chromosomeIndexMap[canonicalName];
+	                }
+
+	                key = getNormalizationVectorKey(type, chrIdx, unit.toString(), binSize);
+
+	                if (!this.normVectorCache.has(key)) {
+	                  _context13.next = 6;
+	                  break;
+	                }
+
+	                return _context13.abrupt("return", this.normVectorCache.get(key));
+
+	              case 6:
+	                _context13.next = 8;
+	                return this.getNormVectorIndex();
+
+	              case 8:
+	                normVectorIndex = _context13.sent;
+
+	                if (normVectorIndex) {
+	                  _context13.next = 11;
+	                  break;
+	                }
+
+	                return _context13.abrupt("return", undefined);
+
+	              case 11:
+	                idx = normVectorIndex[key];
+
+	                if (idx) {
+	                  _context13.next = 14;
+	                  break;
+	                }
+
+	                return _context13.abrupt("return", undefined);
+
+	              case 14:
+	                _context13.next = 16;
+	                return this.file.read(idx.filePosition, 8);
+
+	              case 16:
+	                data = _context13.sent;
+
+	                if (data) {
+	                  _context13.next = 19;
+	                  break;
+	                }
+
+	                return _context13.abrupt("return", undefined);
+
+	              case 19:
+	                parser = new BinaryParser(new DataView(data));
+	                nValues = this.version < 9 ? parser.getInt() : parser.getLong();
+	                dataType = this.version < 9 ? DOUBLE$1 : FLOAT;
+	                filePosition = this.version < 9 ? idx.filePosition + 4 : idx.filePosition + 8;
+	                nv = new NormalizationVector(this.file, filePosition, nValues, dataType);
+	                this.normVectorCache.set(key, nv);
+	                return _context13.abrupt("return", nv);
+
+	              case 26:
+	              case "end":
+	                return _context13.stop();
+	            }
+	          }
+	        }, _callee13, this);
+	      }));
+
+	      function getNormalizationVector(_x20, _x21, _x22, _x23) {
 	        return _getNormalizationVector.apply(this, arguments);
 	      }
 
@@ -15334,48 +15479,48 @@
 	  }, {
 	    key: "getNormVectorIndex",
 	    value: function () {
-	      var _getNormVectorIndex = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee13() {
+	      var _getNormVectorIndex = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee14() {
 	        var url, key, nviResponse, nvi, nviArray, range;
-	        return regeneratorRuntime.wrap(function _callee13$(_context13) {
+	        return regeneratorRuntime.wrap(function _callee14$(_context14) {
 	          while (1) {
-	            switch (_context13.prev = _context13.next) {
+	            switch (_context14.prev = _context14.next) {
 	              case 0:
 	                if (!(this.version < 6)) {
-	                  _context13.next = 2;
+	                  _context14.next = 2;
 	                  break;
 	                }
 
-	                return _context13.abrupt("return", undefined);
+	                return _context14.abrupt("return", undefined);
 
 	              case 2:
 	                if (this.normVectorIndex) {
-	                  _context13.next = 29;
+	                  _context14.next = 29;
 	                  break;
 	                }
 
 	                if (!(!this.config.nvi && this.remote && this.url)) {
-	                  _context13.next = 14;
+	                  _context14.next = 14;
 	                  break;
 	                }
 
 	                url = new URL(this.url);
 	                key = encodeURIComponent(url.hostname + url.pathname);
-	                _context13.next = 8;
+	                _context14.next = 8;
 	                return crossFetch('https://t5dvc6kn3f.execute-api.us-east-1.amazonaws.com/dev/nvi/' + key);
 
 	              case 8:
-	                nviResponse = _context13.sent;
+	                nviResponse = _context14.sent;
 
 	                if (!(nviResponse.status === 200)) {
-	                  _context13.next = 14;
+	                  _context14.next = 14;
 	                  break;
 	                }
 
-	                _context13.next = 12;
+	                _context14.next = 12;
 	                return nviResponse.text();
 
 	              case 12:
-	                nvi = _context13.sent;
+	                nvi = _context14.sent;
 
 	                if (nvi) {
 	                  this.config.nvi = nvi;
@@ -15383,7 +15528,7 @@
 
 	              case 14:
 	                if (!this.config.nvi) {
-	                  _context13.next = 20;
+	                  _context14.next = 20;
 	                  break;
 	                }
 
@@ -15392,36 +15537,36 @@
 	                  start: parseInt(nviArray[0]),
 	                  size: parseInt(nviArray[1])
 	                };
-	                return _context13.abrupt("return", this.readNormVectorIndex(range));
+	                return _context14.abrupt("return", this.readNormVectorIndex(range));
 
 	              case 20:
-	                _context13.prev = 20;
-	                _context13.next = 23;
+	                _context14.prev = 20;
+	                _context14.next = 23;
 	                return this.readNormExpectedValuesAndNormVectorIndex();
 
 	              case 23:
-	                return _context13.abrupt("return", this.normVectorIndex);
+	                return _context14.abrupt("return", this.normVectorIndex);
 
 	              case 26:
-	                _context13.prev = 26;
-	                _context13.t0 = _context13["catch"](20);
+	                _context14.prev = 26;
+	                _context14.t0 = _context14["catch"](20);
 
-	                if (_context13.t0.code === "416" || _context13.t0.code === 416) {
+	                if (_context14.t0.code === "416" || _context14.t0.code === 416) {
 	                  // This is expected if file does not contain norm vectors
 	                  this.normExpectedValueVectorsPosition = undefined;
 	                } else {
-	                  console.error(_context13.t0);
+	                  console.error(_context14.t0);
 	                }
 
 	              case 29:
-	                return _context13.abrupt("return", this.normVectorIndex);
+	                return _context14.abrupt("return", this.normVectorIndex);
 
 	              case 30:
 	              case "end":
-	                return _context13.stop();
+	                return _context14.stop();
 	            }
 	          }
-	        }, _callee13, this, [[20, 26]]);
+	        }, _callee14, this, [[20, 26]]);
 	      }));
 
 	      function getNormVectorIndex() {
@@ -15433,23 +15578,23 @@
 	  }, {
 	    key: "getNormalizationOptions",
 	    value: function () {
-	      var _getNormalizationOptions = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee14() {
-	        return regeneratorRuntime.wrap(function _callee14$(_context14) {
+	      var _getNormalizationOptions = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee15() {
+	        return regeneratorRuntime.wrap(function _callee15$(_context15) {
 	          while (1) {
-	            switch (_context14.prev = _context14.next) {
+	            switch (_context15.prev = _context15.next) {
 	              case 0:
-	                _context14.next = 2;
+	                _context15.next = 2;
 	                return this.getNormVectorIndex();
 
 	              case 2:
-	                return _context14.abrupt("return", this.normalizationTypes);
+	                return _context15.abrupt("return", this.normalizationTypes);
 
 	              case 3:
 	              case "end":
-	                return _context14.stop();
+	                return _context15.stop();
 	            }
 	          }
-	        }, _callee14, this);
+	        }, _callee15, this);
 	      }));
 
 	      function getNormalizationOptions() {
@@ -15469,22 +15614,22 @@
 	  }, {
 	    key: "readNormVectorIndex",
 	    value: function () {
-	      var _readNormVectorIndex = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee15(range) {
+	      var _readNormVectorIndex = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee16(range) {
 	        var data, binaryParser, nEntries;
-	        return regeneratorRuntime.wrap(function _callee15$(_context15) {
+	        return regeneratorRuntime.wrap(function _callee16$(_context16) {
 	          while (1) {
-	            switch (_context15.prev = _context15.next) {
+	            switch (_context16.prev = _context16.next) {
 	              case 0:
-	                _context15.next = 2;
+	                _context16.next = 2;
 	                return this.init();
 
 	              case 2:
 	                this.normalizationVectorIndexRange = range;
-	                _context15.next = 5;
+	                _context16.next = 5;
 	                return this.file.read(range.start, range.size);
 
 	              case 5:
-	                data = _context15.sent;
+	                data = _context16.sent;
 	                binaryParser = new BinaryParser(new DataView(data));
 	                this.normVectorIndex = {};
 	                nEntries = binaryParser.getInt();
@@ -15493,17 +15638,17 @@
 	                  this.parseNormVectorEntry(binaryParser);
 	                }
 
-	                return _context15.abrupt("return", this.normVectorIndex);
+	                return _context16.abrupt("return", this.normVectorIndex);
 
 	              case 11:
 	              case "end":
-	                return _context15.stop();
+	                return _context16.stop();
 	            }
 	          }
-	        }, _callee15, this);
+	        }, _callee16, this);
 	      }));
 
-	      function readNormVectorIndex(_x20) {
+	      function readNormVectorIndex(_x24) {
 	        return _readNormVectorIndex.apply(this, arguments);
 	      }
 
@@ -15520,31 +15665,31 @@
 	  }, {
 	    key: "readNormExpectedValuesAndNormVectorIndex",
 	    value: function () {
-	      var _readNormExpectedValuesAndNormVectorIndex = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee17() {
+	      var _readNormExpectedValuesAndNormVectorIndex = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee18() {
 	        var nviStart, byteCount, data, binaryParser, nEntries, sizeEstimate, range, processEntries, _processEntries;
 
-	        return regeneratorRuntime.wrap(function _callee17$(_context17) {
+	        return regeneratorRuntime.wrap(function _callee18$(_context18) {
 	          while (1) {
-	            switch (_context17.prev = _context17.next) {
+	            switch (_context18.prev = _context18.next) {
 	              case 0:
 	                _processEntries = function _processEntries3() {
-	                  _processEntries = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee16(nEntries, data) {
+	                  _processEntries = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee17(nEntries, data) {
 	                    var binaryParser, _sizeEstimate, _range, _data;
 
-	                    return regeneratorRuntime.wrap(function _callee16$(_context16) {
+	                    return regeneratorRuntime.wrap(function _callee17$(_context17) {
 	                      while (1) {
-	                        switch (_context16.prev = _context16.next) {
+	                        switch (_context17.prev = _context17.next) {
 	                          case 0:
 	                            binaryParser = new BinaryParser(new DataView(data));
 
 	                          case 1:
 	                            if (!(nEntries-- > 0)) {
-	                              _context16.next = 14;
+	                              _context17.next = 14;
 	                              break;
 	                            }
 
 	                            if (!(binaryParser.available() < 100)) {
-	                              _context16.next = 11;
+	                              _context17.next = 11;
 	                              break;
 	                            }
 
@@ -15556,16 +15701,16 @@
 	                              start: nviStart + byteCount,
 	                              size: _sizeEstimate
 	                            };
-	                            _context16.next = 9;
+	                            _context17.next = 9;
 	                            return this.file.read(_range.start, _range.size);
 
 	                          case 9:
-	                            _data = _context16.sent;
-	                            return _context16.abrupt("return", processEntries.call(this, nEntries, _data));
+	                            _data = _context17.sent;
+	                            return _context17.abrupt("return", processEntries.call(this, nEntries, _data));
 
 	                          case 11:
 	                            this.parseNormVectorEntry(binaryParser);
-	                            _context16.next = 1;
+	                            _context17.next = 1;
 	                            break;
 
 	                          case 14:
@@ -15573,48 +15718,48 @@
 
 	                          case 15:
 	                          case "end":
-	                            return _context16.stop();
+	                            return _context17.stop();
 	                        }
 	                      }
-	                    }, _callee16, this);
+	                    }, _callee17, this);
 	                  }));
 	                  return _processEntries.apply(this, arguments);
 	                };
 
-	                processEntries = function _processEntries2(_x21, _x22) {
+	                processEntries = function _processEntries2(_x25, _x26) {
 	                  return _processEntries.apply(this, arguments);
 	                };
 
-	                _context17.next = 4;
+	                _context18.next = 4;
 	                return this.init();
 
 	              case 4:
 	                if (!(this.normExpectedValueVectorsPosition === undefined)) {
-	                  _context17.next = 6;
+	                  _context18.next = 6;
 	                  break;
 	                }
 
-	                return _context17.abrupt("return");
+	                return _context18.abrupt("return");
 
 	              case 6:
-	                _context17.next = 8;
+	                _context18.next = 8;
 	                return this.skipExpectedValues(this.normExpectedValueVectorsPosition);
 
 	              case 8:
-	                nviStart = _context17.sent;
+	                nviStart = _context18.sent;
 	                byteCount = INT;
-	                _context17.next = 12;
+	                _context18.next = 12;
 	                return this.file.read(nviStart, INT);
 
 	              case 12:
-	                data = _context17.sent;
+	                data = _context18.sent;
 
 	                if (!(data.byteLength === 0)) {
-	                  _context17.next = 15;
+	                  _context18.next = 15;
 	                  break;
 	                }
 
-	                return _context17.abrupt("return");
+	                return _context18.abrupt("return");
 
 	              case 15:
 	                binaryParser = new BinaryParser(new DataView(data));
@@ -15624,15 +15769,15 @@
 	                  start: nviStart + byteCount,
 	                  size: sizeEstimate
 	                };
-	                _context17.next = 21;
+	                _context18.next = 21;
 	                return this.file.read(range.start, range.size);
 
 	              case 21:
-	                data = _context17.sent;
+	                data = _context18.sent;
 	                this.normalizedExpectedValueVectors = {};
 	                this.normVectorIndex = {}; // Recursively process entries
 
-	                _context17.next = 26;
+	                _context18.next = 26;
 	                return processEntries.call(this, nEntries, data);
 
 	              case 26:
@@ -15640,10 +15785,10 @@
 
 	              case 27:
 	              case "end":
-	                return _context17.stop();
+	                return _context18.stop();
 	            }
 	          }
-	        }, _callee17, this);
+	        }, _callee18, this);
 	      }));
 
 	      function readNormExpectedValuesAndNormVectorIndex() {
@@ -15663,19 +15808,19 @@
 	  }, {
 	    key: "skipExpectedValues",
 	    value: function () {
-	      var _skipExpectedValues = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee19(start) {
+	      var _skipExpectedValues = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee20(start) {
 	        var version, file, range, data, binaryParser, nEntries, parseNext, _parseNext;
 
-	        return regeneratorRuntime.wrap(function _callee19$(_context19) {
+	        return regeneratorRuntime.wrap(function _callee20$(_context20) {
 	          while (1) {
-	            switch (_context19.prev = _context19.next) {
+	            switch (_context20.prev = _context20.next) {
 	              case 0:
 	                _parseNext = function _parseNext3() {
-	                  _parseNext = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee18(start, nEntries) {
+	                  _parseNext = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee19(start, nEntries) {
 	                    var range, chunkSize, p0, data, binaryParser, type, unit, binSize, nValues, nChrScaleFactors;
-	                    return regeneratorRuntime.wrap(function _callee18$(_context18) {
+	                    return regeneratorRuntime.wrap(function _callee19$(_context19) {
 	                      while (1) {
-	                        switch (_context18.prev = _context18.next) {
+	                        switch (_context19.prev = _context19.next) {
 	                          case 0:
 	                            range = {
 	                              start: start,
@@ -15683,11 +15828,11 @@
 	                            };
 	                            chunkSize = 0;
 	                            p0 = start;
-	                            _context18.next = 5;
+	                            _context19.next = 5;
 	                            return file.read(range.start, range.size);
 
 	                          case 5:
-	                            data = _context18.sent;
+	                            data = _context19.sent;
 	                            binaryParser = new BinaryParser(new DataView(data));
 	                            type = binaryParser.getString(); // type
 
@@ -15696,42 +15841,42 @@
 	                            binSize = binaryParser.getInt(); // binSize
 
 	                            nValues = version < 9 ? binaryParser.getInt() : binaryParser.getLong();
-	                            chunkSize += binaryParser.position + nValues * (version < 9 ? DOUBLE : FLOAT);
+	                            chunkSize += binaryParser.position + nValues * (version < 9 ? DOUBLE$1 : FLOAT);
 	                            range = {
 	                              start: start + chunkSize,
 	                              size: INT
 	                            };
-	                            _context18.next = 15;
+	                            _context19.next = 15;
 	                            return file.read(range.start, range.size);
 
 	                          case 15:
-	                            data = _context18.sent;
+	                            data = _context19.sent;
 	                            binaryParser = new BinaryParser(new DataView(data));
 	                            nChrScaleFactors = binaryParser.getInt();
-	                            chunkSize += INT + nChrScaleFactors * (INT + (version < 9 ? DOUBLE : FLOAT));
+	                            chunkSize += INT + nChrScaleFactors * (INT + (version < 9 ? DOUBLE$1 : FLOAT));
 	                            nEntries--;
 
 	                            if (!(nEntries === 0)) {
-	                              _context18.next = 24;
+	                              _context19.next = 24;
 	                              break;
 	                            }
 
-	                            return _context18.abrupt("return", p0 + chunkSize);
+	                            return _context19.abrupt("return", p0 + chunkSize);
 
 	                          case 24:
-	                            return _context18.abrupt("return", parseNext(p0 + chunkSize, nEntries));
+	                            return _context19.abrupt("return", parseNext(p0 + chunkSize, nEntries));
 
 	                          case 25:
 	                          case "end":
-	                            return _context18.stop();
+	                            return _context19.stop();
 	                        }
 	                      }
-	                    }, _callee18);
+	                    }, _callee19);
 	                  }));
 	                  return _parseNext.apply(this, arguments);
 	                };
 
-	                parseNext = function _parseNext2(_x24, _x25) {
+	                parseNext = function _parseNext2(_x28, _x29) {
 	                  return _parseNext.apply(this, arguments);
 	                };
 
@@ -15744,33 +15889,33 @@
 	                  start: start,
 	                  size: INT
 	                };
-	                _context19.next = 7;
+	                _context20.next = 7;
 	                return file.read(range.start, range.size);
 
 	              case 7:
-	                data = _context19.sent;
+	                data = _context20.sent;
 	                binaryParser = new BinaryParser(new DataView(data));
 	                nEntries = binaryParser.getInt(); // Total # of expected value chunks
 
 	                if (!(nEntries === 0)) {
-	                  _context19.next = 14;
+	                  _context20.next = 14;
 	                  break;
 	                }
 
-	                return _context19.abrupt("return", start + INT);
+	                return _context20.abrupt("return", start + INT);
 
 	              case 14:
-	                return _context19.abrupt("return", parseNext(start + INT, nEntries));
+	                return _context20.abrupt("return", parseNext(start + INT, nEntries));
 
 	              case 15:
 	              case "end":
-	                return _context19.stop();
+	                return _context20.stop();
 	            }
 	          }
-	        }, _callee19, this);
+	        }, _callee20, this);
 	      }));
 
-	      function skipExpectedValues(_x23) {
+	      function skipExpectedValues(_x27) {
 	        return _skipExpectedValues.apply(this, arguments);
 	      }
 

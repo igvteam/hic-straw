@@ -1,5 +1,4 @@
 import HicFile from "./hicFile.js"
-import ContactRecord from "./contactRecord.js"
 
 class Straw {
 
@@ -19,10 +18,6 @@ class Straw {
 
     async getNormalizationOptions() {
         return this.hicFile.getNormalizationOptions()
-    }
-
-    async hasNormalizationVector(type, chr, unit, binSize) {
-        await this.hicFile.hasNormalizationVector(type, chr, unit, binSize);
     }
 
     async getNVI() {

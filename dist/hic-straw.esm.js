@@ -5914,6 +5914,14 @@ class MatrixZoomData {
     }
 
     getBlockNumbers(region1, region2, version) {
+
+        // Verify region chromosomes and swap if neccessary
+        if(region1.chr == this.chr2 && region2.chr === this.chr1) {
+            const tmp = region1;
+            region1 = region2;
+            region2 = tmp;
+        }
+
         const sameChr = this.chr1 === this.chr2;
         const binsize = this.zoom.binSize;
         const blockBinCount = this.blockBinCount;
@@ -6118,76 +6126,6 @@ class Matrix {
 
 }
 
-/*
- *  The MIT License (MIT)
- *
- * Copyright (c) 2016-2017 The Regents of the University of California
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
- * associated documentation files (the "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the
- * following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or substantial
- * portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,  FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
- * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
- * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- */
-
-
-/**
- * @author Jim Robinson
- */
-
-class NormalizationVector {
-
-    constructor(type, chrIdx, unit, resolution, values) {
-
-        var avg = mean(values), i;
-        if (avg > 0) {
-            for (i = 0; i < values.length; i++) {
-                values[i] /= avg;
-            }
-        }
-
-        this.type = type;
-        this.chrIdx = chrIdx;
-        this.unit = unit;
-        this.resolution = resolution;
-        this.data = values;
-    }
-
-    getKey() {
-        return NormalizationVector.getKey(this.type, this.chrIdx, this.unit, this.resolution);
-    }
-
-
-    static getNormalizationVectorKey(type, chrIdx, unit, resolution) {
-        return type + "_" + chrIdx + "_" + unit + "_" + resolution;
-    }
-
-}
-
-function mean (array) {
-
-    var t = 0, n = 0,
-        i;
-    for (i = 0; i < array.length; i++) {
-        if (!isNaN(array[i])) {
-            t += array[i];
-            n++;
-        }
-    }
-    return n > 0 ? t / n : 0;
-}
-
 class ContactRecord {
 
     constructor(bin1, bin2, counts) {
@@ -6240,9 +6178,83 @@ class LRU {
     }
 }
 
+/*
+ *  The MIT License (MIT)
+ *
+ * Copyright (c) 2016-2017 The Regents of the University of California
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ * associated documentation files (the "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the
+ * following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial
+ * portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,  FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ */
+const DOUBLE = 8;
+
+class NormalizationVector {
+
+    constructor(file, filePosition, nValues, dataType) {
+        this.file = file;
+        this.filePosition = filePosition;
+        this.nValues = nValues;
+        this.dataType = dataType;
+        this.cache = undefined;
+    }
+
+    async getValues(start, end) {
+
+        if(!this.cache || start < this.cache.start || end > this.cache.end) {
+            const adjustedStart = Math.max(0, start - 1000);
+            const adjustedEnd = Math.min(this.nValues, end + 1000);
+            const startPosition = this.filePosition + adjustedStart * this.dataType;
+            const sizeInBytes = (adjustedEnd - adjustedStart) * this.dataType;
+            const data = await this.file.read(startPosition, sizeInBytes);
+            if (!data) {
+                return undefined;
+            }
+            const parser = new BinaryParser(new DataView(data));
+            const n = adjustedEnd - adjustedStart;
+            const values = [];
+            for (let i = 0; i < n; i++) {
+                values[i] = this.dataType === DOUBLE ? parser.getDouble() : parser.getFloat();
+
+            }
+            this.cache = {
+                start: adjustedStart,
+                end: adjustedEnd,
+                values: values
+            };
+        }
+
+        const sliceStart = start - this.cache.start;
+        const sliceEnd = sliceStart + (end - start);
+        return this.cache.values.slice(sliceStart, sliceEnd);
+    }
+
+    getKey() {
+        return NormalizationVector.getKey(this.type, this.chrIdx, this.unit, this.resolution);
+    }
+
+
+    static getNormalizationVectorKey(type, chrIdx, unit, resolution) {
+        return type + "_" + chrIdx + "_" + unit + "_" + resolution;
+    }
+}
+
 const isNode$3 = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
 const Short_MIN_VALUE = -32768;
-const DOUBLE = 8;
+const DOUBLE$1 = 8;
 const FLOAT = 4;
 const INT = 4;
 const GoogleRateLimiter = new RateLimiter(100);
@@ -6256,9 +6268,9 @@ class HicFile {
 
         this.loadFragData = args.loadFragData;
         this.fragmentSitesCache = {};
-        this.normVectorCache = {};
+        this.normVectorCache = new LRU(10);
         this.normalizationTypes = ['NONE'];
-        this.matrixCache = new LRU();
+        this.matrixCache = new LRU(10);
         this.blockCache = new BlockCache();
 
         // args may specify an io.File object, a local path (Node only), or a url
@@ -6534,45 +6546,58 @@ class HicFile {
 
     }
 
-    async getContactRecords(normalization, region1, region2, units, binsize) {
+    async getContactRecords(normalization, region1, region2, units, binsize, allRecords = false) {
+
+        await this.init();
+
+        const idx1 = this.chromosomeIndexMap[this.getFileChrName(region1.chr)];
+        const idx2 = this.chromosomeIndexMap[this.getFileChrName(region2.chr)];
+
+        const transpose = (idx1 > idx2) || (idx1 === idx2 && region1.start >= region2.end);
+        if (transpose) {
+            const tmp = region1;
+            region1 = region2;
+            region2 = tmp;
+        }
 
         const blocks = await this.getBlocks(region1, region2, units, binsize);
-
         if (!blocks || blocks.length === 0) {
             return []
         }
 
-        let normVector1;
-        let normVector2;
-        const isNorm = normalization && normalization !== "NONE";
-        const chr1 = this.getFileChrName(region1.chr);
-        const chr2 = this.getFileChrName(region2.chr);
-        if (isNorm) {
-            normVector1 = await this.getNormalizationVector(normalization, chr1, units, binsize);
-            if (chr1 === chr2) {
-                normVector2 = normVector1;
-            } else {
-                normVector2 = await this.getNormalizationVector(normalization, chr2, units, binsize);
-            }
-        }
-
         const contactRecords = [];
-        const sameChr = region1.chr === region2.chr;
         const x1 = region1.start / binsize;
         const x2 = region1.end / binsize;
         const y1 = region2.start / binsize;
         const y2 = region2.end / binsize;
         for (let block of blocks) {
             if (block) { // An undefined block is most likely caused by a base pair range outside the chromosome
-                for (let rec of block.records) {
+                let normVector1;
+                let normVector2;
+                let isNorm = normalization && normalization !== "NONE";
+                const chr1 = this.getFileChrName(region1.chr);
+                const chr2 = this.getFileChrName(region2.chr);
+                if (isNorm) {
+                    const nv1 = await this.getNormalizationVector(normalization, chr1, units, binsize);
+                    const nv2 = (chr1 === chr2) ? nv1 : await this.getNormalizationVector(normalization, chr2, units, binsize);
 
-                    if (rec.bin1 >= x1 && rec.bin1 <= x2 && rec.bin2 >= y1 && rec.bin2 <= y2 ||
-                        sameChr && (rec.bin1 >= y1 && rec.bin1 <= y2 && rec.bin2 >= x1 && rec.bin2 <= x2)) {
+                    if(nv1 && nv2) {
+                        normVector1 = await nv1.getValues(x1, x2);
+                        normVector2 = await nv2.getValues(y1, y2);
+                    }
+                    else {
+                        isNorm = false;
+                        // Raise message and switch pulldown
+                    }
+                }
+
+                for (let rec of block.records) {
+                    if (allRecords || (rec.bin1 >= x1 && rec.bin1 < x2 && rec.bin2 >= y1 && rec.bin2 < y2)) {
                         if (isNorm) {
                             const x = rec.bin1;
                             const y = rec.bin2;
-                            const nvnv = normVector1.data[x] * normVector2.data[y];
-                            if (nvnv[x] !== 0 && !isNaN(nvnv)) {
+                            const nvnv = normVector1[x - x1] * normVector2[y - y1];
+                            if (nvnv !== 0 && !isNaN(nvnv)) {
                                 const counts = rec.counts / nvnv;
                                 contactRecords.push(new ContactRecord(x, y, counts));
                             }
@@ -6723,6 +6748,20 @@ class HicFile {
         }
     };
 
+    async hasNormalizationVector(type, chr, unit, binSize) {
+        await this.init();
+        let chrIdx;
+        if (Number.isInteger(chr)) {
+            chrIdx = chr;
+        } else {
+            const canonicalName = this.getFileChrName(chr);
+            chrIdx = this.chromosomeIndexMap[canonicalName];
+        }
+        const key = getNormalizationVectorKey(type, chrIdx, unit.toString(), binSize);
+        const normVectorIndex = await this.getNormVectorIndex();
+        return normVectorIndex && normVectorIndex[key];
+    }
+
     async getNormalizationVector(type, chr, unit, binSize) {
 
         await this.init();
@@ -6735,11 +6774,10 @@ class HicFile {
             chrIdx = this.chromosomeIndexMap[canonicalName];
         }
 
-
         const key = getNormalizationVectorKey(type, chrIdx, unit.toString(), binSize);
 
-        if (this.normVectorCache.hasOwnProperty(key)) {
-            return Promise.resolve(this.normVectorCache[key]);
+        if (this.normVectorCache.has(key)) {
+            return this.normVectorCache.get(key);
         }
 
         const normVectorIndex = await this.getNormVectorIndex();
@@ -6754,7 +6792,7 @@ class HicFile {
             return undefined;
         }
 
-        const data = await this.file.read(idx.filePosition, idx.size);
+        const data = await this.file.read(idx.filePosition, 8);
 
         if (!data) {
             return undefined;
@@ -6762,19 +6800,11 @@ class HicFile {
 
         const parser = new BinaryParser(new DataView(data));
         const nValues = this.version < 9 ? parser.getInt() : parser.getLong();
-        const values = [];
-        let allNaN = true;
-        for (let i = 0; i < nValues; i++) {
-            values[i] = this.version < 9 ? parser.getDouble() : parser.getFloat();
-            if (!isNaN(values[i])) {
-                allNaN = false;
-            }
-        }
-        if (allNaN) {
-            return undefined;
-        } else {
-            return new NormalizationVector(type, chrIdx, unit, binSize, values);
-        }
+        const dataType = this.version < 9 ? DOUBLE$1 : FLOAT;
+        const filePosition = this.version < 9 ? idx.filePosition + 4 : idx.filePosition + 8;
+        const nv = new NormalizationVector(this.file, filePosition, nValues, dataType);
+        this.normVectorCache.set(key, nv);
+        return nv;
 
     }
 
@@ -6952,13 +6982,13 @@ class HicFile {
             const binSize = binaryParser.getInt(); // binSize
             const nValues = version < 9 ? binaryParser.getInt() : binaryParser.getLong();
 
-            chunkSize += binaryParser.position + nValues * (version < 9 ? DOUBLE : FLOAT);
+            chunkSize += binaryParser.position + nValues * (version < 9 ? DOUBLE$1 : FLOAT);
 
             range = {start: start + chunkSize, size: INT};
             data = await file.read(range.start, range.size);
             binaryParser = new BinaryParser(new DataView(data));
             const nChrScaleFactors = binaryParser.getInt();
-            chunkSize += (INT + nChrScaleFactors * (INT + (version < 9 ? DOUBLE : FLOAT)));
+            chunkSize += (INT + nChrScaleFactors * (INT + (version < 9 ? DOUBLE$1 : FLOAT)));
 
 
             nEntries--;
@@ -7087,7 +7117,7 @@ class Straw {
         return await this.hicFile.getMetaData()
     }
 
-//straw <NONE/VC/VC_SQRT/KR> <ile> <chr1>[:x1:x2] <chr2>[:y1:y2] <BP/FRAG> <binsize>
+    //straw <NONE/VC/VC_SQRT/KR> <ile> <chr1>[:x1:x2] <chr2>[:y1:y2] <BP/FRAG> <binsize>
     async getContactRecords(normalization, region1, region2, units, binsize) {
         return this.hicFile.getContactRecords(normalization, region1, region2, units, binsize);
     }
