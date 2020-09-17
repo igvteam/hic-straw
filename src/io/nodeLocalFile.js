@@ -29,7 +29,8 @@ class NodeLocalFile {
         })
 
         //TODO -- compare result.bytesRead with length
-        const arrayBuffer = result.buffer.buffer;
+        const b = result.buffer;
+        const arrayBuffer = b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength);
         return arrayBuffer
     }
 }
