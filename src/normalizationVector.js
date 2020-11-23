@@ -50,7 +50,7 @@ class NormalizationVector {
             const adjustedStart = Math.max(0, start - 1000);
             const adjustedEnd = Math.min(this.nValues, end + 1000);
             const startPosition = this.filePosition + adjustedStart * this.dataType;
-            const sizeInBytes = (adjustedEnd - adjustedStart) * this.dataType;
+            const sizeInBytes = Math.ceil(adjustedEnd - adjustedStart) * this.dataType;
             const data = await this.file.read(startPosition, sizeInBytes);
             if (!data) {
                 return undefined;
