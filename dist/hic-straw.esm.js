@@ -5433,7 +5433,8 @@ class NodeLocalFile {
         });
 
         //TODO -- compare result.bytesRead with length
-        const arrayBuffer = result.buffer.buffer;
+        const b = result.buffer;
+        const arrayBuffer = b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength);
         return arrayBuffer
     }
 }
@@ -5450,8 +5451,8 @@ class RemoteFile {
 
     async read(position, length) {
 
+        length = Math.ceil(length);
         const headers = this.config.headers || {};
-
         const rangeString = "bytes=" + position + "-" + (position + length - 1);
         headers['Range'] = rangeString;
 
@@ -6218,13 +6219,14 @@ class NormalizationVector {
             const adjustedStart = Math.max(0, start - 1000);
             const adjustedEnd = Math.min(this.nValues, end + 1000);
             const startPosition = this.filePosition + adjustedStart * this.dataType;
-            const sizeInBytes = (adjustedEnd - adjustedStart) * this.dataType;
+            const n = adjustedEnd - adjustedStart;
+            const sizeInBytes = n  * this.dataType;
             const data = await this.file.read(startPosition, sizeInBytes);
             if (!data) {
                 return undefined;
             }
             const parser = new BinaryParser(new DataView(data));
-            const n = adjustedEnd - adjustedStart;
+
             const values = [];
             for (let i = 0; i < n; i++) {
                 values[i] = this.dataType === DOUBLE ? parser.getDouble() : parser.getFloat();
@@ -6570,6 +6572,10 @@ class HicFile {
         const x2 = region1.end / binsize;
         const y1 = region2.start / binsize;
         const y2 = region2.end / binsize;
+        const nvX1 = Math.floor(x1);
+        const nvX2 = Math.ceil(x2);
+        const nvY1 = Math.floor(y1);
+        const nvY2 = Math.ceil(y2);
         for (let block of blocks) {
             if (block) { // An undefined block is most likely caused by a base pair range outside the chromosome
                 let normVector1;
@@ -6582,8 +6588,8 @@ class HicFile {
                     const nv2 = (chr1 === chr2) ? nv1 : await this.getNormalizationVector(normalization, chr2, units, binsize);
 
                     if(nv1 && nv2) {
-                        normVector1 = await nv1.getValues(x1, x2);
-                        normVector2 = await nv2.getValues(y1, y2);
+                        normVector1 = await nv1.getValues(nvX1, nvX2);
+                        normVector2 = await nv2.getValues(nvY1, nvY2);
                     }
                     else {
                         isNorm = false;
@@ -6596,7 +6602,7 @@ class HicFile {
                         if (isNorm) {
                             const x = rec.bin1;
                             const y = rec.bin2;
-                            const nvnv = normVector1[x - x1] * normVector2[y - y1];
+                            const nvnv = normVector1[x - nvX1] * normVector2[y - nvY1];
                             if (nvnv !== 0 && !isNaN(nvnv)) {
                                 const counts = rec.counts / nvnv;
                                 contactRecords.push(new ContactRecord(x, y, counts));

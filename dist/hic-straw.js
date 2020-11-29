@@ -28,6 +28,25 @@
 	    var asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator";
 	    var toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag";
 
+	    function define(obj, key, value) {
+	      Object.defineProperty(obj, key, {
+	        value: value,
+	        enumerable: true,
+	        configurable: true,
+	        writable: true
+	      });
+	      return obj[key];
+	    }
+
+	    try {
+	      // IE 8 has a broken Object.defineProperty that only works on DOM objects.
+	      define({}, "");
+	    } catch (err) {
+	      define = function (obj, key, value) {
+	        return obj[key] = value;
+	      };
+	    }
+
 	    function wrap(innerFn, outerFn, self, tryLocsList) {
 	      // If outerFn provided and outerFn.prototype is a Generator, then outerFn.prototype instanceof Generator.
 	      var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator;
@@ -101,14 +120,14 @@
 	    var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype);
 	    GeneratorFunction.prototype = Gp.constructor = GeneratorFunctionPrototype;
 	    GeneratorFunctionPrototype.constructor = GeneratorFunction;
-	    GeneratorFunctionPrototype[toStringTagSymbol] = GeneratorFunction.displayName = "GeneratorFunction"; // Helper for defining the .next, .throw, and .return methods of the
+	    GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"); // Helper for defining the .next, .throw, and .return methods of the
 	    // Iterator interface in terms of a single ._invoke method.
 
 	    function defineIteratorMethods(prototype) {
 	      ["next", "throw", "return"].forEach(function (method) {
-	        prototype[method] = function (arg) {
+	        define(prototype, method, function (arg) {
 	          return this._invoke(method, arg);
-	        };
+	        });
 	      });
 	    }
 
@@ -124,10 +143,7 @@
 	        Object.setPrototypeOf(genFun, GeneratorFunctionPrototype);
 	      } else {
 	        genFun.__proto__ = GeneratorFunctionPrototype;
-
-	        if (!(toStringTagSymbol in genFun)) {
-	          genFun[toStringTagSymbol] = "GeneratorFunction";
-	        }
+	        define(genFun, toStringTagSymbol, "GeneratorFunction");
 	      }
 
 	      genFun.prototype = Object.create(Gp);
@@ -383,7 +399,7 @@
 
 
 	    defineIteratorMethods(Gp);
-	    Gp[toStringTagSymbol] = "Generator"; // A Generator should always return itself as the iterator object when the
+	    define(Gp, toStringTagSymbol, "Generator"); // A Generator should always return itself as the iterator object when the
 	    // @@iterator function is called on it. Some browsers' implementations of the
 	    // iterator prototype chain incorrectly implement this, causing the Generator
 	    // object to not be returned from this call. This ensures that doesn't happen.
@@ -12728,7 +12744,7 @@
 	    key: "read",
 	    value: function () {
 	      var _read = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(position, length) {
-	        var buffer, fd, result, arrayBuffer;
+	        var buffer, fd, result, b, arrayBuffer;
 	        return regeneratorRuntime.wrap(function _callee$(_context) {
 	          while (1) {
 	            switch (_context.prev = _context.next) {
@@ -12747,10 +12763,11 @@
 	                fs.close(fd, function (error) {// TODO Do something with error
 	                }); //TODO -- compare result.bytesRead with length
 
-	                arrayBuffer = result.buffer.buffer;
+	                b = result.buffer;
+	                arrayBuffer = b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength);
 	                return _context.abrupt("return", arrayBuffer);
 
-	              case 10:
+	              case 11:
 	              case "end":
 	                return _context.stop();
 	            }
@@ -12958,6 +12975,7 @@
 	                  return _resolveToken.apply(this, arguments);
 	                };
 
+	                length = Math.ceil(length);
 	                headers = this.config.headers || {};
 	                rangeString = "bytes=" + position + "-" + (position + length - 1);
 	                headers['Range'] = rangeString;
@@ -12984,7 +13002,7 @@
 	                  url = addParameter(url, "key", this.config.apiKey);
 	                }
 
-	                _context2.next = 10;
+	                _context2.next = 11;
 	                return crossFetch(url, {
 	                  method: 'GET',
 	                  headers: headers,
@@ -12992,12 +13010,12 @@
 	                  mode: 'cors'
 	                });
 
-	              case 10:
+	              case 11:
 	                response = _context2.sent;
 	                status = response.status;
 
 	                if (!(status >= 400)) {
-	                  _context2.next = 19;
+	                  _context2.next = 20;
 	                  break;
 	                }
 
@@ -13006,10 +13024,10 @@
 	                err.code = status;
 	                throw err;
 
-	              case 19:
+	              case 20:
 	                return _context2.abrupt("return", response.arrayBuffer());
 
-	              case 20:
+	              case 21:
 	              case "end":
 	                return _context2.stop();
 	            }
@@ -14250,7 +14268,7 @@
 	    key: "getValues",
 	    value: function () {
 	      var _getValues = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(start, end) {
-	        var adjustedStart, adjustedEnd, startPosition, sizeInBytes, data, parser, n, values, i, sliceStart, sliceEnd;
+	        var adjustedStart, adjustedEnd, startPosition, n, sizeInBytes, data, parser, values, i, sliceStart, sliceEnd;
 	        return regeneratorRuntime.wrap(function _callee$(_context) {
 	          while (1) {
 	            switch (_context.prev = _context.next) {
@@ -14263,23 +14281,23 @@
 	                adjustedStart = Math.max(0, start - 1000);
 	                adjustedEnd = Math.min(this.nValues, end + 1000);
 	                startPosition = this.filePosition + adjustedStart * this.dataType;
-	                sizeInBytes = (adjustedEnd - adjustedStart) * this.dataType;
-	                _context.next = 7;
+	                n = adjustedEnd - adjustedStart;
+	                sizeInBytes = n * this.dataType;
+	                _context.next = 8;
 	                return this.file.read(startPosition, sizeInBytes);
 
-	              case 7:
+	              case 8:
 	                data = _context.sent;
 
 	                if (data) {
-	                  _context.next = 10;
+	                  _context.next = 11;
 	                  break;
 	                }
 
 	                return _context.abrupt("return", undefined);
 
-	              case 10:
+	              case 11:
 	                parser = new BinaryParser(new DataView(data));
-	                n = adjustedEnd - adjustedStart;
 	                values = [];
 
 	                for (i = 0; i < n; i++) {
@@ -14875,6 +14893,10 @@
 	            x2,
 	            y1,
 	            y2,
+	            nvX1,
+	            nvX2,
+	            nvY1,
+	            nvY2,
 	            _iterator,
 	            _step,
 	            block,
@@ -14932,21 +14954,25 @@
 	                x2 = region1.end / binsize;
 	                y1 = region2.start / binsize;
 	                y2 = region2.end / binsize;
+	                nvX1 = Math.floor(x1);
+	                nvX2 = Math.ceil(x2);
+	                nvY1 = Math.floor(y1);
+	                nvY2 = Math.ceil(y2);
 	                _iterator = _createForOfIteratorHelper(blocks);
-	                _context9.prev = 18;
+	                _context9.prev = 22;
 
 	                _iterator.s();
 
-	              case 20:
+	              case 24:
 	                if ((_step = _iterator.n()).done) {
-	                  _context9.next = 54;
+	                  _context9.next = 58;
 	                  break;
 	                }
 
 	                block = _step.value;
 
 	                if (!block) {
-	                  _context9.next = 52;
+	                  _context9.next = 56;
 	                  break;
 	                }
 
@@ -14958,57 +14984,57 @@
 	                chr2 = this.getFileChrName(region2.chr);
 
 	                if (!isNorm) {
-	                  _context9.next = 50;
+	                  _context9.next = 54;
 	                  break;
 	                }
 
-	                _context9.next = 31;
+	                _context9.next = 35;
 	                return this.getNormalizationVector(normalization, chr1, units, binsize);
 
-	              case 31:
+	              case 35:
 	                nv1 = _context9.sent;
 
 	                if (!(chr1 === chr2)) {
-	                  _context9.next = 36;
+	                  _context9.next = 40;
 	                  break;
 	                }
 
 	                _context9.t0 = nv1;
-	                _context9.next = 39;
+	                _context9.next = 43;
 	                break;
 
-	              case 36:
-	                _context9.next = 38;
+	              case 40:
+	                _context9.next = 42;
 	                return this.getNormalizationVector(normalization, chr2, units, binsize);
 
-	              case 38:
+	              case 42:
 	                _context9.t0 = _context9.sent;
 
-	              case 39:
+	              case 43:
 	                nv2 = _context9.t0;
 
 	                if (!(nv1 && nv2)) {
-	                  _context9.next = 49;
+	                  _context9.next = 53;
 	                  break;
 	                }
 
-	                _context9.next = 43;
-	                return nv1.getValues(x1, x2);
+	                _context9.next = 47;
+	                return nv1.getValues(nvX1, nvX2);
 
-	              case 43:
+	              case 47:
 	                normVector1 = _context9.sent;
-	                _context9.next = 46;
-	                return nv2.getValues(y1, y2);
-
-	              case 46:
-	                normVector2 = _context9.sent;
 	                _context9.next = 50;
-	                break;
-
-	              case 49:
-	                isNorm = false; // Raise message and switch pulldown
+	                return nv2.getValues(nvY1, nvY2);
 
 	              case 50:
+	                normVector2 = _context9.sent;
+	                _context9.next = 54;
+	                break;
+
+	              case 53:
+	                isNorm = false; // Raise message and switch pulldown
+
+	              case 54:
 	                _iterator2 = _createForOfIteratorHelper(block.records);
 
 	                try {
@@ -15019,7 +15045,7 @@
 	                      if (isNorm) {
 	                        x = rec.bin1;
 	                        y = rec.bin2;
-	                        nvnv = normVector1[x - x1] * normVector2[y - y1];
+	                        nvnv = normVector1[x - nvX1] * normVector2[y - nvY1];
 
 	                        if (nvnv !== 0 && !isNaN(nvnv)) {
 	                          counts = rec.counts / nvnv;
@@ -15036,36 +15062,36 @@
 	                  _iterator2.f();
 	                }
 
-	              case 52:
-	                _context9.next = 20;
-	                break;
-
-	              case 54:
-	                _context9.next = 59;
-	                break;
-
 	              case 56:
-	                _context9.prev = 56;
-	                _context9.t1 = _context9["catch"](18);
+	                _context9.next = 24;
+	                break;
+
+	              case 58:
+	                _context9.next = 63;
+	                break;
+
+	              case 60:
+	                _context9.prev = 60;
+	                _context9.t1 = _context9["catch"](22);
 
 	                _iterator.e(_context9.t1);
 
-	              case 59:
-	                _context9.prev = 59;
+	              case 63:
+	                _context9.prev = 63;
 
 	                _iterator.f();
 
-	                return _context9.finish(59);
+	                return _context9.finish(63);
 
-	              case 62:
+	              case 66:
 	                return _context9.abrupt("return", contactRecords);
 
-	              case 63:
+	              case 67:
 	              case "end":
 	                return _context9.stop();
 	            }
 	          }
-	        }, _callee9, this, [[18, 56, 59, 62]]);
+	        }, _callee9, this, [[22, 60, 63, 66]]);
 	      }));
 
 	      function getContactRecords(_x5, _x6, _x7, _x8, _x9) {
