@@ -53,9 +53,7 @@ suite('HicFile', function () {
         const unit = "BP"
         const binSize = 100000
         const normVector = await hicFile.getNormalizationVector(type, chr, unit, binSize)
-        assert.equal(normVector.data.length, 515)
-        assert.ok(normVector)
-
+        assert.equal(normVector.nValues, 515)
     })
 
     test('remote file read header', async function () {

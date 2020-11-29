@@ -50,13 +50,14 @@ class NormalizationVector {
             const adjustedStart = Math.max(0, start - 1000);
             const adjustedEnd = Math.min(this.nValues, end + 1000);
             const startPosition = this.filePosition + adjustedStart * this.dataType;
-            const sizeInBytes = (adjustedEnd - adjustedStart) * this.dataType;
+            const n = adjustedEnd - adjustedStart;
+            const sizeInBytes = n  * this.dataType;
             const data = await this.file.read(startPosition, sizeInBytes);
             if (!data) {
                 return undefined;
             }
             const parser = new BinaryParser(new DataView(data));
-            const n = adjustedEnd - adjustedStart;
+
             const values = [];
             for (let i = 0; i < n; i++) {
                 values[i] = this.dataType === DOUBLE ? parser.getDouble() : parser.getFloat();

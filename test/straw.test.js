@@ -1,6 +1,7 @@
 import {assert} from 'chai';
 import Straw from '../src/straw';
 import NodeLocalFile from '../src/io/nodeLocalFile';
+import RemoteFile from "../src/io/remoteFile.js";
 
 suite('Straw', function () {
 
@@ -97,7 +98,7 @@ suite('Straw', function () {
             10000
         )
 
-        assert.equal(contactRecords.length, 341 - 110)  // Earlier versions contained 110 duplicates
+        assert.equal(contactRecords.length, 210)  // Earlier versions contained 110 duplicates
 
     })
 
@@ -179,7 +180,7 @@ suite('Straw', function () {
             "BP",
             binSize
         )
-        assert.equal(contactRecords.length, 10);
+        assert.equal(contactRecords.length, 6);
 
         // convention is bin2 > bin1,  other diagonal can be inferred by transposition
         for(let record of contactRecords) {

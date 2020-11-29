@@ -334,6 +334,10 @@ class HicFile {
         const x2 = region1.end / binsize
         const y1 = region2.start / binsize
         const y2 = region2.end / binsize
+        const nvX1 = Math.floor(x1);
+        const nvX2 = Math.ceil(x2);
+        const nvY1 = Math.floor(y1);
+        const nvY2 = Math.ceil(y2);
         for (let block of blocks) {
             if (block) { // An undefined block is most likely caused by a base pair range outside the chromosome
                 let normVector1;
@@ -346,8 +350,8 @@ class HicFile {
                     const nv2 = (chr1 === chr2) ? nv1 : await this.getNormalizationVector(normalization, chr2, units, binsize);
 
                     if(nv1 && nv2) {
-                        normVector1 = await nv1.getValues(x1, x2);
-                        normVector2 = await nv2.getValues(y1, y2);
+                        normVector1 = await nv1.getValues(nvX1, nvX2);
+                        normVector2 = await nv2.getValues(nvY1, nvY2);
                     }
                     else {
                         isNorm = false;
@@ -360,7 +364,7 @@ class HicFile {
                         if (isNorm) {
                             const x = rec.bin1;
                             const y = rec.bin2;
-                            const nvnv = normVector1[x - x1] * normVector2[y - y1];
+                            const nvnv = normVector1[x - nvX1] * normVector2[y - nvY1];
                             if (nvnv !== 0 && !isNaN(nvnv)) {
                                 const counts = rec.counts / nvnv;
                                 contactRecords.push(new ContactRecord(x, y, counts));

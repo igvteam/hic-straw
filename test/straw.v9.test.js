@@ -34,7 +34,7 @@ suite('Straw v9', function () {
             "BP",
             10000
         )
-        assert.equal(231, contactRecords.length)
+        assert.equal(210, contactRecords.length)
 
         // This is an on-diagonal block,  convention is 1 diagonal is returned only, other can be inferred by transposition
         for(let record of contactRecords) {
@@ -70,7 +70,8 @@ suite('Straw v9', function () {
             "BP",
             10000
         )
-        assert.equal(344, contactRecords.length)
+        const nRecords = contactRecords.length
+        assert.ok(nRecords > 0)
 
         const contactRecordsTransposed = await straw.getContactRecords(
             "NONE",
@@ -79,7 +80,7 @@ suite('Straw v9', function () {
             "BP",
             10000
         )
-        assert.equal(344, contactRecordsTransposed.length)
+        assert.equal(nRecords, contactRecordsTransposed.length)
 
 
     })
@@ -101,7 +102,7 @@ suite('Straw v9', function () {
             "BP",
             500000
         )
-        assert.equal(21308, contactRecords.length)
+        assert.equal(21684, contactRecords.length)
 
         const contactRecordsTransposed = await straw.getContactRecords(
             "SCALE",
@@ -177,8 +178,7 @@ suite('Straw v9', function () {
         const unit = "BP"
         const binSize = 100000
         const normVector = await hicFile.getNormalizationVector(type, chr, unit, binSize)
-        assert.equal(normVector.data.length, 515)
-        assert.ok(normVector)
+        assert.equal(normVector.nValues, 515)
 
     })
 })

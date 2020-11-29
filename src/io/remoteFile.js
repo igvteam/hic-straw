@@ -12,8 +12,8 @@ class RemoteFile {
 
     async read(position, length) {
 
+        length = Math.ceil(length);
         const headers = this.config.headers || {}
-
         const rangeString = "bytes=" + position + "-" + (position + length - 1)
         headers['Range'] = rangeString
 
