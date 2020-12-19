@@ -2157,6 +2157,69 @@
 	  }
 	});
 
+	var createMethod$2 = function (IS_RIGHT) {
+	  return function (that, callbackfn, argumentsLength, memo) {
+	    aFunction$1(callbackfn);
+	    var O = toObject(that);
+	    var self = indexedObject(O);
+	    var length = toLength(O.length);
+	    var index = IS_RIGHT ? length - 1 : 0;
+	    var i = IS_RIGHT ? -1 : 1;
+	    if (argumentsLength < 2) while (true) {
+	      if (index in self) {
+	        memo = self[index];
+	        index += i;
+	        break;
+	      }
+
+	      index += i;
+
+	      if (IS_RIGHT ? index < 0 : length <= index) {
+	        throw TypeError('Reduce of empty array with no initial value');
+	      }
+	    }
+
+	    for (; IS_RIGHT ? index >= 0 : length > index; index += i) if (index in self) {
+	      memo = callbackfn(memo, self[index], index, O);
+	    }
+
+	    return memo;
+	  };
+	};
+
+	var arrayReduce = {
+	  // `Array.prototype.reduce` method
+	  // https://tc39.github.io/ecma262/#sec-array.prototype.reduce
+	  left: createMethod$2(false),
+	  // `Array.prototype.reduceRight` method
+	  // https://tc39.github.io/ecma262/#sec-array.prototype.reduceright
+	  right: createMethod$2(true)
+	};
+
+	var engineIsNode = classofRaw(global_1.process) == 'process';
+
+	var $reduce = arrayReduce.left;
+	var STRICT_METHOD$1 = arrayMethodIsStrict('reduce');
+	var USES_TO_LENGTH$3 = arrayMethodUsesToLength('reduce', {
+	  1: 0
+	}); // Chrome 80-82 has a critical bug
+	// https://bugs.chromium.org/p/chromium/issues/detail?id=1049982
+
+	var CHROME_BUG = !engineIsNode && engineV8Version > 79 && engineV8Version < 83; // `Array.prototype.reduce` method
+	// https://tc39.github.io/ecma262/#sec-array.prototype.reduce
+
+	_export({
+	  target: 'Array',
+	  proto: true,
+	  forced: !STRICT_METHOD$1 || !USES_TO_LENGTH$3 || CHROME_BUG
+	}, {
+	  reduce: function reduce(callbackfn
+	  /* , initialValue */
+	  ) {
+	    return $reduce(this, callbackfn, arguments.length, arguments.length > 1 ? arguments[1] : undefined);
+	  }
+	});
+
 	var defineProperty$2 = objectDefineProperty.f;
 	var FunctionPrototype = Function.prototype;
 	var FunctionPrototypeToString = FunctionPrototype.toString;
@@ -2193,7 +2256,7 @@
 	var ltrim = RegExp('^' + whitespace + whitespace + '*');
 	var rtrim = RegExp(whitespace + whitespace + '*$'); // `String.prototype.{ trim, trimStart, trimEnd, trimLeft, trimRight }` methods implementation
 
-	var createMethod$2 = function (TYPE) {
+	var createMethod$3 = function (TYPE) {
 	  return function ($this) {
 	    var string = String(requireObjectCoercible($this));
 	    if (TYPE & 1) string = string.replace(ltrim, '');
@@ -2205,13 +2268,13 @@
 	var stringTrim = {
 	  // `String.prototype.{ trimLeft, trimStart }` methods
 	  // https://tc39.github.io/ecma262/#sec-string.prototype.trimstart
-	  start: createMethod$2(1),
+	  start: createMethod$3(1),
 	  // `String.prototype.{ trimRight, trimEnd }` methods
 	  // https://tc39.github.io/ecma262/#sec-string.prototype.trimend
-	  end: createMethod$2(2),
+	  end: createMethod$3(2),
 	  // `String.prototype.trim` method
 	  // https://tc39.github.io/ecma262/#sec-string.prototype.trim
-	  trim: createMethod$2(3)
+	  trim: createMethod$3(3)
 	};
 
 	var getOwnPropertyNames = objectGetOwnPropertyNames.f;
@@ -2372,6 +2435,50 @@
 	    unsafe: true
 	  });
 	}
+
+	var propertyIsEnumerable = objectPropertyIsEnumerable.f; // `Object.{ entries, values }` methods implementation
+
+	var createMethod$4 = function (TO_ENTRIES) {
+	  return function (it) {
+	    var O = toIndexedObject(it);
+	    var keys = objectKeys(O);
+	    var length = keys.length;
+	    var i = 0;
+	    var result = [];
+	    var key;
+
+	    while (length > i) {
+	      key = keys[i++];
+
+	      if (!descriptors || propertyIsEnumerable.call(O, key)) {
+	        result.push(TO_ENTRIES ? [key, O[key]] : O[key]);
+	      }
+	    }
+
+	    return result;
+	  };
+	};
+
+	var objectToArray = {
+	  // `Object.entries` method
+	  // https://tc39.github.io/ecma262/#sec-object.entries
+	  entries: createMethod$4(true),
+	  // `Object.values` method
+	  // https://tc39.github.io/ecma262/#sec-object.values
+	  values: createMethod$4(false)
+	};
+
+	var $values = objectToArray.values; // `Object.values` method
+	// https://tc39.github.io/ecma262/#sec-object.values
+
+	_export({
+	  target: 'Object',
+	  stat: true
+	}, {
+	  values: function values(O) {
+	    return $values(O);
+	  }
+	});
 
 	var nativePromiseConstructor = global_1.Promise;
 
@@ -2550,8 +2657,6 @@
 	};
 
 	var engineIsIos = /(iphone|ipod|ipad).*applewebkit/i.test(engineUserAgent);
-
-	var engineIsNode = classofRaw(global_1.process) == 'process';
 
 	var location = global_1.location;
 	var set$1 = global_1.setImmediate;
@@ -3386,7 +3491,7 @@
 	  }
 	});
 
-	var createMethod$3 = function (CONVERT_TO_STRING) {
+	var createMethod$5 = function (CONVERT_TO_STRING) {
 	  return function ($this, pos) {
 	    var S = String(requireObjectCoercible($this));
 	    var position = toInteger(pos);
@@ -3401,10 +3506,10 @@
 	var stringMultibyte = {
 	  // `String.prototype.codePointAt` method
 	  // https://tc39.github.io/ecma262/#sec-string.prototype.codepointat
-	  codeAt: createMethod$3(false),
+	  codeAt: createMethod$5(false),
 	  // `String.prototype.at` method
 	  // https://github.com/mathiasbynens/String.prototype.at
-	  charAt: createMethod$3(true)
+	  charAt: createMethod$5(true)
 	};
 
 	var charAt = stringMultibyte.charAt;
@@ -4743,13 +4848,13 @@
 	var min$5 = Math.min;
 	var nativeLastIndexOf = [].lastIndexOf;
 	var NEGATIVE_ZERO$1 = !!nativeLastIndexOf && 1 / [1].lastIndexOf(1, -0) < 0;
-	var STRICT_METHOD$1 = arrayMethodIsStrict('lastIndexOf'); // For preventing possible almost infinite loop in non-standard implementations, test the forward version of the method
+	var STRICT_METHOD$2 = arrayMethodIsStrict('lastIndexOf'); // For preventing possible almost infinite loop in non-standard implementations, test the forward version of the method
 
-	var USES_TO_LENGTH$3 = arrayMethodUsesToLength('indexOf', {
+	var USES_TO_LENGTH$4 = arrayMethodUsesToLength('indexOf', {
 	  ACCESSORS: true,
 	  1: 0
 	});
-	var FORCED$2 = NEGATIVE_ZERO$1 || !STRICT_METHOD$1 || !USES_TO_LENGTH$3; // `Array.prototype.lastIndexOf` method implementation
+	var FORCED$2 = NEGATIVE_ZERO$1 || !STRICT_METHOD$2 || !USES_TO_LENGTH$4; // `Array.prototype.lastIndexOf` method implementation
 	// https://tc39.github.io/ecma262/#sec-array.prototype.lastindexof
 
 	var arrayLastIndexOf = FORCED$2 ? function lastIndexOf(searchElement
@@ -4793,46 +4898,7 @@
 	  });
 	});
 
-	var createMethod$4 = function (IS_RIGHT) {
-	  return function (that, callbackfn, argumentsLength, memo) {
-	    aFunction$1(callbackfn);
-	    var O = toObject(that);
-	    var self = indexedObject(O);
-	    var length = toLength(O.length);
-	    var index = IS_RIGHT ? length - 1 : 0;
-	    var i = IS_RIGHT ? -1 : 1;
-	    if (argumentsLength < 2) while (true) {
-	      if (index in self) {
-	        memo = self[index];
-	        index += i;
-	        break;
-	      }
-
-	      index += i;
-
-	      if (IS_RIGHT ? index < 0 : length <= index) {
-	        throw TypeError('Reduce of empty array with no initial value');
-	      }
-	    }
-
-	    for (; IS_RIGHT ? index >= 0 : length > index; index += i) if (index in self) {
-	      memo = callbackfn(memo, self[index], index, O);
-	    }
-
-	    return memo;
-	  };
-	};
-
-	var arrayReduce = {
-	  // `Array.prototype.reduce` method
-	  // https://tc39.github.io/ecma262/#sec-array.prototype.reduce
-	  left: createMethod$4(false),
-	  // `Array.prototype.reduceRight` method
-	  // https://tc39.github.io/ecma262/#sec-array.prototype.reduceright
-	  right: createMethod$4(true)
-	};
-
-	var $reduce = arrayReduce.left;
+	var $reduce$1 = arrayReduce.left;
 	var aTypedArray$e = arrayBufferViewCore.aTypedArray;
 	var exportTypedArrayMethod$e = arrayBufferViewCore.exportTypedArrayMethod; // `%TypedArray%.prototype.reduce` method
 	// https://tc39.github.io/ecma262/#sec-%typedarray%.prototype.reduce
@@ -4840,7 +4906,7 @@
 	exportTypedArrayMethod$e('reduce', function reduce(callbackfn
 	/* , initialValue */
 	) {
-	  return $reduce(aTypedArray$e(this), callbackfn, arguments.length, arguments.length > 1 ? arguments[1] : undefined);
+	  return $reduce$1(aTypedArray$e(this), callbackfn, arguments.length, arguments.length > 1 ? arguments[1] : undefined);
 	});
 
 	var $reduceRight = arrayReduce.right;
@@ -6837,13 +6903,13 @@
 
 	var nativeJoin = [].join;
 	var ES3_STRINGS = indexedObject != Object;
-	var STRICT_METHOD$2 = arrayMethodIsStrict('join', ','); // `Array.prototype.join` method
+	var STRICT_METHOD$3 = arrayMethodIsStrict('join', ','); // `Array.prototype.join` method
 	// https://tc39.github.io/ecma262/#sec-array.prototype.join
 
 	_export({
 	  target: 'Array',
 	  proto: true,
-	  forced: ES3_STRINGS || !STRICT_METHOD$2
+	  forced: ES3_STRINGS || !STRICT_METHOD$3
 	}, {
 	  join: function join(separator) {
 	    return nativeJoin.call(toIndexedObject(this), separator === undefined ? ',' : separator);
@@ -6851,7 +6917,7 @@
 	});
 
 	var HAS_SPECIES_SUPPORT$1 = arrayMethodHasSpeciesSupport('slice');
-	var USES_TO_LENGTH$4 = arrayMethodUsesToLength('slice', {
+	var USES_TO_LENGTH$5 = arrayMethodUsesToLength('slice', {
 	  ACCESSORS: true,
 	  0: 0,
 	  1: 2
@@ -6865,7 +6931,7 @@
 	_export({
 	  target: 'Array',
 	  proto: true,
-	  forced: !HAS_SPECIES_SUPPORT$1 || !USES_TO_LENGTH$4
+	  forced: !HAS_SPECIES_SUPPORT$1 || !USES_TO_LENGTH$5
 	}, {
 	  slice: function slice(start, end) {
 	    var O = toIndexedObject(this);
@@ -14473,16 +14539,14 @@
 
 	              case 4:
 	                _context.next = 6;
-	                return this.readHeader();
+	                return this.readHeaderAndFooter();
 
 	              case 6:
-	                _context.next = 8;
-	                return this.readFooter();
-
-	              case 8:
+	                // Footer is read with header
+	                //await this.readFooter()
 	                this.initialized = true;
 
-	              case 9:
+	              case 7:
 	              case "end":
 	                return _context.stop();
 	            }
@@ -14575,27 +14639,27 @@
 	      return getMetaData;
 	    }()
 	  }, {
-	    key: "readHeader",
+	    key: "readHeaderAndFooter",
 	    value: function () {
-	      var _readHeader = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
-	        var data, binaryParser, nAttributes, nChrs, i, chr, nBpResolutions, nFragResolutions, _i, _Object$keys, chrName;
+	      var _readHeaderAndFooter = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
+	        var data, binaryParser, bodyPostion, remainingSize, nAttributes, nChrs, i, chr, nBpResolutions, nFragResolutions, _i, _Object$keys, chrName;
 
 	        return regeneratorRuntime.wrap(function _callee4$(_context4) {
 	          while (1) {
 	            switch (_context4.prev = _context4.next) {
 	              case 0:
 	                _context4.next = 2;
-	                return this.file.read(0, 64000);
+	                return this.file.read(0, 16);
 
 	              case 2:
 	                data = _context4.sent;
 
-	                if (data) {
+	                if (!(!data || data.byteLength === 0)) {
 	                  _context4.next = 5;
 	                  break;
 	                }
 
-	                return _context4.abrupt("return", undefined);
+	                throw Error("File content is empty");
 
 	              case 5:
 	                binaryParser = new BinaryParser(new DataView(data));
@@ -14610,7 +14674,22 @@
 	                throw Error("Unsupported hic version: " + this.version);
 
 	              case 10:
-	                this.footerPosition = binaryParser.getLong();
+	                this.footerPosition = binaryParser.getLong(); // Read footer and determine file position for body section (i.e. end of header)
+
+	                _context4.next = 13;
+	                return this.readFooter();
+
+	              case 13:
+	                bodyPostion = Object.values(this.masterIndex).reduce(function (min, currentValue) {
+	                  return Math.min(min, currentValue.start);
+	                }, Number.MAX_VALUE);
+	                remainingSize = bodyPostion - 16;
+	                _context4.next = 17;
+	                return this.file.read(16, remainingSize);
+
+	              case 17:
+	                data = _context4.sent;
+	                binaryParser = new BinaryParser(new DataView(data));
 	                this.genomeId = binaryParser.getString();
 
 	                if (this.version >= 9) {
@@ -14698,7 +14777,7 @@
 	                  "resolutions": this.bpResolutions
 	                };
 
-	              case 28:
+	              case 36:
 	              case "end":
 	                return _context4.stop();
 	            }
@@ -14706,11 +14785,11 @@
 	        }, _callee4, this);
 	      }));
 
-	      function readHeader() {
-	        return _readHeader.apply(this, arguments);
+	      function readHeaderAndFooter() {
+	        return _readHeaderAndFooter.apply(this, arguments);
 	      }
 
-	      return readHeader;
+	      return readHeaderAndFooter;
 	    }()
 	  }, {
 	    key: "readFooter",
