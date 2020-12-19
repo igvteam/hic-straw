@@ -65,8 +65,9 @@ class HicFile {
         if (this.initialized) {
             return;
         } else {
-            await this.readHeader()
-            await this.readFooter()
+            await this.readHeaderAndFooter()
+            // Footer is read with header
+            //await this.readFooter()
             this.initialized = true
         }
     }
@@ -91,24 +92,33 @@ class HicFile {
         return this.meta
     }
 
-    async readHeader() {
+    async readHeaderAndFooter() {
 
-        const data = await this.file.read(0, 64000)
-
-        if (!data) {
-            return undefined;
+        // Read initial fields magic, version, and footer position
+        let data = await this.file.read(0, 16)
+        if (!data || data.byteLength === 0) {
+            throw Error("File content is empty")
         }
-
-        const binaryParser = new BinaryParser(new DataView(data));
-
+        let binaryParser = new BinaryParser(new DataView(data));
         this.magic = binaryParser.getString();
         this.version = binaryParser.getInt();
-
         if (this.version < 5) {
             throw Error("Unsupported hic version: " + this.version)
         }
-
         this.footerPosition = binaryParser.getLong();
+
+        // Read footer and determine file position for body section (i.e. end of header)
+
+        await this.readFooter();
+
+        const bodyPostion = Object.values(this.masterIndex).reduce((min, currentValue) => {
+            return Math.min(min, currentValue.start)
+        }, Number.MAX_VALUE)
+
+        const remainingSize = bodyPostion - 16;
+        data = await this.file.read(16, remainingSize);
+        binaryParser = new BinaryParser(new DataView(data));
+
         this.genomeId = binaryParser.getString();
 
         if (this.version >= 9) {
@@ -349,11 +359,10 @@ class HicFile {
                     const nv1 = await this.getNormalizationVector(normalization, chr1, units, binsize);
                     const nv2 = (chr1 === chr2) ? nv1 : await this.getNormalizationVector(normalization, chr2, units, binsize);
 
-                    if(nv1 && nv2) {
+                    if (nv1 && nv2) {
                         normVector1 = await nv1.getValues(nvX1, nvX2);
                         normVector2 = await nv2.getValues(nvY1, nvY2);
-                    }
-                    else {
+                    } else {
                         isNorm = false;
                         // Raise message and switch pulldown
                     }

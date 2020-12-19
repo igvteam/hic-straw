@@ -13,7 +13,7 @@ suite('HicFile-2', function () {
     test('read header and footer', async function () {
 
         const hicFile = new HicFile({file: file})
-        await hicFile.readHeader()
+        await hicFile.readHeaderAndFooter()
         assert.equal(hicFile.magic, "HIC")
         await hicFile.readFooter();
 

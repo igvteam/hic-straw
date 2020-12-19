@@ -12,7 +12,7 @@ suite('HicFile', function () {
         })
         const hicFile = new HicFile({file: file})
 
-        await hicFile.readHeader()
+        await hicFile.readHeaderAndFooter()
         assert.equal(hicFile.magic, "HIC")
     })
 
@@ -63,8 +63,26 @@ suite('HicFile', function () {
             "loadFragData": false
         })
 
-        await hicFile.readHeader()
+        await hicFile.readHeaderAndFooter()
         assert.equal(hicFile.magic, "HIC")
+
+    })
+
+
+    test('empty file', async function () {
+
+        const hicFile = new HicFile({
+            "url": "https://adam.3dg.io/suhas_juicebox/libs/combined_maps/GM12878/GM12878_intact_16B_5.11.20_1bpRes.hic",
+            "loadFragData": false
+        })
+
+        try {
+            await hicFile.readHeaderAndFooter();
+            assert.fail("Exception expected");
+        } catch (e) {
+            // This is expected
+            assert.ok(true);
+        }
 
     })
 
