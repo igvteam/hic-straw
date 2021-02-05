@@ -37,7 +37,7 @@ suite('HicFile-2', function () {
     test('local file nvi', async function () {
 
         const hicFile = new HicFile({file: file})
-        const matrix = await hicFile.readMatrix(0, 0)
+        const matrix = await hicFile.getMatrix(0, 0)
         assert.ok(matrix)
 
         await hicFile.readNormExpectedValuesAndNormVectorIndex();

@@ -8,7 +8,7 @@ class Matrix {
         this.chr2 = chr2
         this.bpZoomData = []
         this.fragZoomData = []
-        for(let zd of zoomDataList) {
+        for (let zd of zoomDataList) {
             if (zd.zoom.unit === "BP") {
                 this.bpZoomData.push(zd)
             } else {
@@ -63,6 +63,15 @@ class Matrix {
     getZoomDataByIndex(index, unit) {
         const zdArray = "FRAG" === unit ? this.fragZoomData : this.bpZoomData
         return zdArray[index]
+    }
+
+    static getKey(chrIdx1, chrIdx2) {
+        if (chrIdx1 > chrIdx2) {
+            const tmp = chrIdx1
+            chrIdx1 = chrIdx2
+            chrIdx2 = tmp
+        }
+        return `${chrIdx1}_${chrIdx2}`;
     }
 
     static parseMatrix(data, chromosomes) {

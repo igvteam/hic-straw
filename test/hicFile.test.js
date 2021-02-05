@@ -22,7 +22,7 @@ suite('HicFile', function () {
             "path": require.resolve("./data/test_chr22.hic"),
         })
         const hicFile = new HicFile({file: file})
-        const matrix = await hicFile.readMatrix(22, 22)
+        const matrix = await hicFile.getMatrix(22, 22)
         assert.ok(matrix)
     })
 

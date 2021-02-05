@@ -285,11 +285,11 @@ class HicFile {
     }
 
     async getMatrix(chrIdx1, chrIdx2) {
-        const key = `${chrIdx1}__${chrIdx2}`;
+        const key = Matrix.getKey(chrIdx1, chrIdx2);
         if (this.matrixCache.has(key)) {
             return this.matrixCache.get(key);
         } else {
-            const matrix = this.readMatrix(chrIdx1, chrIdx2);
+            const matrix = await this.readMatrix(chrIdx1, chrIdx2);
             this.matrixCache.set(key, matrix);
             return matrix;
         }
@@ -305,12 +305,11 @@ class HicFile {
             chrIdx2 = tmp
         }
 
-        const key = "" + chrIdx1 + "_" + chrIdx2
+        const key = Matrix.getKey(chrIdx1 , chrIdx2)
         const idx = this.masterIndex[key]
         if (!idx) {
             return undefined
         }
-
         const data = await this.file.read(idx.start, idx.size)
         if (!data) {
             return undefined

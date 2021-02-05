@@ -18,7 +18,7 @@ class LRU {
         // refresh key
         if (this.map.has(key)) this.map.delete(key);
         // evict oldest
-        else if (this.map.size == this.max) {
+        else if (this.map.size === this.max) {
             this.map.delete(this.first());
         }
         this.map.set(key, val);

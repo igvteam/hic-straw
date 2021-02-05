@@ -6047,7 +6047,7 @@ class Matrix {
         this.chr2 = chr2;
         this.bpZoomData = [];
         this.fragZoomData = [];
-        for(let zd of zoomDataList) {
+        for (let zd of zoomDataList) {
             if (zd.zoom.unit === "BP") {
                 this.bpZoomData.push(zd);
             } else {
@@ -6102,6 +6102,15 @@ class Matrix {
     getZoomDataByIndex(index, unit) {
         const zdArray = "FRAG" === unit ? this.fragZoomData : this.bpZoomData;
         return zdArray[index]
+    }
+
+    static getKey(chrIdx1, chrIdx2) {
+        if (chrIdx1 > chrIdx2) {
+            const tmp = chrIdx1;
+            chrIdx1 = chrIdx2;
+            chrIdx2 = tmp;
+        }
+        return `${chrIdx1}_${chrIdx2}`;
     }
 
     static parseMatrix(data, chromosomes) {
@@ -6160,7 +6169,7 @@ class LRU {
         // refresh key
         if (this.map.has(key)) this.map.delete(key);
         // evict oldest
-        else if (this.map.size == this.max) {
+        else if (this.map.size === this.max) {
             this.map.delete(this.first());
         }
         this.map.set(key, val);
@@ -6523,11 +6532,11 @@ class HicFile {
     }
 
     async getMatrix(chrIdx1, chrIdx2) {
-        const key = `${chrIdx1}__${chrIdx2}`;
+        const key = Matrix.getKey(chrIdx1, chrIdx2);
         if (this.matrixCache.has(key)) {
             return this.matrixCache.get(key);
         } else {
-            const matrix = this.readMatrix(chrIdx1, chrIdx2);
+            const matrix = await this.readMatrix(chrIdx1, chrIdx2);
             this.matrixCache.set(key, matrix);
             return matrix;
         }
@@ -6543,12 +6552,11 @@ class HicFile {
             chrIdx2 = tmp;
         }
 
-        const key = "" + chrIdx1 + "_" + chrIdx2;
+        const key = Matrix.getKey(chrIdx1 , chrIdx2);
         const idx = this.masterIndex[key];
         if (!idx) {
             return undefined
         }
-
         const data = await this.file.read(idx.start, idx.size);
         if (!data) {
             return undefined
