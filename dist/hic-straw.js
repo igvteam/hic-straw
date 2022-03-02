@@ -12744,27 +12744,18 @@
 	            switch (_context.prev = _context.next) {
 	              case 0:
 	                file = this.file;
-	                return _context.abrupt("return", new Promise(function (fullfill, reject) {
-	                  var fileReader = new FileReader();
 
-	                  fileReader.onload = function (e) {
-	                    fullfill(fileReader.result);
-	                  };
+	                if (!(position !== undefined)) {
+	                  _context.next = 5;
+	                  break;
+	                }
 
-	                  fileReader.onerror = function (e) {
-	                    console.err("Error reading local file " + file.name);
-	                    reject(null, fileReader);
-	                  };
+	                return _context.abrupt("return", file.slice(position, position + length).arrayBuffer());
 
-	                  if (position !== undefined) {
-	                    var blob = file.slice(position, position + length);
-	                    fileReader.readAsArrayBuffer(blob);
-	                  } else {
-	                    fileReader.readAsArrayBuffer(file);
-	                  }
-	                }));
+	              case 5:
+	                return _context.abrupt("return", file.arrayBuffer());
 
-	              case 2:
+	              case 6:
 	              case "end":
 	                return _context.stop();
 	            }

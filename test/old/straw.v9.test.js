@@ -1,6 +1,6 @@
 import {assert} from 'chai';
-import Straw from '../src/straw';
-import HicFile from "../src/hicFile.js";
+import Straw from '../../src/straw';
+import HicFile from "../../src/hicFile.js";
 
 suite('Straw v9', function () {
 

@@ -5373,32 +5373,14 @@ class BrowserLocalFile {
     }
 
     async read(position, length) {
-
         const file = this.file;
+        if (position !== undefined) {
+            return file.slice(position, position + length).arrayBuffer()
 
-        return new Promise(function (fullfill, reject) {
+        } else {
+            return file.arrayBuffer()
 
-            const fileReader = new FileReader();
-
-            fileReader.onload = function (e) {
-                fullfill(fileReader.result);
-            };
-
-            fileReader.onerror = function (e) {
-                console.err("Error reading local file " + file.name);
-                reject(null, fileReader);
-            };
-
-            if (position !== undefined) {
-                const blob = file.slice(position, position + length);
-                fileReader.readAsArrayBuffer(blob);
-
-            } else {
-                fileReader.readAsArrayBuffer(file);
-
-            }
-
-        });
+        }
     }
 }
 
