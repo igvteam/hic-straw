@@ -15188,62 +15188,66 @@
 	      var _getBlocks = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee10(region1, region2, unit, binSize) {
 	        var _this = this;
 
-	        var chr1, chr2, idx1, idx2, matrix, zd, msg, blockNumbers, blocks, blockNumbersToQuery, _iterator3, _step3, num, promises, newBlocks, _iterator4, _step4, block;
+	        var blockKey, chr1, chr2, idx1, idx2, matrix, zd, msg, blockNumbers, blocks, blockNumbersToQuery, _iterator3, _step3, num, key, promises, newBlocks, _iterator4, _step4, block;
 
 	        return regeneratorRuntime.wrap(function _callee10$(_context10) {
 	          while (1) {
 	            switch (_context10.prev = _context10.next) {
 	              case 0:
-	                _context10.next = 2;
+	                blockKey = function blockKey(blockNumber, zd) {
+	                  return "".concat(zd.getKey(), "_").concat(blockNumber);
+	                };
+
+	                _context10.next = 3;
 	                return this.init();
 
-	              case 2:
+	              case 3:
 	                chr1 = this.getFileChrName(region1.chr);
 	                chr2 = this.getFileChrName(region2.chr);
 	                idx1 = this.chromosomeIndexMap[chr1];
 	                idx2 = this.chromosomeIndexMap[chr2];
 
 	                if (!(idx1 === undefined)) {
-	                  _context10.next = 8;
+	                  _context10.next = 9;
 	                  break;
 	                }
 
 	                return _context10.abrupt("return", []);
 
-	              case 8:
+	              case 9:
 	                if (!(idx2 === undefined)) {
-	                  _context10.next = 10;
+	                  _context10.next = 11;
 	                  break;
 	                }
 
 	                return _context10.abrupt("return", []);
 
-	              case 10:
-	                _context10.next = 12;
+	              case 11:
+	                _context10.next = 13;
 	                return this.getMatrix(idx1, idx2);
 
-	              case 12:
+	              case 13:
 	                matrix = _context10.sent;
 
 	                if (matrix) {
-	                  _context10.next = 15;
+	                  _context10.next = 16;
 	                  break;
 	                }
 
 	                return _context10.abrupt("return", []);
 
-	              case 15:
+	              case 16:
 	                zd = matrix.getZoomData(binSize, unit);
 
 	                if (zd) {
-	                  _context10.next = 19;
+	                  _context10.next = 20;
 	                  break;
 	                }
 
 	                msg = "No data avalailble for resolution: ".concat(binSize, "  for map ").concat(region1.chr, "-").concat(region2.chr);
 	                throw new Error(msg);
 
-	              case 19:
+	              case 20:
 	                blockNumbers = zd.getBlockNumbers(region1, region2, this.version);
 	                blocks = [];
 	                blockNumbersToQuery = [];
@@ -15252,9 +15256,10 @@
 	                try {
 	                  for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
 	                    num = _step3.value;
+	                    key = blockKey(num, zd);
 
-	                    if (this.blockCache.has(binSize, num)) {
-	                      blocks.push(this.blockCache.get(binSize, num));
+	                    if (this.blockCache.has(binSize, key)) {
+	                      blocks.push(this.blockCache.get(binSize, key));
 	                    } else {
 	                      blockNumbersToQuery.push(num);
 	                    }
@@ -15268,10 +15273,10 @@
 	                promises = blockNumbersToQuery.map(function (blockNumber) {
 	                  return _this.readBlock(blockNumber, zd);
 	                });
-	                _context10.next = 27;
+	                _context10.next = 28;
 	                return Promise.all(promises);
 
-	              case 27:
+	              case 28:
 	                newBlocks = _context10.sent;
 	                _iterator4 = _createForOfIteratorHelper(newBlocks);
 
@@ -15280,7 +15285,7 @@
 	                    block = _step4.value;
 
 	                    if (block) {
-	                      this.blockCache.set(binSize, block.blockNumber, block);
+	                      this.blockCache.set(binSize, blockKey(block.blockNumber, zd), block);
 	                    }
 	                  }
 	                } catch (err) {
@@ -15291,7 +15296,7 @@
 
 	                return _context10.abrupt("return", blocks.concat(newBlocks));
 
-	              case 31:
+	              case 32:
 	              case "end":
 	                return _context10.stop();
 	            }
