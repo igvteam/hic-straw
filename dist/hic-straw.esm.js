@@ -2456,7 +2456,7 @@ Zlib.InflateStream.prototype.decompress = function(input) {
 
   buffer = this.rawinflate.decompress(this.input, this.ip);
   if (this.rawinflate.ip !== 0) {
-    this.input = 
+    this.input =
       this.input.subarray(this.rawinflate.ip) ;
     this.ip = 0;
   }
@@ -3269,7 +3269,7 @@ Zlib.RawDeflate.prototype.compress = function() {
     case Zlib.RawDeflate.CompressionType.NONE:
       // each 65535-Byte (length header: 16-bit)
       for (position = 0, length = input.length; position < length;) {
-        blockArray = 
+        blockArray =
           input.subarray(position, position + 0xffff) ;
         position += blockArray.length;
         this.makeNocompressBlock(blockArray, (position === length));
@@ -3750,7 +3750,7 @@ Zlib.RawDeflate.prototype.lz77 = function(dataArray) {
   /** @type {Zlib.RawDeflate.Lz77Match} previous longest match */
   var prevMatch;
   /** @type {!(Array.<number>|Uint16Array)} lz77 buffer */
-  var lz77buf = 
+  var lz77buf =
     new Uint16Array(dataArray.length * 2) ;
   /** @type {number} lz77 output buffer pointer */
   var pos = 0;
@@ -3870,7 +3870,7 @@ Zlib.RawDeflate.prototype.lz77 = function(dataArray) {
   this.freqsDist = freqsDist;
 
   return /** @type {!(Uint16Array|Array.<number>)} */ (
-      lz77buf.subarray(0, pos) 
+      lz77buf.subarray(0, pos)
   );
 };
 
@@ -4442,16 +4442,16 @@ Zlib.Unzip.FileHeader.prototype.parse = function() {
   ) >>> 0;
 
   // file name
-  this.filename = String.fromCharCode.apply(null, 
-    input.subarray(ip, ip += this.fileNameLength) 
+  this.filename = String.fromCharCode.apply(null,
+    input.subarray(ip, ip += this.fileNameLength)
   );
 
   // extra field
-  this.extraField = 
+  this.extraField =
     input.subarray(ip, ip += this.extraFieldLength) ;
 
   // file comment
-  this.comment = 
+  this.comment =
     input.subarray(ip, ip + this.fileCommentLength) ;
 
   this.length = ip - this.offset;
@@ -4551,12 +4551,12 @@ Zlib.Unzip.LocalFileHeader.prototype.parse = function() {
   this.extraFieldLength = input[ip++] | (input[ip++] << 8);
 
   // file name
-  this.filename = String.fromCharCode.apply(null, 
-    input.subarray(ip, ip += this.fileNameLength) 
+  this.filename = String.fromCharCode.apply(null,
+    input.subarray(ip, ip += this.fileNameLength)
   );
 
   // extra field
-  this.extraField = 
+  this.extraField =
     input.subarray(ip, ip += this.extraFieldLength) ;
 
   this.length = ip - this.offset;
@@ -4629,7 +4629,7 @@ Zlib.Unzip.prototype.parseEndOfCentralDirectoryRecord = function() {
   this.commentLength = input[ip++] | (input[ip++] << 8);
 
   // .ZIP file comment
-  this.comment = 
+  this.comment =
     input.subarray(ip, ip + this.commentLength) ;
 };
 
@@ -4736,7 +4736,7 @@ Zlib.Unzip.prototype.getFileData = function(index, opt_params) {
 
   switch (localFileHeader.compression) {
     case Zlib.Unzip.CompressionMethod.STORE:
-      buffer = 
+      buffer =
         this.input.subarray(offset, offset + length) ;
       break;
     case Zlib.Unzip.CompressionMethod.DEFLATE:
@@ -6796,6 +6796,7 @@ class HicFile {
 
         const idx = normVectorIndex[key];
         if (!idx) {
+
             // TODO -- alert in browsers
             return undefined;
         }
