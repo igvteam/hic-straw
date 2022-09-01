@@ -6826,8 +6826,6 @@ class HicFile {
 
             if (this.alert) {
                 this.alert(str);
-            } else {
-                alert(str);
             }
             return undefined
         }
