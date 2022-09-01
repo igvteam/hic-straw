@@ -1,4 +1,3 @@
-import {Alert} from "../node_modules/igv-ui/dist/igv-ui.js"
 import Zlib from "./vendor/zlib_and_gzip.js"
 import crossFetch from "./io/crossFetch.js"
 import BrowserLocalFile from './io/browserLocalFile.js';
@@ -26,8 +25,8 @@ class HicFile {
 
     constructor(args) {
 
-        if (args.parentElement) {
-            Alert.init(args.parentElement)
+        if (args.alert) {
+            this.alert = args.alert
         }
 
         this.config = args
@@ -63,7 +62,6 @@ class HicFile {
             throw Error("Arguments must include file, blob, url, or path")
         }
     }
-
 
     async init() {
 
@@ -599,10 +597,14 @@ class HicFile {
 
         if (false === status) {
 
-            const str = `Normalization option ${ type } not available at resolution ${ binSize }`
+            const str = `Normalization option ${ type } not available at resolution ${ binSize }. Will use NONE.`
             console.log(str)
 
-            Alert.presentAlert(str)
+            if (this.alert) {
+                this.alert(str)
+            } else {
+                alert(str)
+            }
             return undefined
         }
 

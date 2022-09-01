@@ -26,7 +26,6 @@
     "core-js": "^3.6.5",
     "del-cli": "^3.0.1",
     "esm": "^3.2.25",
-    "igv-ui": "github:igvteam/igv-ui#v1.2.5",
     "mocha": "^6.2.3",
     "node-fetch": "^2.6.0",
     "regenerator-runtime": "^0.13.7",
