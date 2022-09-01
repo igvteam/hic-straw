@@ -25,6 +25,10 @@ class HicFile {
 
     constructor(args) {
 
+        if (args.alert) {
+            this.alert = args.alert
+        }
+
         this.config = args
 
         this.loadFragData = args.loadFragData
@@ -58,7 +62,6 @@ class HicFile {
             throw Error("Arguments must include file, blob, url, or path")
         }
     }
-
 
     async init() {
 
@@ -355,6 +358,7 @@ class HicFile {
                 const chr1 = this.getFileChrName(region1.chr);
                 const chr2 = this.getFileChrName(region2.chr);
                 if (isNorm) {
+
                     const nv1 = await this.getNormalizationVector(normalization, chr1, units, binsize);
                     const nv2 = (chr1 === chr2) ? nv1 : await this.getNormalizationVector(normalization, chr2, units, binsize);
 
@@ -544,6 +548,26 @@ class HicFile {
         return normVectorIndex && normVectorIndex[key];
     }
 
+    async isNormalizationValueAvailableAtResolution(normalization, chr, unit, resolution) {
+
+        let chromosomeIndex
+        if (Number.isInteger(chr)) {
+            chromosomeIndex = chr
+        } else {
+            const canonicalName = this.getFileChrName(chr)
+            chromosomeIndex = this.chromosomeIndexMap[canonicalName]
+        }
+
+        const normVectorIndex = await this.getNormVectorIndex()
+
+        const key = getNormalizationVectorKey(normalization, chromosomeIndex, unit.toString(), resolution)
+
+        const index = normVectorIndex[key]
+
+        return undefined !== index
+
+    }
+
     async getNormalizationVector(type, chr, unit, binSize) {
 
         await this.init()
@@ -569,12 +593,20 @@ class HicFile {
             return undefined
         }
 
-        const idx = normVectorIndex[key];
-        if (!idx) {
-            // TODO -- alert in browsers
-            console.log("Normalization option " + type + " not available at this resolution");
-            return undefined;
+        const status = await this.isNormalizationValueAvailableAtResolution(type, chr, unit, binSize)
+
+        if (false === status) {
+
+            const str = `Normalization option ${ type } not available at resolution ${ binSize }. Will use NONE.`
+            console.log(str)
+
+            if (this.alert) {
+                this.alert(str)
+            } 
+            return undefined
         }
+
+        const idx = normVectorIndex[key];
 
         const data = await this.file.read(idx.filePosition, 8)
 

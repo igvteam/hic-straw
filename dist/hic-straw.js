@@ -873,7 +873,9 @@
 
 	var global_1 = // eslint-disable-next-line no-undef
 	check(typeof globalThis == 'object' && globalThis) || check(typeof window == 'object' && window) || check(typeof self == 'object' && self) || check(typeof commonjsGlobal == 'object' && commonjsGlobal) || // eslint-disable-next-line no-new-func
-	Function('return this')();
+	function () {
+	  return this;
+	}() || Function('return this')();
 
 	var fails = function (exec) {
 	  try {
@@ -1067,7 +1069,7 @@
 	  (module.exports = function (key, value) {
 	    return sharedStore[key] || (sharedStore[key] = value !== undefined ? value : {});
 	  })('versions', []).push({
-	    version: '3.6.5',
+	    version: '3.8.1',
 	    mode:  'global',
 	    copyright: '© 2020 Denis Pushkarev (zloirock.ru)'
 	  });
@@ -1108,12 +1110,13 @@
 	};
 
 	if (nativeWeakMap) {
-	  var store$1 = new WeakMap$1();
+	  var store$1 = sharedStore.state || (sharedStore.state = new WeakMap$1());
 	  var wmget = store$1.get;
 	  var wmhas = store$1.has;
 	  var wmset = store$1.set;
 
 	  set = function (it, metadata) {
+	    metadata.facade = it;
 	    wmset.call(store$1, it, metadata);
 	    return metadata;
 	  };
@@ -1130,6 +1133,7 @@
 	  hiddenKeys[STATE] = true;
 
 	  set = function (it, metadata) {
+	    metadata.facade = it;
 	    createNonEnumerableProperty(it, STATE, metadata);
 	    return metadata;
 	  };
@@ -1159,10 +1163,18 @@
 	    var unsafe = options ? !!options.unsafe : false;
 	    var simple = options ? !!options.enumerable : false;
 	    var noTargetGet = options ? !!options.noTargetGet : false;
+	    var state;
 
 	    if (typeof value == 'function') {
-	      if (typeof key == 'string' && !has(value, 'name')) createNonEnumerableProperty(value, 'name', key);
-	      enforceInternalState(value).source = TEMPLATE.join(typeof key == 'string' ? key : '');
+	      if (typeof key == 'string' && !has(value, 'name')) {
+	        createNonEnumerableProperty(value, 'name', key);
+	      }
+
+	      state = enforceInternalState(value);
+
+	      if (!state.source) {
+	        state.source = TEMPLATE.join(typeof key == 'string' ? key : '');
+	      }
 	    }
 
 	    if (O === global_1) {
@@ -2041,7 +2053,7 @@
 	  };
 	};
 
-	var push = [].push; // `Array.prototype.{ forEach, map, filter, some, every, find, findIndex }` methods implementation
+	var push = [].push; // `Array.prototype.{ forEach, map, filter, some, every, find, findIndex, filterOut }` methods implementation
 
 	var createMethod$1 = function (TYPE) {
 	  var IS_MAP = TYPE == 1;
@@ -2049,6 +2061,7 @@
 	  var IS_SOME = TYPE == 3;
 	  var IS_EVERY = TYPE == 4;
 	  var IS_FIND_INDEX = TYPE == 6;
+	  var IS_FILTER_OUT = TYPE == 7;
 	  var NO_HOLES = TYPE == 5 || IS_FIND_INDEX;
 	  return function ($this, callbackfn, that, specificCreate) {
 	    var O = toObject($this);
@@ -2057,7 +2070,7 @@
 	    var length = toLength(self.length);
 	    var index = 0;
 	    var create = specificCreate || arraySpeciesCreate;
-	    var target = IS_MAP ? create($this, length) : IS_FILTER ? create($this, 0) : undefined;
+	    var target = IS_MAP ? create($this, length) : IS_FILTER || IS_FILTER_OUT ? create($this, 0) : undefined;
 	    var value, result;
 
 	    for (; length > index; index++) if (NO_HOLES || index in self) {
@@ -2082,7 +2095,15 @@
 	            case 2:
 	              push.call(target, value);
 	            // filter
-	          } else if (IS_EVERY) return false; // every
+	          } else switch (TYPE) {
+	            case 4:
+	              return false;
+	            // every
+
+	            case 7:
+	              push.call(target, value);
+	            // filterOut
+	          }
 	      }
 	    }
 
@@ -2111,7 +2132,10 @@
 	  find: createMethod$1(5),
 	  // `Array.prototype.findIndex` method
 	  // https://tc39.github.io/ecma262/#sec-array.prototype.findIndex
-	  findIndex: createMethod$1(6)
+	  findIndex: createMethod$1(6),
+	  // `Array.prototype.filterOut` method
+	  // https://github.com/tc39/proposal-array-filtering
+	  filterOut: createMethod$1(7)
 	};
 
 	var $map = arrayIteration.map;
@@ -2172,17 +2196,22 @@
 	  right: createMethod$2(true)
 	};
 
+	var engineIsNode = classofRaw(global_1.process) == 'process';
+
 	var $reduce = arrayReduce.left;
 	var STRICT_METHOD$1 = arrayMethodIsStrict('reduce');
 	var USES_TO_LENGTH$3 = arrayMethodUsesToLength('reduce', {
 	  1: 0
-	}); // `Array.prototype.reduce` method
+	}); // Chrome 80-82 has a critical bug
+	// https://bugs.chromium.org/p/chromium/issues/detail?id=1049982
+
+	var CHROME_BUG = !engineIsNode && engineV8Version > 79 && engineV8Version < 83; // `Array.prototype.reduce` method
 	// https://tc39.github.io/ecma262/#sec-array.prototype.reduce
 
 	_export({
 	  target: 'Array',
 	  proto: true,
-	  forced: !STRICT_METHOD$1 || !USES_TO_LENGTH$3
+	  forced: !STRICT_METHOD$1 || !USES_TO_LENGTH$3 || CHROME_BUG
 	}, {
 	  reduce: function reduce(callbackfn
 	  /* , initialValue */
@@ -2321,7 +2350,8 @@
 
 	  for (var keys$1 = descriptors ? getOwnPropertyNames(NativeNumber) : ( // ES3:
 	  'MAX_VALUE,MIN_VALUE,NaN,NEGATIVE_INFINITY,POSITIVE_INFINITY,' + // ES2015 (in case, if modules with ES2015 Number statics required before):
-	  'EPSILON,isFinite,isInteger,isNaN,isSafeInteger,MAX_SAFE_INTEGER,' + 'MIN_SAFE_INTEGER,parseFloat,parseInt,isInteger').split(','), j = 0, key; keys$1.length > j; j++) {
+	  'EPSILON,isFinite,isInteger,isNaN,isSafeInteger,MAX_SAFE_INTEGER,' + 'MIN_SAFE_INTEGER,parseFloat,parseInt,isInteger,' + // ESNext
+	  'fromString,range').split(','), j = 0, key; keys$1.length > j; j++) {
 	    if (has(NativeNumber, key = keys$1[j]) && !has(NumberWrapper, key)) {
 	      defineProperty$3(NumberWrapper, key, getOwnPropertyDescriptor$2(NativeNumber, key));
 	    }
@@ -2495,58 +2525,74 @@
 	  if (it != undefined) return it[ITERATOR$3] || it['@@iterator'] || iterators[classof(it)];
 	};
 
-	var callWithSafeIterationClosing = function (iterator, fn, value, ENTRIES) {
-	  try {
-	    return ENTRIES ? fn(anObject(value)[0], value[1]) : fn(value); // 7.4.6 IteratorClose(iterator, completion)
-	  } catch (error) {
-	    var returnMethod = iterator['return'];
-	    if (returnMethod !== undefined) anObject(returnMethod.call(iterator));
-	    throw error;
+	var iteratorClose = function (iterator) {
+	  var returnMethod = iterator['return'];
+
+	  if (returnMethod !== undefined) {
+	    return anObject(returnMethod.call(iterator)).value;
 	  }
 	};
 
-	var iterate_1 = createCommonjsModule(function (module) {
-	  var Result = function (stopped, result) {
-	    this.stopped = stopped;
-	    this.result = result;
+	var Result = function (stopped, result) {
+	  this.stopped = stopped;
+	  this.result = result;
+	};
+
+	var iterate = function (iterable, unboundFunction, options) {
+	  var that = options && options.that;
+	  var AS_ENTRIES = !!(options && options.AS_ENTRIES);
+	  var IS_ITERATOR = !!(options && options.IS_ITERATOR);
+	  var INTERRUPTED = !!(options && options.INTERRUPTED);
+	  var fn = functionBindContext(unboundFunction, that, 1 + AS_ENTRIES + INTERRUPTED);
+	  var iterator, iterFn, index, length, result, next, step;
+
+	  var stop = function (condition) {
+	    if (iterator) iteratorClose(iterator);
+	    return new Result(true, condition);
 	  };
 
-	  var iterate = module.exports = function (iterable, fn, that, AS_ENTRIES, IS_ITERATOR) {
-	    var boundFunction = functionBindContext(fn, that, AS_ENTRIES ? 2 : 1);
-	    var iterator, iterFn, index, length, result, next, step;
+	  var callFn = function (value) {
+	    if (AS_ENTRIES) {
+	      anObject(value);
+	      return INTERRUPTED ? fn(value[0], value[1], stop) : fn(value[0], value[1]);
+	    }
 
-	    if (IS_ITERATOR) {
-	      iterator = iterable;
-	    } else {
-	      iterFn = getIteratorMethod(iterable);
-	      if (typeof iterFn != 'function') throw TypeError('Target is not iterable'); // optimisation for array iterators
+	    return INTERRUPTED ? fn(value, stop) : fn(value);
+	  };
 
-	      if (isArrayIteratorMethod(iterFn)) {
-	        for (index = 0, length = toLength(iterable.length); length > index; index++) {
-	          result = AS_ENTRIES ? boundFunction(anObject(step = iterable[index])[0], step[1]) : boundFunction(iterable[index]);
-	          if (result && result instanceof Result) return result;
-	        }
+	  if (IS_ITERATOR) {
+	    iterator = iterable;
+	  } else {
+	    iterFn = getIteratorMethod(iterable);
+	    if (typeof iterFn != 'function') throw TypeError('Target is not iterable'); // optimisation for array iterators
 
-	        return new Result(false);
+	    if (isArrayIteratorMethod(iterFn)) {
+	      for (index = 0, length = toLength(iterable.length); length > index; index++) {
+	        result = callFn(iterable[index]);
+	        if (result && result instanceof Result) return result;
 	      }
 
-	      iterator = iterFn.call(iterable);
+	      return new Result(false);
 	    }
 
-	    next = iterator.next;
+	    iterator = iterFn.call(iterable);
+	  }
 
-	    while (!(step = next.call(iterator)).done) {
-	      result = callWithSafeIterationClosing(iterator, boundFunction, step.value, AS_ENTRIES);
-	      if (typeof result == 'object' && result && result instanceof Result) return result;
+	  next = iterator.next;
+
+	  while (!(step = next.call(iterator)).done) {
+	    try {
+	      result = callFn(step.value);
+	    } catch (error) {
+	      iteratorClose(iterator);
+	      throw error;
 	    }
 
-	    return new Result(false);
-	  };
+	    if (typeof result == 'object' && result && result instanceof Result) return result;
+	  }
 
-	  iterate.stop = function (result) {
-	    return new Result(true, result);
-	  };
-	});
+	  return new Result(false);
+	};
 
 	var ITERATOR$4 = wellKnownSymbol('iterator');
 	var SAFE_CLOSING = false;
@@ -2669,7 +2715,7 @@
 	  }; // Node.js 0.8-
 
 
-	  if (classofRaw(process$2) == 'process') {
+	  if (engineIsNode) {
 	    defer = function (id) {
 	      process$2.nextTick(runner(id));
 	    }; // Sphere (JS game engine) Dispatch API
@@ -2686,7 +2732,7 @@
 	    channel.port1.onmessage = listener;
 	    defer = functionBindContext(port.postMessage, port, 1); // Browsers with postMessage, skip WebWorkers
 	    // IE8 has postMessage, but it's sync & typeof its postMessage is 'object'
-	  } else if (global_1.addEventListener && typeof postMessage == 'function' && !global_1.importScripts && !fails(post) && location.protocol !== 'file:') {
+	  } else if (global_1.addEventListener && typeof postMessage == 'function' && !global_1.importScripts && location && location.protocol !== 'file:' && !fails(post)) {
 	    defer = post;
 	    global_1.addEventListener('message', listener, false); // IE8-
 	  } else if (ONREADYSTATECHANGE in documentCreateElement('script')) {
@@ -2712,9 +2758,9 @@
 	var getOwnPropertyDescriptor$3 = objectGetOwnPropertyDescriptor.f;
 	var macrotask = task.set;
 	var MutationObserver = global_1.MutationObserver || global_1.WebKitMutationObserver;
+	var document$2 = global_1.document;
 	var process$3 = global_1.process;
-	var Promise$1 = global_1.Promise;
-	var IS_NODE = classofRaw(process$3) == 'process'; // Node.js 11 shows ExperimentalWarning on getting `queueMicrotask`
+	var Promise$1 = global_1.Promise; // Node.js 11 shows ExperimentalWarning on getting `queueMicrotask`
 
 	var queueMicrotaskDescriptor = getOwnPropertyDescriptor$3(global_1, 'queueMicrotask');
 	var queueMicrotask = queueMicrotaskDescriptor && queueMicrotaskDescriptor.value;
@@ -2723,7 +2769,7 @@
 	if (!queueMicrotask) {
 	  flush = function () {
 	    var parent, fn;
-	    if (IS_NODE && (parent = process$3.domain)) parent.exit();
+	    if (engineIsNode && (parent = process$3.domain)) parent.exit();
 
 	    while (head) {
 	      fn = head.fn;
@@ -2739,17 +2785,12 @@
 
 	    last = undefined;
 	    if (parent) parent.enter();
-	  }; // Node.js
+	  }; // browsers with MutationObserver, except iOS - https://github.com/zloirock/core-js/issues/339
 
 
-	  if (IS_NODE) {
-	    notify = function () {
-	      process$3.nextTick(flush);
-	    }; // browsers with MutationObserver, except iOS - https://github.com/zloirock/core-js/issues/339
-
-	  } else if (MutationObserver && !engineIsIos) {
+	  if (!engineIsIos && !engineIsNode && MutationObserver && document$2) {
 	    toggle = true;
-	    node = document.createTextNode('');
+	    node = document$2.createTextNode('');
 	    new MutationObserver(flush).observe(node, {
 	      characterData: true
 	    });
@@ -2765,6 +2806,11 @@
 
 	    notify = function () {
 	      then.call(promise, flush);
+	    }; // Node.js without promises
+
+	  } else if (engineIsNode) {
+	    notify = function () {
+	      process$3.nextTick(flush);
 	    }; // for other environments - macrotask based on:
 	    // - setImmediate
 	    // - MessageChannel
@@ -2854,13 +2900,13 @@
 	var getInternalPromiseState = internalState.getterFor(PROMISE);
 	var PromiseConstructor = nativePromiseConstructor;
 	var TypeError$1 = global_1.TypeError;
-	var document$2 = global_1.document;
+	var document$3 = global_1.document;
 	var process$4 = global_1.process;
 	var $fetch = getBuiltIn('fetch');
 	var newPromiseCapability$1 = newPromiseCapability.f;
 	var newGenericPromiseCapability = newPromiseCapability$1;
-	var IS_NODE$1 = classofRaw(process$4) == 'process';
-	var DISPATCH_EVENT = !!(document$2 && document$2.createEvent && global_1.dispatchEvent);
+	var DISPATCH_EVENT = !!(document$3 && document$3.createEvent && global_1.dispatchEvent);
+	var NATIVE_REJECTION_EVENT = typeof PromiseRejectionEvent == 'function';
 	var UNHANDLED_REJECTION = 'unhandledrejection';
 	var REJECTION_HANDLED = 'rejectionhandled';
 	var PENDING = 0;
@@ -2878,7 +2924,7 @@
 	    // We can't detect it synchronously, so just check versions
 	    if (engineV8Version === 66) return true; // Unhandled rejections tracking support, NodeJS Promise without it fails @@species test
 
-	    if (!IS_NODE$1 && typeof PromiseRejectionEvent != 'function') return true;
+	    if (!engineIsNode && !NATIVE_REJECTION_EVENT) return true;
 	  } // We need Promise#finally in the pure version for preventing prototype pollution
 	  // deoptimization and performance degradation
 	  // https://github.com/zloirock/core-js/issues/679
@@ -2912,7 +2958,7 @@
 	  return isObject(it) && typeof (then = it.then) == 'function' ? then : false;
 	};
 
-	var notify$1 = function (promise, state, isReject) {
+	var notify$1 = function (state, isReject) {
 	  if (state.notified) return;
 	  state.notified = true;
 	  var chain = state.reactions;
@@ -2932,7 +2978,7 @@
 	      try {
 	        if (handler) {
 	          if (!ok) {
-	            if (state.rejection === UNHANDLED) onHandleUnhandled(promise, state);
+	            if (state.rejection === UNHANDLED) onHandleUnhandled(state);
 	            state.rejection = HANDLED;
 	          }
 
@@ -2960,7 +3006,7 @@
 
 	    state.reactions = [];
 	    state.notified = false;
-	    if (isReject && !state.rejection) onUnhandled(promise, state);
+	    if (isReject && !state.rejection) onUnhandled(state);
 	  });
 	};
 
@@ -2968,7 +3014,7 @@
 	  var event, handler;
 
 	  if (DISPATCH_EVENT) {
-	    event = document$2.createEvent('Event');
+	    event = document$3.createEvent('Event');
 	    event.promise = promise;
 	    event.reason = reason;
 	    event.initEvent(name, false, true);
@@ -2978,23 +3024,24 @@
 	    reason: reason
 	  };
 
-	  if (handler = global_1['on' + name]) handler(event);else if (name === UNHANDLED_REJECTION) hostReportErrors('Unhandled promise rejection', reason);
+	  if (!NATIVE_REJECTION_EVENT && (handler = global_1['on' + name])) handler(event);else if (name === UNHANDLED_REJECTION) hostReportErrors('Unhandled promise rejection', reason);
 	};
 
-	var onUnhandled = function (promise, state) {
+	var onUnhandled = function (state) {
 	  task$1.call(global_1, function () {
+	    var promise = state.facade;
 	    var value = state.value;
 	    var IS_UNHANDLED = isUnhandled(state);
 	    var result;
 
 	    if (IS_UNHANDLED) {
 	      result = perform(function () {
-	        if (IS_NODE$1) {
+	        if (engineIsNode) {
 	          process$4.emit('unhandledRejection', value, promise);
 	        } else dispatchEvent(UNHANDLED_REJECTION, promise, value);
 	      }); // Browsers should not trigger `rejectionHandled` event if it was handled here, NodeJS - should
 
-	      state.rejection = IS_NODE$1 || isUnhandled(state) ? UNHANDLED : HANDLED;
+	      state.rejection = engineIsNode || isUnhandled(state) ? UNHANDLED : HANDLED;
 	      if (result.error) throw result.value;
 	    }
 	  });
@@ -3004,36 +3051,38 @@
 	  return state.rejection !== HANDLED && !state.parent;
 	};
 
-	var onHandleUnhandled = function (promise, state) {
+	var onHandleUnhandled = function (state) {
 	  task$1.call(global_1, function () {
-	    if (IS_NODE$1) {
+	    var promise = state.facade;
+
+	    if (engineIsNode) {
 	      process$4.emit('rejectionHandled', promise);
 	    } else dispatchEvent(REJECTION_HANDLED, promise, state.value);
 	  });
 	};
 
-	var bind = function (fn, promise, state, unwrap) {
+	var bind = function (fn, state, unwrap) {
 	  return function (value) {
-	    fn(promise, state, value, unwrap);
+	    fn(state, value, unwrap);
 	  };
 	};
 
-	var internalReject = function (promise, state, value, unwrap) {
+	var internalReject = function (state, value, unwrap) {
 	  if (state.done) return;
 	  state.done = true;
 	  if (unwrap) state = unwrap;
 	  state.value = value;
 	  state.state = REJECTED;
-	  notify$1(promise, state, true);
+	  notify$1(state, true);
 	};
 
-	var internalResolve = function (promise, state, value, unwrap) {
+	var internalResolve = function (state, value, unwrap) {
 	  if (state.done) return;
 	  state.done = true;
 	  if (unwrap) state = unwrap;
 
 	  try {
-	    if (promise === value) throw TypeError$1("Promise can't be resolved itself");
+	    if (state.facade === value) throw TypeError$1("Promise can't be resolved itself");
 	    var then = isThenable(value);
 
 	    if (then) {
@@ -3043,18 +3092,18 @@
 	        };
 
 	        try {
-	          then.call(value, bind(internalResolve, promise, wrapper, state), bind(internalReject, promise, wrapper, state));
+	          then.call(value, bind(internalResolve, wrapper, state), bind(internalReject, wrapper, state));
 	        } catch (error) {
-	          internalReject(promise, wrapper, error, state);
+	          internalReject(wrapper, error, state);
 	        }
 	      });
 	    } else {
 	      state.value = value;
 	      state.state = FULFILLED;
-	      notify$1(promise, state, false);
+	      notify$1(state, false);
 	    }
 	  } catch (error) {
-	    internalReject(promise, {
+	    internalReject({
 	      done: false
 	    }, error, state);
 	  }
@@ -3070,9 +3119,9 @@
 	    var state = getInternalState$1(this);
 
 	    try {
-	      executor(bind(internalResolve, this, state), bind(internalReject, this, state));
+	      executor(bind(internalResolve, state), bind(internalReject, state));
 	    } catch (error) {
-	      internalReject(this, state, error);
+	      internalReject(state, error);
 	    }
 	  }; // eslint-disable-next-line no-unused-vars
 
@@ -3098,10 +3147,10 @@
 	      var reaction = newPromiseCapability$1(speciesConstructor(this, PromiseConstructor));
 	      reaction.ok = typeof onFulfilled == 'function' ? onFulfilled : true;
 	      reaction.fail = typeof onRejected == 'function' && onRejected;
-	      reaction.domain = IS_NODE$1 ? process$4.domain : undefined;
+	      reaction.domain = engineIsNode ? process$4.domain : undefined;
 	      state.parent = true;
 	      state.reactions.push(reaction);
-	      if (state.state != PENDING) notify$1(this, state, false);
+	      if (state.state != PENDING) notify$1(state, false);
 	      return reaction.promise;
 	    },
 	    // `Promise.prototype.catch` method
@@ -3115,8 +3164,8 @@
 	    var promise = new Internal();
 	    var state = getInternalState$1(promise);
 	    this.promise = promise;
-	    this.resolve = bind(internalResolve, promise, state);
-	    this.reject = bind(internalReject, promise, state);
+	    this.resolve = bind(internalResolve, state);
+	    this.reject = bind(internalReject, state);
 	  };
 
 	  newPromiseCapability.f = newPromiseCapability$1 = function (C) {
@@ -3202,7 +3251,7 @@
 	      var values = [];
 	      var counter = 0;
 	      var remaining = 1;
-	      iterate_1(iterable, function (promise) {
+	      iterate(iterable, function (promise) {
 	        var index = counter++;
 	        var alreadyCalled = false;
 	        values.push(undefined);
@@ -3227,7 +3276,7 @@
 	    var reject = capability.reject;
 	    var result = perform(function () {
 	      var $promiseResolve = aFunction$1(C.resolve);
-	      iterate_1(iterable, function (promise) {
+	      iterate(iterable, function (promise) {
 	        $promiseResolve.call(C, promise).then(capability.resolve, reject);
 	      });
 	    });
@@ -3415,11 +3464,11 @@
 
 	  try {
 	    '/./'[METHOD_NAME](regexp);
-	  } catch (e) {
+	  } catch (error1) {
 	    try {
 	      regexp[MATCH$1] = false;
 	      return '/./'[METHOD_NAME](regexp);
-	    } catch (f) {
+	    } catch (error2) {
 	      /* empty */
 	    }
 	  }
@@ -3822,14 +3871,21 @@
 	  Float32Array: 4,
 	  Float64Array: 8
 	};
+	var BigIntArrayConstructorsList = {
+	  BigInt64Array: 8,
+	  BigUint64Array: 8
+	};
 
 	var isView = function isView(it) {
+	  if (!isObject(it)) return false;
 	  var klass = classof(it);
-	  return klass === 'DataView' || has(TypedArrayConstructorsList, klass);
+	  return klass === 'DataView' || has(TypedArrayConstructorsList, klass) || has(BigIntArrayConstructorsList, klass);
 	};
 
 	var isTypedArray = function (it) {
-	  return isObject(it) && has(TypedArrayConstructorsList, classof(it));
+	  if (!isObject(it)) return false;
+	  var klass = classof(it);
+	  return has(TypedArrayConstructorsList, klass) || has(BigIntArrayConstructorsList, klass);
 	};
 
 	var aTypedArray = function (it) {
@@ -5138,6 +5194,15 @@
 	  return T;
 	} : nativeAssign;
 
+	var callWithSafeIterationClosing = function (iterator, fn, value, ENTRIES) {
+	  try {
+	    return ENTRIES ? fn(anObject(value)[0], value[1]) : fn(value); // 7.4.6 IteratorClose(iterator, completion)
+	  } catch (error) {
+	    iteratorClose(iterator);
+	    throw error;
+	  }
+	};
+
 	// https://tc39.github.io/ecma262/#sec-array.from
 
 
@@ -5529,7 +5594,7 @@
 
 	var URLSearchParamsPrototype = URLSearchParamsConstructor.prototype;
 	redefineAll(URLSearchParamsPrototype, {
-	  // `URLSearchParams.prototype.appent` method
+	  // `URLSearchParams.prototype.append` method
 	  // https://url.spec.whatwg.org/#dom-urlsearchparams-append
 	  append: function append(name, value) {
 	    validateArgumentsLength(arguments.length, 2);
@@ -14034,7 +14099,10 @@
 	      Constructor = wrapper(function (dummy, iterable) {
 	        anInstance(dummy, Constructor, CONSTRUCTOR_NAME);
 	        var that = inheritIfRequired(new NativeConstructor(), dummy, Constructor);
-	        if (iterable != undefined) iterate_1(iterable, that[ADDER], that, IS_MAP);
+	        if (iterable != undefined) iterate(iterable, that[ADDER], {
+	          that: that,
+	          AS_ENTRIES: IS_MAP
+	        });
 	        return that;
 	      });
 	      Constructor.prototype = NativePrototype;
@@ -14078,7 +14146,10 @@
 	        size: 0
 	      });
 	      if (!descriptors) that.size = 0;
-	      if (iterable != undefined) iterate_1(iterable, that[ADDER], that, IS_MAP);
+	      if (iterable != undefined) iterate(iterable, that[ADDER], {
+	        that: that,
+	        AS_ENTRIES: IS_MAP
+	      });
 	    });
 	    var getInternalState = internalStateGetterFor(CONSTRUCTOR_NAME);
 
@@ -14419,6 +14490,10 @@
 	var HicFile = /*#__PURE__*/function () {
 	  function HicFile(args) {
 	    _classCallCheck(this, HicFile);
+
+	    if (args.alert) {
+	      this.alert = args.alert;
+	    }
 
 	    this.config = args;
 	    this.loadFragData = args.loadFragData;
@@ -15500,15 +15575,54 @@
 	      return hasNormalizationVector;
 	    }()
 	  }, {
-	    key: "getNormalizationVector",
+	    key: "isNormalizationValueAvailableAtResolution",
 	    value: function () {
-	      var _getNormalizationVector = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee13(type, chr, unit, binSize) {
-	        var chrIdx, canonicalName, key, normVectorIndex, idx, data, parser, nValues, dataType, filePosition, nv;
+	      var _isNormalizationValueAvailableAtResolution = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee13(normalization, chr, unit, resolution) {
+	        var chromosomeIndex, canonicalName, normVectorIndex, key, index;
 	        return regeneratorRuntime.wrap(function _callee13$(_context13) {
 	          while (1) {
 	            switch (_context13.prev = _context13.next) {
 	              case 0:
-	                _context13.next = 2;
+	                if (Number.isInteger(chr)) {
+	                  chromosomeIndex = chr;
+	                } else {
+	                  canonicalName = this.getFileChrName(chr);
+	                  chromosomeIndex = this.chromosomeIndexMap[canonicalName];
+	                }
+
+	                _context13.next = 3;
+	                return this.getNormVectorIndex();
+
+	              case 3:
+	                normVectorIndex = _context13.sent;
+	                key = getNormalizationVectorKey(normalization, chromosomeIndex, unit.toString(), resolution);
+	                index = normVectorIndex[key];
+	                return _context13.abrupt("return", undefined !== index);
+
+	              case 7:
+	              case "end":
+	                return _context13.stop();
+	            }
+	          }
+	        }, _callee13, this);
+	      }));
+
+	      function isNormalizationValueAvailableAtResolution(_x20, _x21, _x22, _x23) {
+	        return _isNormalizationValueAvailableAtResolution.apply(this, arguments);
+	      }
+
+	      return isNormalizationValueAvailableAtResolution;
+	    }()
+	  }, {
+	    key: "getNormalizationVector",
+	    value: function () {
+	      var _getNormalizationVector = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee14(type, chr, unit, binSize) {
+	        var chrIdx, canonicalName, key, normVectorIndex, status, str, idx, data, parser, nValues, dataType, filePosition, nv;
+	        return regeneratorRuntime.wrap(function _callee14$(_context14) {
+	          while (1) {
+	            switch (_context14.prev = _context14.next) {
+	              case 0:
+	                _context14.next = 2;
 	                return this.init();
 
 	              case 2:
@@ -15522,68 +15636,81 @@
 	                key = getNormalizationVectorKey(type, chrIdx, unit.toString(), binSize);
 
 	                if (!this.normVectorCache.has(key)) {
-	                  _context13.next = 6;
+	                  _context14.next = 6;
 	                  break;
 	                }
 
-	                return _context13.abrupt("return", this.normVectorCache.get(key));
+	                return _context14.abrupt("return", this.normVectorCache.get(key));
 
 	              case 6:
-	                _context13.next = 8;
+	                _context14.next = 8;
 	                return this.getNormVectorIndex();
 
 	              case 8:
-	                normVectorIndex = _context13.sent;
+	                normVectorIndex = _context14.sent;
 
 	                if (normVectorIndex) {
-	                  _context13.next = 11;
+	                  _context14.next = 11;
 	                  break;
 	                }
 
-	                return _context13.abrupt("return", undefined);
+	                return _context14.abrupt("return", undefined);
 
 	              case 11:
-	                idx = normVectorIndex[key];
+	                _context14.next = 13;
+	                return this.isNormalizationValueAvailableAtResolution(type, chr, unit, binSize);
 
-	                if (idx) {
-	                  _context13.next = 14;
+	              case 13:
+	                status = _context14.sent;
+
+	                if (!(false === status)) {
+	                  _context14.next = 18;
 	                  break;
 	                }
 
-	                return _context13.abrupt("return", undefined);
+	                str = "Normalization option ".concat(type, " not available at resolution ").concat(binSize, ". Will use NONE.");
 
-	              case 14:
-	                _context13.next = 16;
+	                if (this.alert) {
+	                  this.alert(str);
+	                } else {
+	                  alert(str);
+	                }
+
+	                return _context14.abrupt("return", undefined);
+
+	              case 18:
+	                idx = normVectorIndex[key];
+	                _context14.next = 21;
 	                return this.file.read(idx.filePosition, 8);
 
-	              case 16:
-	                data = _context13.sent;
+	              case 21:
+	                data = _context14.sent;
 
 	                if (data) {
-	                  _context13.next = 19;
+	                  _context14.next = 24;
 	                  break;
 	                }
 
-	                return _context13.abrupt("return", undefined);
+	                return _context14.abrupt("return", undefined);
 
-	              case 19:
+	              case 24:
 	                parser = new BinaryParser(new DataView(data));
 	                nValues = this.version < 9 ? parser.getInt() : parser.getLong();
 	                dataType = this.version < 9 ? DOUBLE$1 : FLOAT;
 	                filePosition = this.version < 9 ? idx.filePosition + 4 : idx.filePosition + 8;
 	                nv = new NormalizationVector(this.file, filePosition, nValues, dataType);
 	                this.normVectorCache.set(key, nv);
-	                return _context13.abrupt("return", nv);
+	                return _context14.abrupt("return", nv);
 
-	              case 26:
+	              case 31:
 	              case "end":
-	                return _context13.stop();
+	                return _context14.stop();
 	            }
 	          }
-	        }, _callee13, this);
+	        }, _callee14, this);
 	      }));
 
-	      function getNormalizationVector(_x20, _x21, _x22, _x23) {
+	      function getNormalizationVector(_x24, _x25, _x26, _x27) {
 	        return _getNormalizationVector.apply(this, arguments);
 	      }
 
@@ -15592,48 +15719,48 @@
 	  }, {
 	    key: "getNormVectorIndex",
 	    value: function () {
-	      var _getNormVectorIndex = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee14() {
+	      var _getNormVectorIndex = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee15() {
 	        var url, key, nviResponse, nvi, nviArray, range;
-	        return regeneratorRuntime.wrap(function _callee14$(_context14) {
+	        return regeneratorRuntime.wrap(function _callee15$(_context15) {
 	          while (1) {
-	            switch (_context14.prev = _context14.next) {
+	            switch (_context15.prev = _context15.next) {
 	              case 0:
 	                if (!(this.version < 6)) {
-	                  _context14.next = 2;
+	                  _context15.next = 2;
 	                  break;
 	                }
 
-	                return _context14.abrupt("return", undefined);
+	                return _context15.abrupt("return", undefined);
 
 	              case 2:
 	                if (this.normVectorIndex) {
-	                  _context14.next = 29;
+	                  _context15.next = 29;
 	                  break;
 	                }
 
 	                if (!(!this.config.nvi && this.remote && this.url)) {
-	                  _context14.next = 14;
+	                  _context15.next = 14;
 	                  break;
 	                }
 
 	                url = new URL(this.url);
 	                key = encodeURIComponent(url.hostname + url.pathname);
-	                _context14.next = 8;
+	                _context15.next = 8;
 	                return crossFetch('https://t5dvc6kn3f.execute-api.us-east-1.amazonaws.com/dev/nvi/' + key);
 
 	              case 8:
-	                nviResponse = _context14.sent;
+	                nviResponse = _context15.sent;
 
 	                if (!(nviResponse.status === 200)) {
-	                  _context14.next = 14;
+	                  _context15.next = 14;
 	                  break;
 	                }
 
-	                _context14.next = 12;
+	                _context15.next = 12;
 	                return nviResponse.text();
 
 	              case 12:
-	                nvi = _context14.sent;
+	                nvi = _context15.sent;
 
 	                if (nvi) {
 	                  this.config.nvi = nvi;
@@ -15641,7 +15768,7 @@
 
 	              case 14:
 	                if (!this.config.nvi) {
-	                  _context14.next = 20;
+	                  _context15.next = 20;
 	                  break;
 	                }
 
@@ -15650,36 +15777,36 @@
 	                  start: parseInt(nviArray[0]),
 	                  size: parseInt(nviArray[1])
 	                };
-	                return _context14.abrupt("return", this.readNormVectorIndex(range));
+	                return _context15.abrupt("return", this.readNormVectorIndex(range));
 
 	              case 20:
-	                _context14.prev = 20;
-	                _context14.next = 23;
+	                _context15.prev = 20;
+	                _context15.next = 23;
 	                return this.readNormExpectedValuesAndNormVectorIndex();
 
 	              case 23:
-	                return _context14.abrupt("return", this.normVectorIndex);
+	                return _context15.abrupt("return", this.normVectorIndex);
 
 	              case 26:
-	                _context14.prev = 26;
-	                _context14.t0 = _context14["catch"](20);
+	                _context15.prev = 26;
+	                _context15.t0 = _context15["catch"](20);
 
-	                if (_context14.t0.code === "416" || _context14.t0.code === 416) {
+	                if (_context15.t0.code === "416" || _context15.t0.code === 416) {
 	                  // This is expected if file does not contain norm vectors
 	                  this.normExpectedValueVectorsPosition = undefined;
 	                } else {
-	                  console.error(_context14.t0);
+	                  console.error(_context15.t0);
 	                }
 
 	              case 29:
-	                return _context14.abrupt("return", this.normVectorIndex);
+	                return _context15.abrupt("return", this.normVectorIndex);
 
 	              case 30:
 	              case "end":
-	                return _context14.stop();
+	                return _context15.stop();
 	            }
 	          }
-	        }, _callee14, this, [[20, 26]]);
+	        }, _callee15, this, [[20, 26]]);
 	      }));
 
 	      function getNormVectorIndex() {
@@ -15691,23 +15818,23 @@
 	  }, {
 	    key: "getNormalizationOptions",
 	    value: function () {
-	      var _getNormalizationOptions = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee15() {
-	        return regeneratorRuntime.wrap(function _callee15$(_context15) {
+	      var _getNormalizationOptions = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee16() {
+	        return regeneratorRuntime.wrap(function _callee16$(_context16) {
 	          while (1) {
-	            switch (_context15.prev = _context15.next) {
+	            switch (_context16.prev = _context16.next) {
 	              case 0:
-	                _context15.next = 2;
+	                _context16.next = 2;
 	                return this.getNormVectorIndex();
 
 	              case 2:
-	                return _context15.abrupt("return", this.normalizationTypes);
+	                return _context16.abrupt("return", this.normalizationTypes);
 
 	              case 3:
 	              case "end":
-	                return _context15.stop();
+	                return _context16.stop();
 	            }
 	          }
-	        }, _callee15, this);
+	        }, _callee16, this);
 	      }));
 
 	      function getNormalizationOptions() {
@@ -15727,22 +15854,22 @@
 	  }, {
 	    key: "readNormVectorIndex",
 	    value: function () {
-	      var _readNormVectorIndex = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee16(range) {
+	      var _readNormVectorIndex = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee17(range) {
 	        var data, binaryParser, nEntries;
-	        return regeneratorRuntime.wrap(function _callee16$(_context16) {
+	        return regeneratorRuntime.wrap(function _callee17$(_context17) {
 	          while (1) {
-	            switch (_context16.prev = _context16.next) {
+	            switch (_context17.prev = _context17.next) {
 	              case 0:
-	                _context16.next = 2;
+	                _context17.next = 2;
 	                return this.init();
 
 	              case 2:
 	                this.normalizationVectorIndexRange = range;
-	                _context16.next = 5;
+	                _context17.next = 5;
 	                return this.file.read(range.start, range.size);
 
 	              case 5:
-	                data = _context16.sent;
+	                data = _context17.sent;
 	                binaryParser = new BinaryParser(new DataView(data));
 	                this.normVectorIndex = {};
 	                nEntries = binaryParser.getInt();
@@ -15751,17 +15878,17 @@
 	                  this.parseNormVectorEntry(binaryParser);
 	                }
 
-	                return _context16.abrupt("return", this.normVectorIndex);
+	                return _context17.abrupt("return", this.normVectorIndex);
 
 	              case 11:
 	              case "end":
-	                return _context16.stop();
+	                return _context17.stop();
 	            }
 	          }
-	        }, _callee16, this);
+	        }, _callee17, this);
 	      }));
 
-	      function readNormVectorIndex(_x24) {
+	      function readNormVectorIndex(_x28) {
 	        return _readNormVectorIndex.apply(this, arguments);
 	      }
 
@@ -15778,31 +15905,31 @@
 	  }, {
 	    key: "readNormExpectedValuesAndNormVectorIndex",
 	    value: function () {
-	      var _readNormExpectedValuesAndNormVectorIndex = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee18() {
+	      var _readNormExpectedValuesAndNormVectorIndex = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee19() {
 	        var nviStart, byteCount, data, binaryParser, nEntries, sizeEstimate, range, processEntries, _processEntries;
 
-	        return regeneratorRuntime.wrap(function _callee18$(_context18) {
+	        return regeneratorRuntime.wrap(function _callee19$(_context19) {
 	          while (1) {
-	            switch (_context18.prev = _context18.next) {
+	            switch (_context19.prev = _context19.next) {
 	              case 0:
 	                _processEntries = function _processEntries3() {
-	                  _processEntries = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee17(nEntries, data) {
+	                  _processEntries = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee18(nEntries, data) {
 	                    var binaryParser, _sizeEstimate, _range, _data;
 
-	                    return regeneratorRuntime.wrap(function _callee17$(_context17) {
+	                    return regeneratorRuntime.wrap(function _callee18$(_context18) {
 	                      while (1) {
-	                        switch (_context17.prev = _context17.next) {
+	                        switch (_context18.prev = _context18.next) {
 	                          case 0:
 	                            binaryParser = new BinaryParser(new DataView(data));
 
 	                          case 1:
 	                            if (!(nEntries-- > 0)) {
-	                              _context17.next = 14;
+	                              _context18.next = 14;
 	                              break;
 	                            }
 
 	                            if (!(binaryParser.available() < 100)) {
-	                              _context17.next = 11;
+	                              _context18.next = 11;
 	                              break;
 	                            }
 
@@ -15814,16 +15941,16 @@
 	                              start: nviStart + byteCount,
 	                              size: _sizeEstimate
 	                            };
-	                            _context17.next = 9;
+	                            _context18.next = 9;
 	                            return this.file.read(_range.start, _range.size);
 
 	                          case 9:
-	                            _data = _context17.sent;
-	                            return _context17.abrupt("return", processEntries.call(this, nEntries, _data));
+	                            _data = _context18.sent;
+	                            return _context18.abrupt("return", processEntries.call(this, nEntries, _data));
 
 	                          case 11:
 	                            this.parseNormVectorEntry(binaryParser);
-	                            _context17.next = 1;
+	                            _context18.next = 1;
 	                            break;
 
 	                          case 14:
@@ -15831,48 +15958,48 @@
 
 	                          case 15:
 	                          case "end":
-	                            return _context17.stop();
+	                            return _context18.stop();
 	                        }
 	                      }
-	                    }, _callee17, this);
+	                    }, _callee18, this);
 	                  }));
 	                  return _processEntries.apply(this, arguments);
 	                };
 
-	                processEntries = function _processEntries2(_x25, _x26) {
+	                processEntries = function _processEntries2(_x29, _x30) {
 	                  return _processEntries.apply(this, arguments);
 	                };
 
-	                _context18.next = 4;
+	                _context19.next = 4;
 	                return this.init();
 
 	              case 4:
 	                if (!(this.normExpectedValueVectorsPosition === undefined)) {
-	                  _context18.next = 6;
+	                  _context19.next = 6;
 	                  break;
 	                }
 
-	                return _context18.abrupt("return");
+	                return _context19.abrupt("return");
 
 	              case 6:
-	                _context18.next = 8;
+	                _context19.next = 8;
 	                return this.skipExpectedValues(this.normExpectedValueVectorsPosition);
 
 	              case 8:
-	                nviStart = _context18.sent;
+	                nviStart = _context19.sent;
 	                byteCount = INT;
-	                _context18.next = 12;
+	                _context19.next = 12;
 	                return this.file.read(nviStart, INT);
 
 	              case 12:
-	                data = _context18.sent;
+	                data = _context19.sent;
 
 	                if (!(data.byteLength === 0)) {
-	                  _context18.next = 15;
+	                  _context19.next = 15;
 	                  break;
 	                }
 
-	                return _context18.abrupt("return");
+	                return _context19.abrupt("return");
 
 	              case 15:
 	                binaryParser = new BinaryParser(new DataView(data));
@@ -15882,15 +16009,15 @@
 	                  start: nviStart + byteCount,
 	                  size: sizeEstimate
 	                };
-	                _context18.next = 21;
+	                _context19.next = 21;
 	                return this.file.read(range.start, range.size);
 
 	              case 21:
-	                data = _context18.sent;
+	                data = _context19.sent;
 	                this.normalizedExpectedValueVectors = {};
 	                this.normVectorIndex = {}; // Recursively process entries
 
-	                _context18.next = 26;
+	                _context19.next = 26;
 	                return processEntries.call(this, nEntries, data);
 
 	              case 26:
@@ -15898,10 +16025,10 @@
 
 	              case 27:
 	              case "end":
-	                return _context18.stop();
+	                return _context19.stop();
 	            }
 	          }
-	        }, _callee18, this);
+	        }, _callee19, this);
 	      }));
 
 	      function readNormExpectedValuesAndNormVectorIndex() {
@@ -15921,19 +16048,19 @@
 	  }, {
 	    key: "skipExpectedValues",
 	    value: function () {
-	      var _skipExpectedValues = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee20(start) {
+	      var _skipExpectedValues = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee21(start) {
 	        var version, file, range, data, binaryParser, nEntries, parseNext, _parseNext;
 
-	        return regeneratorRuntime.wrap(function _callee20$(_context20) {
+	        return regeneratorRuntime.wrap(function _callee21$(_context21) {
 	          while (1) {
-	            switch (_context20.prev = _context20.next) {
+	            switch (_context21.prev = _context21.next) {
 	              case 0:
 	                _parseNext = function _parseNext3() {
-	                  _parseNext = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee19(start, nEntries) {
+	                  _parseNext = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee20(start, nEntries) {
 	                    var range, chunkSize, p0, data, binaryParser, type, unit, binSize, nValues, nChrScaleFactors;
-	                    return regeneratorRuntime.wrap(function _callee19$(_context19) {
+	                    return regeneratorRuntime.wrap(function _callee20$(_context20) {
 	                      while (1) {
-	                        switch (_context19.prev = _context19.next) {
+	                        switch (_context20.prev = _context20.next) {
 	                          case 0:
 	                            range = {
 	                              start: start,
@@ -15941,11 +16068,11 @@
 	                            };
 	                            chunkSize = 0;
 	                            p0 = start;
-	                            _context19.next = 5;
+	                            _context20.next = 5;
 	                            return file.read(range.start, range.size);
 
 	                          case 5:
-	                            data = _context19.sent;
+	                            data = _context20.sent;
 	                            binaryParser = new BinaryParser(new DataView(data));
 	                            type = binaryParser.getString(); // type
 
@@ -15959,37 +16086,37 @@
 	                              start: start + chunkSize,
 	                              size: INT
 	                            };
-	                            _context19.next = 15;
+	                            _context20.next = 15;
 	                            return file.read(range.start, range.size);
 
 	                          case 15:
-	                            data = _context19.sent;
+	                            data = _context20.sent;
 	                            binaryParser = new BinaryParser(new DataView(data));
 	                            nChrScaleFactors = binaryParser.getInt();
 	                            chunkSize += INT + nChrScaleFactors * (INT + (version < 9 ? DOUBLE$1 : FLOAT));
 	                            nEntries--;
 
 	                            if (!(nEntries === 0)) {
-	                              _context19.next = 24;
+	                              _context20.next = 24;
 	                              break;
 	                            }
 
-	                            return _context19.abrupt("return", p0 + chunkSize);
+	                            return _context20.abrupt("return", p0 + chunkSize);
 
 	                          case 24:
-	                            return _context19.abrupt("return", parseNext(p0 + chunkSize, nEntries));
+	                            return _context20.abrupt("return", parseNext(p0 + chunkSize, nEntries));
 
 	                          case 25:
 	                          case "end":
-	                            return _context19.stop();
+	                            return _context20.stop();
 	                        }
 	                      }
-	                    }, _callee19);
+	                    }, _callee20);
 	                  }));
 	                  return _parseNext.apply(this, arguments);
 	                };
 
-	                parseNext = function _parseNext2(_x28, _x29) {
+	                parseNext = function _parseNext2(_x32, _x33) {
 	                  return _parseNext.apply(this, arguments);
 	                };
 
@@ -16002,33 +16129,33 @@
 	                  start: start,
 	                  size: INT
 	                };
-	                _context20.next = 7;
+	                _context21.next = 7;
 	                return file.read(range.start, range.size);
 
 	              case 7:
-	                data = _context20.sent;
+	                data = _context21.sent;
 	                binaryParser = new BinaryParser(new DataView(data));
 	                nEntries = binaryParser.getInt(); // Total # of expected value chunks
 
 	                if (!(nEntries === 0)) {
-	                  _context20.next = 14;
+	                  _context21.next = 14;
 	                  break;
 	                }
 
-	                return _context20.abrupt("return", start + INT);
+	                return _context21.abrupt("return", start + INT);
 
 	              case 14:
-	                return _context20.abrupt("return", parseNext(start + INT, nEntries));
+	                return _context21.abrupt("return", parseNext(start + INT, nEntries));
 
 	              case 15:
 	              case "end":
-	                return _context20.stop();
+	                return _context21.stop();
 	            }
 	          }
-	        }, _callee20, this);
+	        }, _callee21, this);
 	      }));
 
-	      function skipExpectedValues(_x27) {
+	      function skipExpectedValues(_x31) {
 	        return _skipExpectedValues.apply(this, arguments);
 	      }
 
