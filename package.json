@@ -1,6 +1,6 @@
 {
   "name": "hic-straw",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "description": "Utilities for reading .files (contact matrix files)",
   "main": "dist/hic-straw.js",
   "module": "dist/hic-straw.esm.js",
@@ -10,6 +10,7 @@
     "cli.js"
   ],
   "scripts": {
+    "prepare": "npm run build",
     "build": "npx del-cli dist && npx rollup --config",
     "test": "mocha -u tdd -r esm",
     "prepack": "npm run build",
