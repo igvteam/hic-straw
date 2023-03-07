@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import BufferedFile from '../src/io/bufferedFile.js';
-import LocalFile from '../src/io/nodeLocalFile.js';
+import LocalFile from '../src/io/nodeLocalFile.mjs';
 import RemoteFile from '../src/io/remoteFile.js';
 
 

@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 
 import HicFile from '../src/hicFile.js'
-import NodeLocalFile from '../src/io/nodeLocalFile.js'
+import NodeLocalFile from '../src/io/nodeLocalFile.mjs'
 import Straw from "../src/index.js"
 
 suite('HicFile-2', function () {

@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import NodeLocalFile from '../src/io/nodeLocalFile.js'
+import NodeLocalFile from '../src/io/nodeLocalFile.mjs'
 
 const range = {start: 25, size: 100};
 

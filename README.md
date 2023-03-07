@@ -29,7 +29,7 @@ Arguments
 ## Examples
 
 
-### In a web page
+### Browser usage
 
 Script tag - see examples/straw.html
 
@@ -81,17 +81,35 @@ ES6 module - see examples/straw-es6.html
 
 `
 
-### In a node script
+### Node
 
-See ```examples/script-es6.js``` and ```examples/script-cjs.js```. 
+The hic-straw distributions are built for browser usagae, but can be used in Node with shims.
 
-** Usage (run from the examples directory)
+**local file**
 
-* ```node -r esm examples/script-es6.js```
+To use hic-straw with a local file use the NodeLocalFile class as follows
 
-* ```node examples/script.js```
+```
+import NodeLocalFile from "src/io/nodeLocalFile.mjs"
+const path = "test/data/test_chr22.hic"
+const nodeLocalFile = new NodeLocalFile({path})
+const straw = new Straw({file: nodeLocalFile})
+```
 
-      
+**remote file**
+
+For remote file access define a global `fetch` function
+
+```javascript
+global.fetch = require("node-fetch")
+const url = "https://foo.bar/test.hic"
+const straw = new Straw({url: url})
+```
+
+
+See ```examples/script-es6.js``` and ```examples/script-cjs.js```  for complete examples. 
+
+   
 ### Command line
 
 Note: "straw" is installed in node_modules/.bin/straw.  This should be added to the path automatically upon installing
