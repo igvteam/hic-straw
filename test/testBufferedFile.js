@@ -1,14 +1,14 @@
 import { assert } from 'chai';
-import BufferedFile from '../src/io/bufferedFile';
-import LocalFile from '../src/io/nodeLocalFile';
-import RemoteFile from '../src/io/remoteFile';
+import BufferedFile from '../src/io/bufferedFile.js';
+import LocalFile from '../src/io/nodeLocalFile.js';
+import RemoteFile from '../src/io/remoteFile.js';
 
 
 suite('BufferedFile', function () {
 
     test('test local file', async function () {
 
-        const path = require.resolve("./data/BufferedReaderTest.bin")
+        const path = "test/data/BufferedReaderTest.bin"
 
         const file = new BufferedFile({file: new LocalFile({path: path}), size: 50})
 

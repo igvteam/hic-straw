@@ -8,7 +8,7 @@ suite('NodeLocalFile', function () {
 
     test('test read range', async function () {
 
-        const path = require.resolve("./data/BufferedReaderTest.bin")
+        const path = "test/data/BufferedReaderTest.bin"
 
         const file = new NodeLocalFile({path: path})
         const arrayBuffer = await file.read(range.start, range.size)

@@ -1,9 +1,10 @@
 {
   "name": "hic-straw",
-  "version": "2.0.6",
+  "version": "2.1.0",
   "description": "Utilities for reading .files (contact matrix files)",
   "main": "dist/hic-straw.js",
   "module": "dist/hic-straw.esm.js",
+  "type": "module",
   "files": [
     "dist/**",
     "src/**",
@@ -12,7 +13,7 @@
   "scripts": {
     "prepare": "npm run build",
     "build": "npx del-cli dist && npx rollup --config",
-    "test": "mocha -u tdd -r esm",
+    "test": "mocha -ui tdd",
     "prepack": "npm run build",
     "fix-mocha": "npx uni -D mocha && npx i -D mocha"
   },
@@ -30,8 +31,7 @@
     "chai": "^4.2.0",
     "core-js": "^3.25.0",
     "del-cli": "^3.0.1",
-    "esm": "^3.2.25",
-    "mocha": "^6.2.3",
+    "mocha": "^10.2.0",
     "node-fetch": "^2.6.0",
     "regenerator-runtime": "^0.13.7",
     "rollup": "^2.79.0",

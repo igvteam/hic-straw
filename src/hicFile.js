@@ -1,7 +1,6 @@
 import Zlib from "./vendor/zlib_and_gzip.js"
-import crossFetch from "./io/crossFetch.js"
 import BrowserLocalFile from './io/browserLocalFile.js';
-import NodeLocalFile from "./io/nodeLocalFile.js";
+//import NodeLocalFile from "./io/nodeLocalFile.js";
 import RemoteFile from './io/remoteFile.js';
 import ThrottledFile from './io/throttledFile.js';
 import RateLimiter from './io/rateLimiter.js';
@@ -56,7 +55,7 @@ class HicFile {
             }
         } else if (args.path) {
             // path argument, assumed local file
-            this.file = new NodeLocalFile({path: args.path})
+            //this.file = new NodeLocalFile({path: args.path})
 
         } else {
             throw Error("Arguments must include file, blob, url, or path")
@@ -636,7 +635,7 @@ class HicFile {
             if (!this.config.nvi && this.remote && this.url) {
                 const url = new URL(this.url)
                 const key = encodeURIComponent(url.hostname + url.pathname)
-                const nviResponse = await crossFetch('https://t5dvc6kn3f.execute-api.us-east-1.amazonaws.com/dev/nvi/' + key)
+                const nviResponse = await fetch('https://t5dvc6kn3f.execute-api.us-east-1.amazonaws.com/dev/nvi/' + key)
                 if (nviResponse.status === 200) {
                     const nvi = await nviResponse.text()
                     if (nvi) {

@@ -1,14 +1,14 @@
 import { assert } from 'chai';
 
-import HicFile from '../src/hicFile'
-import NodeLocalFile from '../src/io/nodeLocalFile'
+import HicFile from '../src/hicFile.js'
+import NodeLocalFile from '../src/io/nodeLocalFile.js'
 
 suite('HicFile', function () {
 
     test('local file read header', async function () {
 
         const file = new NodeLocalFile({
-            "path": require.resolve("./data/test_chr22.hic"),
+            "path": "test/data/test_chr22.hic",
         })
         const hicFile = new HicFile({file: file})
 
@@ -19,7 +19,7 @@ suite('HicFile', function () {
     test('local file read matrix', async function () {
 
         const file = new NodeLocalFile({
-            "path": require.resolve("./data/test_chr22.hic"),
+            "path": "test/data/test_chr22.hic",
         })
         const hicFile = new HicFile({file: file})
         const matrix = await hicFile.getMatrix(22, 22)
@@ -30,7 +30,7 @@ suite('HicFile', function () {
     test('local file read norm vector index', async function () {
 
         const file = new NodeLocalFile({
-            "path": require.resolve("./data/test_chr22.hic"),
+            "path": "test/data/test_chr22.hic"
         })
         const hicFile = new HicFile({file: file})
 
@@ -44,7 +44,7 @@ suite('HicFile', function () {
     test('local file read norm vector', async function () {
 
         const file = new NodeLocalFile({
-            "path": require.resolve("./data/test_chr22.hic"),
+            "path": "test/data/test_chr22.hic",
         })
         const hicFile = new HicFile({file: file})
 

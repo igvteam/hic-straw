@@ -1,13 +1,13 @@
 import { assert } from 'chai';
 
-import HicFile from '../src/hicFile'
-import NodeLocalFile from '../src/io/nodeLocalFile'
-import Straw from "../src"
+import HicFile from '../src/hicFile.js'
+import NodeLocalFile from '../src/io/nodeLocalFile.js'
+import Straw from "../src/index.js"
 
 suite('HicFile-2', function () {
 
     const file = new NodeLocalFile({
-        "path": require.resolve("./data/testFiles/testBp.hic"),
+        "path": "test/data/testFiles/testBp.hic",
     })
 
     test('read header and footer', async function () {
