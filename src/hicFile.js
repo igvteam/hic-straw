@@ -1,6 +1,5 @@
 import Zlib from "./vendor/zlib_and_gzip.js"
 import BrowserLocalFile from './io/browserLocalFile.js';
-//import NodeLocalFile from "./io/nodeLocalFile.js";
 import RemoteFile from './io/remoteFile.js';
 import ThrottledFile from './io/throttledFile.js';
 import RateLimiter from './io/rateLimiter.js';
@@ -55,8 +54,7 @@ class HicFile {
             }
         } else if (args.path) {
             // path argument, assumed local file
-            //this.file = new NodeLocalFile({path: args.path})
-
+            throw Error(`path property is deprecated, use NodeLocalFile`)
         } else {
             throw Error("Arguments must include file, blob, url, or path")
         }

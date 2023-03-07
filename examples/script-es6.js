@@ -3,8 +3,12 @@
 // see https://www.npmjs.com/package/esm
 
 import Straw from "../dist/hic-straw_es6.js";
+import NodeLocalFile from "../src/io/nodeLocalFile.mjs"
+
+
 const path = "../test/data/test_chr22.hic";
-const straw = new Straw({path: path});
+const nodeLocalFile = new NodeLocalFile({path})
+const straw = new Straw({file: nodeLocalFile});
 
 // Get  metadata
 straw.getMetaData()

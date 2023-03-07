@@ -1,9 +1,13 @@
 #!/usr/bin/env node
+import NodeLocalFile from "./src/io/nodeLocalFile.mjs"
 const Straw = require("./dist/hic-straw.js");
 
 const [, , ...args] = process.argv
 const usageString = "Usage: $straw normalization hicfile region1 region2 units resolution"
 const a = prepArgs(args)
+
+// Straw expects a global "fetch" object.  Patch for Node
+global.fetch = require("node-fetch")
 
 if (a.options.has("--meta") && a.positional.length === 1) {
     printMetaData(a.positional[0])
@@ -122,7 +126,8 @@ function getStraw(filepath) {
     if(filepath.startsWith("http://") || filepath.startsWith("https://")) {
         return new Straw({url: filepath});
     } else {
-        return new Straw({path: filepath})
+        const nodeLocalFile = new NodeLocalFile({path: filepath})
+        return new Straw({file: nodeLocalFile})
     }
 }
 

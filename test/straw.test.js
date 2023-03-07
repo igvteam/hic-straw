@@ -1,6 +1,6 @@
 import {assert} from 'chai';
 import Straw from '../src/straw.js';
-import NodeLocalFile from '../src/io/nodeLocalFile.js';
+import NodeLocalFile from '../src/io/nodeLocalFile.mjs';
 
 suite('Straw', function () {
 

@@ -1,5 +1,10 @@
 #!/usr/bin/env node
 
+
+// Straw expects a global "fetch" object.  Patch for Node
+global.fetch = require("node-fetch")
+
+
 const Straw = require("../dist/hic-straw.js");
 
 // Local file  -- must use CJS NodeLocalFile explicitly
