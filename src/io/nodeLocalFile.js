@@ -1,15 +1,8 @@
-const isNode = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
+import * as util from "util"
+import * as fs from "fs"
 
-let fs;
-let fsOpen;
-let fsRead;
-
-if (isNode) {
-    const util = require('util');
-    fs = require('fs');
-    fsOpen = fs && util.promisify(fs.open)
-    fsRead = fs && util.promisify(fs.read)
-}
+let fsOpen =util.promisify(fs.open)
+let fsRead =util.promisify(fs.read)
 
 class NodeLocalFile {
 

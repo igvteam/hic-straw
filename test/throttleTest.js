@@ -1,7 +1,7 @@
 import { assert } from 'chai';
-import RemoteFile from '../src/io/remoteFile';
-import ThrottledFile from '../src/io/throttledFile';
-import RateLimiter from '../src/io/rateLimiter';
+import RemoteFile from '../src/io/remoteFile.js';
+import ThrottledFile from '../src/io/throttledFile.js';
+import RateLimiter from '../src/io/rateLimiter.js';
 
 
 suite('ThrottledFile', function () {

@@ -1,14 +1,13 @@
 import {assert} from 'chai';
-import Straw from '../src/straw';
-import NodeLocalFile from '../src/io/nodeLocalFile';
-import RemoteFile from "../src/io/remoteFile.js";
+import Straw from '../src/straw.js';
+import NodeLocalFile from '../src/io/nodeLocalFile.js';
 
 suite('Straw', function () {
 
     test('local file meta data', async function () {
 
         const file = new NodeLocalFile({
-            "path": require.resolve("./data/test_chr22.hic")
+            "path": "test/data/test_chr22.hic"
         })
         const straw = new Straw({file: file})
 
@@ -24,7 +23,7 @@ suite('Straw', function () {
     test('local file norm vector options', async function () {
 
         const file = new NodeLocalFile({
-            "path": require.resolve("./data/test_chr22.hic")
+            "path": "test/data/test_chr22.hic"
         })
         const straw = new Straw({file: file})
 
@@ -36,7 +35,7 @@ suite('Straw', function () {
     test('local file nvi', async function () {
 
         const file = new NodeLocalFile({
-            "path": require.resolve("./data/test_chr22.hic")
+            "path": "test/data/test_chr22.hic"
         })
         const straw = new Straw({file: file})
 
@@ -47,7 +46,7 @@ suite('Straw', function () {
     test('local file contact records', async function () {
 
         const file = new NodeLocalFile({
-            "path": require.resolve("./data/test_chr22.hic")
+            "path": "test/data/test_chr22.hic"
         })
         const straw = new Straw({file: file})
 
@@ -66,7 +65,7 @@ suite('Straw', function () {
     test('local file contact records - with NVI', async function () {
 
         const file = new NodeLocalFile({
-            "path": require.resolve("./data/test_chr22.hic")
+            "path": "test/data/test_chr22.hic"
         })
         const straw = new Straw({file: file})
 
