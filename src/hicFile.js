@@ -9,6 +9,7 @@ import Matrix from './matrix.js';
 import ContactRecord from './contactRecord.js';
 import LRU from './lru.js';
 import NormalizationVector from "./normalizationVector.js";
+import nvi from './nvi.js'
 
 const isNode = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
 const Short_MIN_VALUE = -32768;
@@ -633,12 +634,8 @@ class HicFile {
             if (!this.config.nvi && this.remote && this.url) {
                 const url = new URL(this.url)
                 const key = encodeURIComponent(url.hostname + url.pathname)
-                const nviResponse = await fetch('https://t5dvc6kn3f.execute-api.us-east-1.amazonaws.com/dev/nvi/' + key)
-                if (nviResponse.status === 200) {
-                    const nvi = await nviResponse.text()
-                    if (nvi) {
-                        this.config.nvi = nvi
-                    }
+                if(nvi.hasOwnProperty(key)) {
+                    this.config.nvi = nvi[key]
                 }
             }
 
