@@ -16,7 +16,7 @@ class RemoteFile {
         headers['Range'] = rangeString
 
         let url = this.url.slice()    // slice => copy
-        headers['User-Agent'] = 'straw'
+        // headers['User-Agent'] = 'straw'
         if (this.config.oauthToken) {
             const token = resolveToken(this.config.oauthToken)
             headers['Authorization'] = `Bearer ${token}`
