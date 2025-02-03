@@ -1,13 +1,15 @@
 #!/usr/bin/env node
 import NodeLocalFile from "./src/io/nodeLocalFile.mjs"
-const Straw = require("./dist/hic-straw.js");
+import Straw  from "./dist/hic-straw.esm.js"
+import fetch from "node-fetch"
+
 
 const [, , ...args] = process.argv
 const usageString = "Usage: $straw normalization hicfile region1 region2 units resolution"
 const a = prepArgs(args)
 
 // Straw expects a global "fetch" object.  Patch for Node
-global.fetch = require("node-fetch")
+global.fetch = fetch
 
 if (a.options.has("--meta") && a.positional.length === 1) {
     printMetaData(a.positional[0])
@@ -32,7 +34,7 @@ function prepArgs(args) {
         options: new Set(),
         positional: []
     }
-    for (arg of args) {
+    for (let arg of args) {
         if (arg.startsWith("-")) {
             a.options.add(arg)
         } else {
